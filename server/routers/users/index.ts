@@ -1,8 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import z from "zod";
 import { getHowlsForUser } from "@/db/queries/howls";
-import { getUserById } from "@/db/queries/users";
+import { getFollowersForUser, getUserById } from "@/db/queries/users";
 import { getUserByIdSchema } from "./schema";
 
 const usersRouter = new Hono();
@@ -23,6 +22,16 @@ usersRouter.get(
     const { id } = c.req.valid("param");
     const howls = await getHowlsForUser(id);
     return c.json(howls);
+  },
+);
+
+usersRouter.get(
+  "/:id/followers",
+  zValidator("param", getUserByIdSchema),
+  async (c) => {
+    const { id } = c.req.valid("param");
+    const followers = await getFollowersForUser(id);
+    return c.json(followers);
   },
 );
 

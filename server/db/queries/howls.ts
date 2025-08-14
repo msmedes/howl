@@ -1,6 +1,6 @@
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { howls } from "@/db/schema";
+import { howls, howlThreads} from "@/db/schema";
 
 export const getHowls = async () => {
   const howls = await db.query.howls.findMany({
@@ -8,8 +8,6 @@ export const getHowls = async () => {
       user: {
         columns: {
           id: true,
-          username: true,
-          bio: true,
         },
       },
     },
@@ -43,4 +41,25 @@ export const getHowlById = async (id: string) => {
     },
   });
   return howl;
+};
+
+export const createHowlThread = async (content: string, userId: string) => {
+  const insertedThread = await db.insert(howlThreads).values({ userId }).returning({id: howlThreads.id});
+  await db.insert(howls).values({ content, userId, threadId: insertedThread[0].id });
+  const threadWithHowls = await db.query.howlThreads.findFirst({
+    where: eq(howlThreads.id, insertedThread[0].id),
+    with: {
+      howls: true,
+    },
+  });
+  return threadWithHowls;
+};
+
+export const getHowlThreads = async () => {
+  const threads = await db.query.howlThreads.findMany({
+    with: {
+      howls: true,
+    },
+  });
+  return threads;
 };

@@ -1,30 +1,29 @@
 {
 	"name": "howl",
+	"private": true,
+	"workspaces": [
+		"server",
+		"frontend"
+	],
 	"scripts": {
-		"dev": "bun run --watch src/index.ts",
-		"start": "bun run src/index.ts",
+		"dev": "concurrently \"bun run server:dev\" \"bun run frontend:dev\"",
+		"server:dev": "cd server && bun run dev",
+		"frontend:dev": "cd frontend && bun run dev",
+		"server:start": "cd server && bun run start",
+		"frontend:build": "cd frontend && bun run build",
+		"frontend:start": "cd frontend && bun run start",
 		"db:start": "docker run --name drizzle-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mypassword -d -p 5433:5432 postgres",
 		"db:stop": "docker stop drizzle-postgres && docker rm drizzle-postgres",
 		"db:restart": "bun run db:stop && bun run db:start",
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio",
-		"test": "vitest"
-	},
-	"dependencies": {
-		"@hono/zod-validator": "^0.7.2",
-		"dotenv": "^17.2.1",
-		"drizzle-orm": "^0.44.4",
-		"hono": "^4.9.1",
-		"nanoid": "^5.1.5",
-		"pg": "^8.16.3"
+		"db:generate": "cd server && bun run db:generate",
+		"db:migrate": "cd server && bun run db:migrate",
+		"db:studio": "cd server && bun run db:studio",
+		"install:all": "bun install && cd server && bun install && cd ../frontend && bun install",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.1.4",
-		"@types/bun": "latest",
-		"@types/pg": "^8.15.5",
-		"drizzle-kit": "^0.31.4",
-		"tsx": "^4.20.4",
-		"vitest": "^3.2.4"
+		"concurrently": "^8.2.2"
 	}
 }
