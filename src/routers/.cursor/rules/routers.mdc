@@ -1,0 +1,19 @@
+---
+description: This rule is for the usage of Hono in the codebase
+alwaysApply: false
+---
+
+# Router Structure
+
+The routers are structured in the `src/routers` directory.  Each router is a file that exports a Hono router.  The router is then mounted in the `src/app.ts` file.
+
+# Router Files
+
+Each router file should be named after the resource it is for.  For example, the `users.ts` file should be for the `users` resource.
+
+# Router Functions
+
+For now we are going to write the database queries directly in the router files.
+
+# Validation
+We must *always* validate the request parameters and body using Zod.  We should use the `zValidator` function to do this.

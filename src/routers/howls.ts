@@ -12,7 +12,8 @@ howlsRouter.get('/', async (c) => {
       user: {
         columns: {
           id: true,
-          name: true,
+          username: true,
+          bio: true,
         },
       },
     },
