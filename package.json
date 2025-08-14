@@ -1,0 +1,30 @@
+{
+	"name": "howl",
+	"scripts": {
+		"dev": "bun run --watch src/index.ts",
+		"start": "bun run src/index.ts",
+		"db:start": "docker run --name drizzle-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mypassword -d -p 5433:5432 postgres",
+		"db:stop": "docker stop drizzle-postgres && docker rm drizzle-postgres",
+		"db:restart": "bun run db:stop && bun run db:start",
+		"db:generate": "drizzle-kit generate",
+		"db:migrate": "drizzle-kit migrate",
+		"db:studio": "drizzle-kit studio",
+		"test": "vitest"
+	},
+	"dependencies": {
+		"@hono/zod-validator": "^0.7.2",
+		"dotenv": "^17.2.1",
+		"drizzle-orm": "^0.44.4",
+		"hono": "^4.9.1",
+		"nanoid": "^5.1.5",
+		"pg": "^8.16.3"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "^2.1.4",
+		"@types/bun": "latest",
+		"@types/pg": "^8.15.5",
+		"drizzle-kit": "^0.31.4",
+		"tsx": "^4.20.4",
+		"vitest": "^3.2.4"
+	}
+}
