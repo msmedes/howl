@@ -4,12 +4,17 @@ import { nanoid } from "nanoid";
 
 const timestamps = {
   createdAt: timestamp().notNull().defaultNow(),
-  updatedAt: timestamp().notNull().defaultNow().$onUpdate(() => sql`CURRENT_TIMESTAMP`),
-}
+  updatedAt: timestamp()
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+};
 
 const ids = {
-  id: varchar({ length: 21 }).primaryKey().$defaultFn(() => nanoid()),
-}
+  id: varchar({ length: 21 })
+    .primaryKey()
+    .$defaultFn(() => nanoid()),
+};
 
 export const users = pgTable("users", {
   ...ids,

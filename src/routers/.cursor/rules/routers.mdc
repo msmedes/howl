@@ -16,4 +16,4 @@ Each router file should be named after the resource it is for.  For example, the
 For now we are going to write the database queries directly in the router files.
 
 # Validation
-We must *always* validate the request parameters and body using Zod.  We should use the `zValidator` function to do this.
+We must *always* validate the request parameters and body using Zod.  We should use the `zValidator` function to do this.  `id` parameters should be validated using the `z.nanoid()` function.

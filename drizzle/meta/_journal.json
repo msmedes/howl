@@ -15,6 +15,13 @@
       "when": 1755145602863,
       "tag": "0001_flat_iron_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1755192959717,
+      "tag": "0002_blue_gwen_stacy",
+      "breakpoints": true
     }
   ]
 }
