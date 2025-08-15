@@ -10,10 +10,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
 import * as React from 'react'
 import type { QueryClient } from '@tanstack/react-query'
-import { DefaultCatchBoundary } from '~/components/DefaultCatchBoundary'
-import { NotFound } from '~/components/NotFound'
-import appCss from '~/styles/app.css?url'
-import { seo } from '~/utils/seo'
+import { DefaultCatchBoundary } from '@/components/DefaultCatchBoundary'
+import { NotFound } from '@/components/NotFound'
+import appCss from '@/styles/app.css?url'
+import { seo } from '@/utils/seo'
 
 export const Route = createRootRouteWithContext<{
   queryClient: QueryClient
@@ -84,6 +84,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       <body>
         <div className="p-2 flex gap-2 text-lg">
           <Link
+            to="/howls"
+            activeProps={{
+              className: 'font-bold',
+            }}
+          >
+            Howls
+          </Link>{' '}
+          <Link
             to="/"
             activeProps={{
               className: 'font-bold',
@@ -107,14 +115,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
             }}
           >
             Users
-          </Link>{' '}
-          <Link
-            to="/deferred"
-            activeProps={{
-              className: 'font-bold',
-            }}
-          >
-            Deferred
           </Link>{' '}
           <Link
             // @ts-expect-error

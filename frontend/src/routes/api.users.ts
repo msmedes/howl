@@ -1,7 +1,7 @@
 import { json } from '@tanstack/react-start'
 import { createServerFileRoute } from '@tanstack/react-start/server'
 import axios from 'redaxios'
-import type { User } from '../utils/users'
+import type { User } from '@/utils/users'
 
 export const ServerRoute = createServerFileRoute('/api/users').methods({
   GET: async ({ request }) => {
