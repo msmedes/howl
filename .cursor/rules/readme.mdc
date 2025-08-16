@@ -1,0 +1,7 @@
+---
+description: This rule is for syncing and updating readmes in the codebase
+alwaysApply: false
+---
+If you are modifying the readme file, put something at the top of the file to indicate it is AI generated and may be inaccurate.
+
+If the readme file is not up to date, update it.
