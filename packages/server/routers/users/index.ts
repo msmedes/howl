@@ -4,35 +4,32 @@ import { getFollowersForUser, getUserById } from "@howl/db/queries/users";
 import { Hono } from "hono";
 import { getUserByIdSchema } from "./schema";
 
-const usersRouter = new Hono();
-
-usersRouter.get("/:id", zValidator("param", getUserByIdSchema), async (c) => {
-	const { id } = c.req.valid("param");
-	const user = await getUserById(id);
-	if (!user) {
-		return c.json({ error: "User not found" }, 404);
-	}
-	return c.json(user);
-});
-
-usersRouter.get(
-	"/:id/howls",
-	zValidator("param", getUserByIdSchema),
-	async (c) => {
+const usersRouter = new Hono()
+	.get("/:id", zValidator("param", getUserByIdSchema), async (c) => {
 		const { id } = c.req.valid("param");
-		const howls = await getHowlsForUser(id);
+		const user = await getUserById(id);
+		if (!user) {
+			return c.json({ error: "User not found" }, 404);
+		}
+		return c.json(user);
+	})
+	.get("/:id/howls", zValidator("param", getUserByIdSchema), async (c) => {
+		const { id } = c.req.valid("param");
+		const user = await getUserById(id);
+		if (!user) {
+			return c.json({ error: "User not found" }, 404);
+		}
+		const howls = await getHowlsForUser(user);
 		return c.json(howls);
-	},
-);
-
-usersRouter.get(
-	"/:id/followers",
-	zValidator("param", getUserByIdSchema),
-	async (c) => {
+	})
+	.get("/:id/followers", zValidator("param", getUserByIdSchema), async (c) => {
 		const { id } = c.req.valid("param");
-		const followers = await getFollowersForUser(id);
+		const user = await getUserById(id);
+		if (!user) {
+			return c.json({ error: "User not found" }, 404);
+		}
+		const followers = await getFollowersForUser(user);
 		return c.json(followers);
-	},
-);
+	});
 
 export default usersRouter;

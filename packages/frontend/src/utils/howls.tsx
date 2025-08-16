@@ -1,11 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
-import client from "@/utils/client";
+import api from "@/utils/client";
 
 export const howlsQueryOptions = () =>
 	queryOptions({
 		queryKey: ["howls"],
 		queryFn: async () => {
-			const res = await client.v1.howls.$get();
+			const res = await api.howls;
 			return res.json();
 		},
 	});

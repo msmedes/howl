@@ -1,6 +1,6 @@
 import { and, eq } from "drizzle-orm";
 import { db } from "../index";
-import { follows, users } from "../schema";
+import { follows, type User, users } from "../schema";
 
 export const getUserById = async (id: string) => {
 	const user = await db.query.users.findFirst({
@@ -9,9 +9,9 @@ export const getUserById = async (id: string) => {
 	return user;
 };
 
-export const getFollowersForUser = async (userId: string) => {
+export const getFollowersForUser = async (user: User) => {
 	const followers = await db.query.follows.findMany({
-		where: eq(follows.followingId, userId),
+		where: eq(follows.followingId, user.id),
 		with: {
 			follower: {
 				columns: {

@@ -20,9 +20,9 @@ export const createHowl = async (content: string, userId: string) => {
 	return howl;
 };
 
-export const getHowlsForUser = async (userId: string) => {
+export const getHowlsForUser = async (user: User) => {
 	const howlsForUser = await db.query.howls.findMany({
-		where: eq(howls.userId, userId),
+		where: eq(howls.userId, user.id),
 	});
 	return howlsForUser;
 };
