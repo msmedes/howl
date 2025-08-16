@@ -1,26 +1,32 @@
 {
-  "name": "@howl/server",
-  "private": true,
-  "type": "module",
-  "scripts": {
-    "dev": "bun run --watch index.ts",
-    "start": "bun run index.ts",
-    "build": "tsc",
-    "lint": "biome check .",
-    "lint:fix": "biome check . --write"
-  },
-  "dependencies": {
-    "dotenv": "^17.2.1",
-    "drizzle-orm": "^0.44.4",
-    "hono": "^4.9.1",
-    "nanoid": "^5.1.5",
-    "pg": "^8.16.3",
-    "zod": "^4.0.17"
-  },
-  "devDependencies": {
-    "@types/bun": "latest",
-    "@types/pg": "^8.15.5",
-    "drizzle-kit": "^0.31.4",
-    "typescript": "^5.7.2"
-  }
+	"name": "@howl/server",
+	"private": true,
+	"type": "module",
+	"types": "./types.ts",
+	"exports": {
+		".": "./index.ts",
+		"./types": "./types.ts"
+	},
+	"scripts": {
+		"dev": "bun run --watch index.ts",
+		"start": "bun run index.ts",
+		"build": "tsc",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write"
+	},
+	"dependencies": {
+		"@howl/db": "workspace:*",
+		"dotenv": "^17.2.1",
+		"drizzle-orm": "^0.44.4",
+		"hono": "^4.9.1",
+		"nanoid": "^5.1.5",
+		"pg": "^8.16.3",
+		"zod": "^4.0.17"
+	},
+	"devDependencies": {
+		"@types/bun": "latest",
+		"@types/pg": "^8.15.5",
+		"drizzle-kit": "^0.31.4",
+		"typescript": "^5.7.2"
+	}
 }

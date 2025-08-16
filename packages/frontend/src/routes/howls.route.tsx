@@ -1,22 +1,22 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { howlsQueryOptions } from '@/utils/howls'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery } from "@tanstack/react-query";
+import { createFileRoute } from "@tanstack/react-router";
+import { howlsQueryOptions } from "@/utils/howls";
 
-export const Route = createFileRoute('/howls')({
-  component: RouteComponent,
-  loader: async ({ context }) => {
-    await context.queryClient.ensureQueryData(howlsQueryOptions())
-  },
-})
+export const Route = createFileRoute("/howls")({
+	component: RouteComponent,
+	loader: async ({ context }) => {
+		await context.queryClient.ensureQueryData(howlsQueryOptions());
+	},
+});
 
 function RouteComponent() {
-  const howlsQuery = useQuery(howlsQueryOptions())
+	const howlsQuery = useQuery(howlsQueryOptions());
 
-  return (
-    <div>
-      {howlsQuery.data.map((howl) => (
-        <div key={howl.id}>{howl.content}</div>
-      ))}
-    </div>
-  )
+	return (
+		<div>
+			{howlsQuery.data.map((howl) => (
+				<div key={howl.id}>{howl.content}</div>
+			))}
+		</div>
+	);
 }
