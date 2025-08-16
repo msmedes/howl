@@ -2,16 +2,15 @@
 	"name": "howl",
 	"private": true,
 	"workspaces": [
-		"server",
-		"frontend"
+		"packages/*"	
 	],
 	"scripts": {
 		"dev": "concurrently \"bun run server:dev\" \"bun run frontend:dev\"",
-		"server:dev": "cd server && bun run dev",
-		"frontend:dev": "cd frontend && bun run dev",
-		"server:start": "cd server && bun run start",
-		"frontend:build": "cd frontend && bun run build",
-		"frontend:start": "cd frontend && bun run start",
+		"server:dev": "cd packages/server && bun run dev",
+		"frontend:dev": "cd packages/frontend && bun run dev",
+		"server:start": "cd packages/server && bun run start",
+		"frontend:build": "cd packages/frontend && bun run build",
+		"frontend:start": "cd packages/frontend && bun run start",
 		"db:start": "docker run --name drizzle-postgres -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=mypassword -d -p 5433:5432 postgres",
 		"db:stop": "docker stop drizzle-postgres && docker rm drizzle-postgres",
 		"db:restart": "bun run db:stop && bun run db:start",

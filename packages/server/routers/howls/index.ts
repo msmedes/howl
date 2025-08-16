@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
 import {z} from "zod";
-import { createHowl, getHowlById, getHowls, createHowlThread, getHowlThreads } from "@/db/queries/howls";
+import { createHowl, getHowlById, getHowls, createHowlThread, getHowlThreads } from "db/queries/howls";
 import { createHowlSchema, createHowlThreadSchema } from "./schema";
 
 const howlsRouter = new Hono();

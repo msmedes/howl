@@ -1,10 +1,12 @@
 import { queryOptions } from '@tanstack/react-query'
-import axios from 'redaxios'
+import client from '@/utils/client'
 
-import { env } from '@/env'
 
 export const howlsQueryOptions = () =>
   queryOptions({
     queryKey: ['howls'],
-    queryFn: () => axios.get(env.VITE_API_BASE + '/howls').then((r) => r.data),
+    queryFn: () => client.howls.$get().then((r) => {
+      console.log(r)
+      return r.json()
+    }),
   })

@@ -6,8 +6,7 @@
 		"useIgnoreFile": false
 	},
 	"files": {
-		"ignoreUnknown": false,
-		"includes": ["!node_modules/**/*", "!drizzle.config.ts", "!drizzle/**/*"]
+		"ignoreUnknown": false
 	},
 	"formatter": {
 		"enabled": true,

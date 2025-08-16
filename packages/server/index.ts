@@ -25,4 +25,7 @@ app.route("/api/howls", howlsRouter);
 // Health check endpoint
 app.get("/api/health", (c) => c.json({ status: "ok", timestamp: new Date().toISOString() }));
 
+
+export type AppType = typeof app;
+
 export default { port: 3001, fetch: app.fetch };

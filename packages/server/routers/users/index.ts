@@ -1,7 +1,7 @@
 import { zValidator } from "@hono/zod-validator";
 import { Hono } from "hono";
-import { getHowlsForUser } from "@/db/queries/howls";
-import { getFollowersForUser, getUserById } from "@/db/queries/users";
+import { getHowlsForUser } from "db/queries/howls";
+import { getFollowersForUser, getUserById } from "db/queries/users";
 import { getUserByIdSchema } from "./schema";
 
 const usersRouter = new Hono();
