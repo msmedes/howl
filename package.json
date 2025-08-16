@@ -2,11 +2,11 @@
 	"name": "howl",
 	"private": true,
 	"workspaces": [
-		"packages/*"	
+		"packages/*"
 	],
 	"scripts": {
 		"dev": "concurrently \"bun run server:dev\" \"bun run frontend:dev\"",
-		"server:dev": "cd packages/server && bun run dev",
+		"server:dev": "cd packages/server && bun run dev:watch",
 		"frontend:dev": "cd packages/frontend && bun run dev",
 		"server:start": "cd packages/server && bun run start",
 		"frontend:build": "cd packages/frontend && bun run build",

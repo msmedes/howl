@@ -5,7 +5,7 @@ export const howlsQueryOptions = () =>
 	queryOptions({
 		queryKey: ["howls"],
 		queryFn: async () => {
-			const res = await api.howls;
+			const res = await api.howls.$get();
 			return res.json();
 		},
 	});

@@ -14,7 +14,7 @@ function RouteComponent() {
 
 	return (
 		<div>
-			{howlsQuery.data.map((howl) => (
+			{howlsQuery.data?.map((howl) => (
 				<div key={howl.id}>{howl.content}</div>
 			))}
 		</div>
