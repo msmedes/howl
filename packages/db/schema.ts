@@ -1,6 +1,7 @@
 import { relations, sql } from "drizzle-orm";
 import {
 	boolean,
+	index,
 	integer,
 	pgTable,
 	primaryKey,
@@ -44,14 +45,11 @@ export const howls = pgTable(
 	},
 	(table) => [
 		// Index for filtering by user and post type (profile tabs)
-		uniqueIndex("idx_howls_user_original").on(
-			table.userId,
-			table.isOriginalPost,
-		),
+		index("idx_howls_user_original").on(table.userId, table.isOriginalPost),
 		// Index for finding replies to a specific howl
-		uniqueIndex("idx_howls_parent").on(table.parentId),
+		index("idx_howls_parent").on(table.parentId),
 		// Index for chronological ordering by user
-		uniqueIndex("idx_howls_user_created").on(table.userId, table.createdAt),
+		index("idx_howls_user_created").on(table.userId, table.createdAt),
 	],
 );
 
@@ -66,22 +64,12 @@ export const howlAncestors = pgTable(
 	},
 	(table) => [
 		primaryKey({ columns: [table.ancestorId, table.descendantId] }),
-		uniqueIndex("unique_ancestor_descendant").on(
-			table.ancestorId,
-			table.descendantId,
-		),
 		// Index for finding all descendants of a howl (thread queries)
-		uniqueIndex("idx_ancestors_ancestor_depth").on(
-			table.ancestorId,
-			table.depth,
-		),
+		index("idx_ancestors_ancestor_depth").on(table.ancestorId, table.depth),
 		// Index for finding all ancestors of a howl (reply chain queries)
-		uniqueIndex("idx_ancestors_descendant_depth").on(
-			table.descendantId,
-			table.depth,
-		),
+		index("idx_ancestors_descendant_depth").on(table.descendantId, table.depth),
 		// Index for depth-based filtering
-		uniqueIndex("idx_ancestors_depth").on(table.depth),
+		index("idx_ancestors_depth").on(table.depth),
 	],
 );
 

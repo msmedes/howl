@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import AddHowlForm from "@/components/howls/AddHowlForm";
 import { howlsQueryOptions } from "@/utils/howls";
 
 export const Route = createFileRoute("/howls")({
@@ -14,9 +15,20 @@ function RouteComponent() {
 
 	return (
 		<div>
+			<AddHowlForm />
 			{howlsQuery.data?.map((howl) => (
-				<div key={howl.id}>{howl.content}</div>
+				<Howl key={howl.id} content={howl.content} timestamp={howl.createdAt} />
 			))}
+		</div>
+	);
+}
+
+function Howl({ content, timestamp }: { content: string; timestamp: string }) {
+	return (
+		<div>
+			<div>{content}</div>
+			<div>{timestamp}</div>
+			<button type="button">Reply</button>
 		</div>
 	);
 }
