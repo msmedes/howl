@@ -1,25 +1,43 @@
 import { db } from "@howl/db";
-import { and, eq, isNull, lte } from "drizzle-orm";
-import { howlAncestors, howls, type User, users } from "../schema";
+import { and, eq, isNull, lte, not } from "drizzle-orm";
+import { type Howl, howlAncestors, howls, type User, users } from "../schema";
 
-export const getHowls = async () => {
-	const howls = await db.query.howls.findMany({
-		with: {
-			user: {
-				columns: {
-					id: true,
+export const getHowls = async (includeDeleted = false) => {
+	const query = includeDeleted
+		? db.query.howls.findMany({
+				with: {
+					user: {
+						columns: {
+							id: true,
+						},
+					},
 				},
-			},
-		},
-	});
-	return howls;
+			})
+		: db.query.howls.findMany({
+				where: not(howls.isDeleted),
+				with: {
+					user: {
+						columns: {
+							id: true,
+						},
+					},
+				},
+			});
+
+	return await query;
 };
 
-export const createHowl = async (
-	content: string,
-	userId: string,
-	parentId?: string,
-) => {
+type CreateHowlParams = {
+	content: string;
+	userId: string;
+	parentId?: string;
+};
+
+export const createHowl = async ({
+	content,
+	userId,
+	parentId,
+}: CreateHowlParams) => {
 	const howl = await db
 		.insert(howls)
 		.values({
@@ -194,4 +212,35 @@ const populateClosureTable = async (newHowlId: string, parentId: string) => {
 	if (closureInserts.length > 0) {
 		await db.insert(howlAncestors).values(closureInserts);
 	}
+};
+
+// Soft delete howls with closure table cleanup
+export const deleteHowl = async (howl: Howl) => {
+	// Mark the howl as deleted
+	const updatedHowl = await db
+		.update(howls)
+		.set({ isDeleted: true })
+		.where(eq(howls.id, howl.id));
+
+	console.log("updatedHowl", updatedHowl);
+
+	// Clean up closure table entries (these are no longer valid for queries)
+	await db.delete(howlAncestors).where(eq(howlAncestors.ancestorId, howl.id));
+	await db.delete(howlAncestors).where(eq(howlAncestors.descendantId, howl.id));
+	return updatedHowl;
+};
+
+// Get only non-deleted howls
+export const getActiveHowls = async () => {
+	const activeHowls = await db.query.howls.findMany({
+		where: not(howls.isDeleted),
+		with: {
+			user: {
+				columns: {
+					id: true,
+				},
+			},
+		},
+	});
+	return activeHowls;
 };

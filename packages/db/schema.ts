@@ -16,7 +16,7 @@ const timestamps = {
 	updatedAt: timestamp()
 		.notNull()
 		.defaultNow()
-		.$onUpdate(() => sql`CURRENT_TIMESTAMP`),
+		.$onUpdate(() => new Date()),
 };
 
 const ids = {
@@ -41,6 +41,7 @@ export const howls = pgTable(
 		userId: varchar({ length: 21 }).references(() => users.id),
 		parentId: varchar({ length: 21 }).references((): any => howls.id), // Self-reference for threading
 		isOriginalPost: boolean().notNull().default(false), // Flag for profile filtering
+		isDeleted: boolean().notNull().default(false), // Soft delete
 		...timestamps,
 	},
 	(table) => [

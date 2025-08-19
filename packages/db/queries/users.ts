@@ -48,3 +48,7 @@ export const unfollowUser = async (followerId: string, followingId: string) => {
 		);
 	return follow;
 };
+
+export const getUserByName = async (username: string) => {
+	return db.query.users.findFirst({ where: eq(users.username, username) });
+};

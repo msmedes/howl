@@ -3,7 +3,15 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { type CreateHowlInput, createHowlSchema } from "@/schemas/howls";
 import api from "@/utils/client";
 
-export default function AddHowlForm() {
+export default function AddHowlForm({
+	parentId,
+	replying = false,
+	onSuccess,
+}: {
+	parentId?: string;
+	replying?: boolean;
+	onSuccess?: () => void;
+}) {
 	const queryClient = useQueryClient();
 
 	const mutation = useMutation({
@@ -19,7 +27,8 @@ export default function AddHowlForm() {
 	const form = useForm({
 		defaultValues: {
 			content: "",
-			userId: "Jf9dPzw5oy9_n5Fu5KWSs", // TODO: Get actual user ID from auth context
+			userId: "lvYXO9QbVXsqPNF9q97_L", // TODO: Get actual user ID from auth context
+			parentId,
 		},
 		onSubmit: async ({ value }) => {
 			try {
@@ -33,6 +42,8 @@ export default function AddHowlForm() {
 				await mutation.mutateAsync(validationResult.data);
 				// Reset form on success
 				form.reset();
+				// Call onSuccess callback if provided
+				onSuccess?.();
 			} catch (error) {
 				console.error("Failed to create howl:", error);
 			}
@@ -40,8 +51,12 @@ export default function AddHowlForm() {
 	});
 
 	return (
-		<div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
-			<h1 className="text-2xl font-bold mb-4 text-gray-800">Add Howl</h1>
+		<div
+			className={`${replying ? "w-full" : "max-w-md mx-auto"} p-6 bg-white rounded-lg shadow-md`}
+		>
+			<h1 className="text-2xl font-bold mb-4 text-gray-800">
+				{replying ? "Reply to Howl" : "Add Howl"}
+			</h1>
 			<form
 				onSubmit={(e) => {
 					e.preventDefault();
@@ -69,7 +84,9 @@ export default function AddHowlForm() {
 									onChange={(e) => field.handleChange(e.target.value)}
 									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 									rows={3}
-									placeholder="What's happening?"
+									placeholder={
+										replying ? "Write your reply..." : "What's happening?"
+									}
 									maxLength={140}
 								/>
 								<div className="flex justify-between items-center mt-1">
@@ -91,7 +108,7 @@ export default function AddHowlForm() {
 							disabled={!canSubmit || isSubmitting}
 							className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
 						>
-							{isSubmitting ? "Posting..." : "Post Howl"}
+							{isSubmitting ? "Posting..." : replying ? "Reply" : "Post Howl"}
 						</button>
 					)}
 				/>
