@@ -65,7 +65,7 @@ export const howlAncestors = pgTable(
 		...timestamps,
 	},
 	(table) => [
-		primaryKey(table.ancestorId, table.descendantId),
+		primaryKey({ columns: [table.ancestorId, table.descendantId] }),
 		uniqueIndex("unique_ancestor_descendant").on(
 			table.ancestorId,
 			table.descendantId,
