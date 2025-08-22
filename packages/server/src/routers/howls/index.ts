@@ -1,11 +1,12 @@
 import { zValidator } from "@hono/zod-validator";
 import {
 	createHowl,
+	createHowlLike,
 	deleteHowl,
 	getHowlById,
 	getHowls,
 } from "@howl/db/queries/howls";
-import { getUserById, getUserByName } from "@howl/db/queries/users";
+import { getUserById } from "@howl/db/queries/users";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
@@ -19,19 +20,16 @@ const app = new Hono()
 	.post("/", zValidator("json", createHowlSchema), async (c) => {
 		const { content, userId, parentId } = c.req.valid("json");
 
-		let user = await getUserById(userId);
-		if (!user) {
-			user = await getUserByName("admin");
-		}
+		const user = await getUserById(userId);
 		if (!user) {
 			throw new HTTPException(404, { message: "User not found" });
 		}
-		const howl = await createHowl({
+		const [howl] = await createHowl({
 			content,
 			userId: user.id,
 			parentId,
 		});
-		return c.json(howl[0]);
+		return c.json(howl);
 	})
 	.get(":id", zValidator("param", z.object({ id: z.nanoid() })), async (c) => {
 		const { id } = c.req.valid("param");
@@ -75,6 +73,7 @@ const app = new Hono()
 				throw new HTTPException(404, { message: "Howl not found" });
 			}
 			const like = await createHowlLike(userId, howl.id);
+			return c.json(like);
 		},
 	);
 

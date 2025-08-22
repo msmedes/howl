@@ -124,15 +124,20 @@ export const followsRelations = relations(follows, ({ one }) => ({
 	follower: one(users, {
 		fields: [follows.followerId],
 		references: [users.id],
+		relationName: "followers",
 	}),
 	following: one(users, {
 		fields: [follows.followingId],
 		references: [users.id],
+		relationName: "following",
 	}),
 }));
 
 export const usersRelations = relations(users, ({ many }) => ({
 	howls: many(howls),
+	blocked: many(userBlocks, { relationName: "blocks" }),
+	following: many(follows, { relationName: "following" }),
+	followers: many(follows, { relationName: "followers" }),
 }));
 
 export const howlsRelations = relations(howls, ({ one, many }) => ({
@@ -187,10 +192,12 @@ export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
 	user: one(users, {
 		fields: [userBlocks.userId],
 		references: [users.id],
+		relationName: "blocks",
 	}),
 	blockedUser: one(users, {
 		fields: [userBlocks.blockedUserId],
 		references: [users.id],
+		relationName: "user_blocked",
 	}),
 }));
 

@@ -1,13 +1,12 @@
 import db from "@howl/db";
-import { follows, howls, type User, users } from "@howl/db/schema";
+import { follows, howls, type User, userBlocks, users } from "@howl/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
 export const getUsers = async () => {
 	const users = await db.query.users.findMany();
 	return users;
 };
-
-export const getUserById = async (id: string) => {
+export const getUserFeed = async (id: string) => {
 	const user = await db.query.users.findFirst({
 		where: eq(users.id, id),
 		with: {
@@ -19,8 +18,34 @@ export const getUserById = async (id: string) => {
 				},
 				orderBy: [desc(howls.createdAt)],
 			},
+			blocked: {
+				with: {
+					blockedUser: {
+						columns: {
+							id: true,
+							username: true,
+						},
+					},
+				},
+				orderBy: [desc(userBlocks.createdAt)],
+			},
+			following: {
+				with: {
+					following: {
+						columns: {
+							id: true,
+							username: true,
+						},
+					},
+				},
+				orderBy: [desc(follows.createdAt)],
+			},
 		},
 	});
+	return user;
+};
+export const getUserById = async (id: string) => {
+	const user = await db.query.users.findFirst({ where: eq(users.id, id) });
 	return user;
 };
 

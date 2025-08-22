@@ -3,6 +3,7 @@ import { getHowlsForUser } from "@howl/db/queries/howls";
 import {
 	getFollowersForUser,
 	getUserById,
+	getUserFeed,
 	getUsers,
 } from "@howl/db/queries/users";
 import { Hono } from "hono";
@@ -16,7 +17,7 @@ const usersRouter = new Hono()
 	})
 	.get("/:id", zValidator("param", getUserByIdSchema), async (c) => {
 		const { id } = c.req.valid("param");
-		const user = await getUserById(id);
+		const user = await getUserFeed(id);
 		if (!user) {
 			throw new HTTPException(404, { message: "User not found" });
 		}
