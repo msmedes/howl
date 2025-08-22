@@ -1,6 +1,7 @@
-import { db } from "@howl/db";
+import db from "@howl/db";
+import type { Howl, User } from "@howl/db/schema";
+import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
 import { and, eq, isNull, lte, not } from "drizzle-orm";
-import { type Howl, howlAncestors, howls, type User, users } from "../schema";
 
 export const getHowls = async (includeDeleted = false) => {
 	const query = includeDeleted
@@ -222,8 +223,6 @@ export const deleteHowl = async (howl: Howl) => {
 		.set({ isDeleted: true })
 		.where(eq(howls.id, howl.id));
 
-	console.log("updatedHowl", updatedHowl);
-
 	// Clean up closure table entries (these are no longer valid for queries)
 	await db.delete(howlAncestors).where(eq(howlAncestors.ancestorId, howl.id));
 	await db.delete(howlAncestors).where(eq(howlAncestors.descendantId, howl.id));
@@ -243,4 +242,12 @@ export const getActiveHowls = async () => {
 		},
 	});
 	return activeHowls;
+};
+
+export const createHowlLike = async (userId: string, howlId: string) => {
+	const like = await db.insert(howlLikes).values({
+		userId,
+		howlId,
+	});
+	return like;
 };

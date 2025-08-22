@@ -3,9 +3,11 @@
 	"module": "index.ts",
 	"type": "module",
 	"exports": {
-		".": "./index.ts",
-		"./queries/*": "./queries/*.ts",
-		"./schema": "./schema.ts"
+		".": "./src/index.ts",
+		"./schema": "./src/schema.ts",
+		"./migrate": "./src/migrate.ts",
+		"./queries/*": "./src/queries/*.ts",
+		"./test": "./src/test/client.ts"
 	},
 	"scripts": {
 		"db:generate": "drizzle-kit generate",
@@ -21,6 +23,7 @@
 		"typescript": "^5.0.0"
 	},
 	"dependencies": {
+		"@electric-sql/pglite": "^0.3.7",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
 		"pg": "^8.16.3",

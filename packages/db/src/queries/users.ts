@@ -1,10 +1,25 @@
-import { and, eq } from "drizzle-orm";
-import { db } from "../index";
-import { follows, type User, users } from "../schema";
+import db from "@howl/db";
+import { follows, howls, type User, users } from "@howl/db/schema";
+import { and, desc, eq } from "drizzle-orm";
+
+export const getUsers = async () => {
+	const users = await db.query.users.findMany();
+	return users;
+};
 
 export const getUserById = async (id: string) => {
 	const user = await db.query.users.findFirst({
 		where: eq(users.id, id),
+		with: {
+			howls: {
+				columns: {
+					id: true,
+					content: true,
+					createdAt: true,
+				},
+				orderBy: [desc(howls.createdAt)],
+			},
+		},
 	});
 	return user;
 };
@@ -50,5 +65,17 @@ export const unfollowUser = async (followerId: string, followingId: string) => {
 };
 
 export const getUserByName = async (username: string) => {
-	return db.query.users.findFirst({ where: eq(users.username, username) });
+	return db.query.users.findFirst({
+		where: eq(users.username, username),
+		with: {
+			howls: {
+				columns: {
+					id: true,
+					content: true,
+					createdAt: true,
+				},
+				orderBy: [desc(howls.createdAt)],
+			},
+		},
+	});
 };

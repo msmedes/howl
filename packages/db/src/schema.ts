@@ -1,4 +1,4 @@
-import { relations, sql } from "drizzle-orm";
+import { relations } from "drizzle-orm";
 import {
 	boolean,
 	index,
@@ -11,6 +11,8 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 
+const NANOID_LENGTH = 21;
+
 const timestamps = {
 	createdAt: timestamp().notNull().defaultNow(),
 	updatedAt: timestamp()
@@ -20,7 +22,7 @@ const timestamps = {
 };
 
 const ids = {
-	id: varchar({ length: 21 })
+	id: varchar({ length: NANOID_LENGTH })
 		.primaryKey()
 		.$defaultFn(() => nanoid()),
 };
@@ -38,8 +40,10 @@ export const howls = pgTable(
 	{
 		...ids,
 		content: varchar({ length: 140 }).notNull(),
-		userId: varchar({ length: 21 }).references(() => users.id),
-		parentId: varchar({ length: 21 }).references((): any => howls.id), // Self-reference for threading
+		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		parentId: varchar({ length: NANOID_LENGTH }).references(
+			(): any => howls.id,
+		), // Self-reference for threading
 		isOriginalPost: boolean().notNull().default(false), // Flag for profile filtering
 		isDeleted: boolean().notNull().default(false), // Soft delete
 		...timestamps,
@@ -58,8 +62,8 @@ export const howls = pgTable(
 export const howlAncestors = pgTable(
 	"howl_ancestors",
 	{
-		ancestorId: varchar({ length: 21 }).references(() => howls.id),
-		descendantId: varchar({ length: 21 }).references(() => howls.id),
+		ancestorId: varchar({ length: NANOID_LENGTH }).references(() => howls.id),
+		descendantId: varchar({ length: NANOID_LENGTH }).references(() => howls.id),
 		depth: integer().notNull(), // Distance between ancestor and descendant
 		...timestamps,
 	},
@@ -74,15 +78,45 @@ export const howlAncestors = pgTable(
 	],
 );
 
+export const howlLikes = pgTable(
+	"howl_likes",
+	{
+		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		howlId: varchar({ length: NANOID_LENGTH }).references(() => howls.id),
+		...timestamps,
+	},
+	(table) => [
+		primaryKey({ columns: [table.userId, table.howlId] }),
+		index("idx_howl_likes_user").on(table.userId),
+		index("idx_howl_likes_howl").on(table.howlId),
+	],
+);
+
 export const follows = pgTable(
 	"follows",
 	{
-		followerId: varchar({ length: 21 }).references(() => users.id),
-		followingId: varchar({ length: 21 }).references(() => users.id),
+		followerId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		followingId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		...timestamps,
 	},
 	(table) => [
 		uniqueIndex("unique_follow").on(table.followerId, table.followingId),
+	],
+);
+
+export const userBlocks = pgTable(
+	"user_blocks",
+	{
+		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		blockedUserId: varchar({ length: NANOID_LENGTH }).references(
+			() => users.id,
+		),
+		...timestamps,
+	},
+	(table) => [
+		uniqueIndex("unique_user_block").on(table.userId, table.blockedUserId),
+		index("idx_user_blocks_user").on(table.userId),
+		index("idx_user_blocks_blocked_user").on(table.blockedUserId),
 	],
 );
 
@@ -133,6 +167,30 @@ export const howlAncestorsRelations = relations(howlAncestors, ({ one }) => ({
 		fields: [howlAncestors.descendantId],
 		references: [howls.id],
 		relationName: "howl_descendant",
+	}),
+}));
+
+export const howlLikesRelations = relations(howlLikes, ({ one }) => ({
+	user: one(users, {
+		fields: [howlLikes.userId],
+		references: [users.id],
+		relationName: "howl_like_user",
+	}),
+	howl: one(howls, {
+		fields: [howlLikes.howlId],
+		references: [howls.id],
+		relationName: "howl_like_howl",
+	}),
+}));
+
+export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
+	user: one(users, {
+		fields: [userBlocks.userId],
+		references: [users.id],
+	}),
+	blockedUser: one(users, {
+		fields: [userBlocks.blockedUserId],
+		references: [users.id],
 	}),
 }));
 

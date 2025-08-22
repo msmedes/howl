@@ -71,6 +71,7 @@ bun run frontend:dev  # Frontend on port 5173
 - `bun run db:generate` - Generate new database migrations
 - `bun run db:migrate` - Apply database migrations
 - `bun run db:studio` - Open Drizzle Studio for database management
+- `bun run db:seed` - Seed database with sample data
 - `bun run lint` - Run linting across all packages
 - `bun run lint:fix` - Fix linting issues automatically
 
@@ -121,6 +122,16 @@ The frontend is built with:
 - **Automatic migrations** - Schema versioning and updates
 - **Shared types** - Database schema shared between packages
 
+### Database Seeding
+The project includes a comprehensive seed script that generates realistic sample data:
+- **Sample Users**: 15 users with realistic usernames, emails, and bios
+- **Original Howls**: 3-8 posts per user with engaging content
+- **Replies & Threading**: 0-3 replies per howl creating conversation threads
+- **Follow Relationships**: 2-6 follows per user building social connections
+- **Closure Table**: Proper threading support for efficient conversation queries
+
+Run with: `bun run db:seed`
+
 ## 🌐 API Endpoints
 
 The API is built with Hono and provides:
@@ -149,7 +160,8 @@ The API is built with Hono and provides:
 2. **Backend Changes**: TypeScript automatically recompiles, server restarts
 3. **Frontend Changes**: Vite provides instant hot reload
 4. **Database Changes**: Run migrations with `bun run db:migrate`
-5. **Type Updates**: Hono client automatically regenerates types
+5. **Seed Data**: Populate database with sample data using `bun run db:seed`
+6. **Type Updates**: Hono client automatically regenerates types
 
 ## 🚀 Deployment
 

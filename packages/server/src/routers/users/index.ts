@@ -1,15 +1,24 @@
 import { zValidator } from "@hono/zod-validator";
 import { getHowlsForUser } from "@howl/db/queries/howls";
-import { getFollowersForUser, getUserById } from "@howl/db/queries/users";
+import {
+	getFollowersForUser,
+	getUserById,
+	getUsers,
+} from "@howl/db/queries/users";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { getUserByIdSchema } from "./schema";
 
 const usersRouter = new Hono()
+	.get("/", async (c) => {
+		const users = await getUsers();
+		return c.json(users);
+	})
 	.get("/:id", zValidator("param", getUserByIdSchema), async (c) => {
 		const { id } = c.req.valid("param");
 		const user = await getUserById(id);
 		if (!user) {
-			return c.json({ error: "User not found" }, 404);
+			throw new HTTPException(404, { message: "User not found" });
 		}
 		return c.json(user);
 	})
@@ -17,7 +26,7 @@ const usersRouter = new Hono()
 		const { id } = c.req.valid("param");
 		const user = await getUserById(id);
 		if (!user) {
-			return c.json({ error: "User not found" }, 404);
+			throw new HTTPException(404, { message: "User not found" });
 		}
 		const howls = await getHowlsForUser(user);
 		return c.json(howls);
@@ -26,7 +35,7 @@ const usersRouter = new Hono()
 		const { id } = c.req.valid("param");
 		const user = await getUserById(id);
 		if (!user) {
-			return c.json({ error: "User not found" }, 404);
+			throw new HTTPException(404, { message: "User not found" });
 		}
 		const followers = await getFollowersForUser(user);
 		return c.json(followers);

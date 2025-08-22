@@ -7,6 +7,7 @@ import {
 } from "@howl/db/queries/howls";
 import { getUserById, getUserByName } from "@howl/db/queries/users";
 import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import { createHowlSchema } from "./schema";
 
@@ -17,12 +18,13 @@ const app = new Hono()
 	})
 	.post("/", zValidator("json", createHowlSchema), async (c) => {
 		const { content, userId, parentId } = c.req.valid("json");
+
 		let user = await getUserById(userId);
 		if (!user) {
 			user = await getUserByName("admin");
 		}
 		if (!user) {
-			return c.json({ error: "User not found" }, 404);
+			throw new HTTPException(404, { message: "User not found" });
 		}
 		const howl = await createHowl({
 			content,
@@ -35,7 +37,7 @@ const app = new Hono()
 		const { id } = c.req.valid("param");
 		const howl = await getHowlById(id);
 		if (!howl) {
-			return c.json({ error: "Howl not found" }, 404);
+			throw new HTTPException(404, { message: "Howl not found" });
 		}
 		return c.json(howl);
 	})
@@ -48,15 +50,31 @@ const app = new Hono()
 			try {
 				const howl = await getHowlById(id);
 				if (!howl) {
-					return c.json({ error: "Howl not found" }, 404);
+					throw new HTTPException(404, { message: "Howl not found" });
 				}
 				console.log("deleting howl", howl);
 				const deletedHowl = await deleteHowl(howl);
 				return c.json({ success: true, howl: deletedHowl });
 			} catch (error) {
 				console.error("Failed to delete howl:", error);
-				return c.json({ error: "Failed to delete howl" }, 500);
+				throw new HTTPException(500, { message: "Failed to delete howl" });
 			}
+		},
+	)
+	.post(
+		":id/likes",
+		zValidator("param", z.object({ id: z.nanoid(), userId: z.nanoid() })),
+		async (c) => {
+			const { id, userId } = c.req.valid("param");
+			const user = await getUserById(userId);
+			if (!user) {
+				throw new HTTPException(404, { message: "User not found" });
+			}
+			const howl = await getHowlById(id);
+			if (!howl) {
+				throw new HTTPException(404, { message: "Howl not found" });
+			}
+			const like = await createHowlLike(userId, howl.id);
 		},
 	);
 
