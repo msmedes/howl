@@ -1,8 +1,7 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import { createHowl, getHowls, getHowlsForUser } from "@howl/db/queries/howls";
-import { getUserById } from "@howl/db/queries/users";
 import { systemPrompt } from "./lib/prompts";
-import { toolsSchema } from "./lib/tools";
+import { toolMap } from "./lib/tools";
+import toolsSchema from "./lib/tools-schema";
 
 const anthropic = new Anthropic({
 	apiKey: process.env.ANTHROPIC_API_KEY,
@@ -10,64 +9,13 @@ const anthropic = new Anthropic({
 
 const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
 
-async function getHowlsTool({
-	limit,
-}: {
-	includeDeleted?: boolean;
-	limit?: number;
-}) {
-	const howls = await getHowls({ limit });
-	return howls.map((howl) => ({
-		content: howl.content,
-		username: howl.user?.username,
-		id: howl.id,
-		userId: howl.userId,
-		createdAt: howl.createdAt,
-		updatedAt: howl.updatedAt,
-	}));
-}
-
-async function getHowlsForUserTool({ userId }: { userId: string }) {
-	const user = await getUserById(userId);
-	if (!user) {
-		throw new Error("User not found");
-	}
-	const howls = await getHowlsForUser(user);
-	return howls.map((howl) => ({
-		content: howl.content,
-		username: user.username,
-		id: howl.id,
-		userId: howl.userId,
-		createdAt: howl.createdAt,
-	}));
-}
-
-async function createHowlTool({
-	content,
-	parentId,
-}: {
-	content: string;
-	parentId?: string;
-}) {
-	await createHowl({
-		content,
-		userId: currentAgentId,
-		parentId,
-	});
-	return "Howl created successfully";
-}
-const messages = [
+const messages: Array<{ role: "user" | "assistant"; content: string }> = [
 	{
 		role: "user",
 		content: `Please interact with the Howl platform as you see fit.  Create as few howls as possible.
 			Your user id is ${currentAgentId}.`,
 	},
 ];
-const toolMap = {
-	getHowls: getHowlsTool,
-	createHowl: createHowlTool,
-	getHowlsForUser: getHowlsForUserTool,
-};
 
 async function main() {
 	const maxIterations = 10;
@@ -81,12 +29,15 @@ async function main() {
 	for (let iteration = 0; iteration < maxIterations; iteration++) {
 		console.log(`\n--- Iteration ${iteration + 1}/${maxIterations} ---`);
 
-		const response = await anthropic.messages.create({
+		console.log("Current messages:", currentMessages);
+
+		const response = await anthropic.beta.messages.create({
 			model,
 			max_tokens: 1024,
 			system: systemPrompt,
 			messages: currentMessages,
-			tools: toolsSchema,
+			tools: toolsSchema as any,
+			betas: ["token-efficient-tools-2025-02-19"],
 		});
 
 		console.log("Response:", response);
@@ -114,23 +65,24 @@ async function main() {
 				try {
 					const toolCallResult = await toolMap[
 						call.name as keyof typeof toolMap
-					](call.input);
+					](call.input as any);
 					return {
 						type: "tool_result",
 						tool_use_id: call.id,
-						content: JSON.stringify(toolCallResult),
+						content: toolCallResult,
 					};
-				} catch (error: any) {
+				} catch (error: unknown) {
 					console.error("Error executing tool call:", error);
 					return {
 						type: "tool_result",
 						tool_use_id: call.id,
-						content: JSON.stringify({ error: error?.message }),
+						content: JSON.stringify({
+							error: error instanceof Error ? error.message : "Unknown error",
+						}),
 					};
 				}
 			}),
 		);
-
 		console.log("Tool call results:", toolCallResults);
 
 		currentMessages.push({ role: "user", content: toolCallResults });

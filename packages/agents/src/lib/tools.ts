@@ -1,53 +1,58 @@
-// this is a json schema for the tools that agents can use
-// for now we are using anthropic's claude to list tools
+import { createHowl, getHowls, getHowlsForUser } from "@howl/db/queries/howls";
+import { getUserById } from "@howl/db/queries/users";
 
-export const toolsSchema = [
-	{
-		name: "getHowls",
-		description: "Get all howls.",
-		input_schema: {
-			type: "object",
-			properties: {
-				limit: {
-					type: "number",
-					description: "The number of howls to return. Defaults to 100.",
-					default: 100,
-				},
-			},
-			required: [],
-			additionalProperties: false,
-		},
-	},
-	{
-		name: "createHowl",
-		description: "Create a new howl.",
-		input_schema: {
-			type: "object",
-			properties: {
-				content: {
-					type: "string",
-					description: "The content of the howl.",
-					minLength: 1,
-					maxLength: 140,
-				},
-			},
-			required: ["content"],
-			additionalProperties: false,
-		},
-	},
-	{
-		name: "getHowlsForUser",
-		description: "Get all howls for a user.",
-		input_schema: {
-			type: "object",
-			properties: {
-				userId: {
-					type: "string",
-					description: "The ID of the user to get howls for.",
-				},
-			},
-			required: ["userId"],
-			additionalProperties: false,
-		},
-	},
-];
+const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
+
+export async function getHowlsTool({
+	limit,
+}: {
+	includeDeleted?: boolean;
+	limit?: number;
+}) {
+	const howls = await getHowls({ limit });
+
+	// Create compact format: [content, username, id, userId, createdAt]
+	return howls
+		.map(
+			(howl: any) =>
+				`[${howl.content},${howl.user?.username || "unknown"},${howl.id},${howl.userId || "unknown"},${howl.createdAt.toISOString().split("T")[0]}]`,
+		)
+		.join("\n");
+}
+
+export async function getHowlsForUserTool({ userId }: { userId: string }) {
+	const user = await getUserById(userId);
+	if (!user) {
+		throw new Error("User not found");
+	}
+	const howls = await getHowlsForUser(user);
+
+	// Compact format: [content, id, createdAt]
+	return howls
+		.map(
+			(howl) =>
+				`[${howl.content},${howl.id},${howl.createdAt.toISOString().split("T")[0]}]`,
+		)
+		.join("\n");
+}
+
+export async function createHowlTool({
+	content,
+	parentId,
+}: {
+	content: string;
+	parentId?: string;
+}) {
+	await createHowl({
+		content,
+		userId: currentAgentId,
+		parentId,
+	});
+	return "Howl created successfully";
+}
+
+export const toolMap = {
+	getHowls: getHowlsTool,
+	createHowl: createHowlTool,
+	getHowlsForUser: getHowlsForUserTool,
+};
