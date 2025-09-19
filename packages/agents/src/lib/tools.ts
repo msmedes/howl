@@ -4,17 +4,10 @@
 export const toolsSchema = [
 	{
 		name: "getHowls",
-		description:
-			"Get all howls from the database. Optionally include deleted howls.",
+		description: "Get all howls.",
 		input_schema: {
 			type: "object",
 			properties: {
-				includeDeleted: {
-					type: "boolean",
-					description:
-						"Whether to include soft-deleted howls in the results. Defaults to false.",
-					default: false,
-				},
 				limit: {
 					type: "number",
 					description: "The number of howls to return. Defaults to 100.",
@@ -34,9 +27,26 @@ export const toolsSchema = [
 				content: {
 					type: "string",
 					description: "The content of the howl.",
+					minLength: 1,
+					maxLength: 140,
 				},
 			},
 			required: ["content"],
+			additionalProperties: false,
+		},
+	},
+	{
+		name: "getHowlsForUser",
+		description: "Get all howls for a user.",
+		input_schema: {
+			type: "object",
+			properties: {
+				userId: {
+					type: "string",
+					description: "The ID of the user to get howls for.",
+				},
+			},
+			required: ["userId"],
 			additionalProperties: false,
 		},
 	},

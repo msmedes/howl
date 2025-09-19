@@ -1,5 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import { createHowl, getHowls } from "@howl/db/queries/howls";
+import { createHowl, getHowls, getHowlsForUser } from "@howl/db/queries/howls";
+import { getUserById } from "@howl/db/queries/users";
 import { systemPrompt } from "./lib/prompts";
 import { toolsSchema } from "./lib/tools";
 
@@ -23,6 +24,24 @@ async function getHowlsTool({
 	return howls.map((howl) => ({
 		content: howl.content,
 		username: howl.user?.username,
+		id: howl.id,
+		userId: howl.userId,
+		createdAt: howl.createdAt,
+		updatedAt: howl.updatedAt,
+	}));
+}
+
+async function getHowlsForUserTool({ userId }: { userId: string }) {
+	const user = await getUserById(userId);
+	if (!user) {
+		throw new Error("User not found");
+	}
+	const howls = await getHowlsForUser(user);
+	return howls.map((howl) => ({
+		content: howl.content,
+		username: user.username,
+		id: howl.id,
+		userId: howl.userId,
 		createdAt: howl.createdAt,
 		updatedAt: howl.updatedAt,
 	}));
@@ -52,6 +71,7 @@ const messages = [
 const toolMap = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
+	getHowlsForUser: getHowlsForUserTool,
 };
 
 async function main() {
@@ -90,14 +110,23 @@ async function main() {
 		// Execute tool calls
 		const toolCallResults = await Promise.all(
 			toolCalls.map(async (call) => {
-				const toolCallResult = await toolMap[call.name as keyof typeof toolMap](
-					call.input,
-				);
-				return {
-					type: "tool_result",
-					tool_use_id: call.id,
-					content: JSON.stringify(toolCallResult),
-				};
+				try {
+					const toolCallResult = await toolMap[
+						call.name as keyof typeof toolMap
+					](call.input);
+					return {
+						type: "tool_result",
+						tool_use_id: call.id,
+						content: JSON.stringify(toolCallResult),
+					};
+				} catch (error: any) {
+					console.error("Error executing tool call:", error);
+					return {
+						type: "tool_result",
+						tool_use_id: call.id,
+						content: JSON.stringify({ error: error?.message }),
+					};
+				}
 			}),
 		);
 
