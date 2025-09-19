@@ -11,16 +11,12 @@ const anthropic = new Anthropic({
 const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
 
 async function getHowlsTool({
-	includeDeleted,
 	limit,
 }: {
 	includeDeleted?: boolean;
 	limit?: number;
 }) {
-	console.log("includeDeleted", includeDeleted);
-	console.log("limit", limit);
-	const howls = await getHowls({ includeDeleted, limit });
-	console.log("howls", howls.length);
+	const howls = await getHowls({ limit });
 	return howls.map((howl) => ({
 		content: howl.content,
 		username: howl.user?.username,
@@ -43,7 +39,6 @@ async function getHowlsForUserTool({ userId }: { userId: string }) {
 		id: howl.id,
 		userId: howl.userId,
 		createdAt: howl.createdAt,
-		updatedAt: howl.updatedAt,
 	}));
 }
 
@@ -54,18 +49,18 @@ async function createHowlTool({
 	content: string;
 	parentId?: string;
 }) {
-	const [howl] = await createHowl({
+	await createHowl({
 		content,
 		userId: currentAgentId,
 		parentId,
 	});
-	return howl;
+	return "Howl created successfully";
 }
 const messages = [
 	{
 		role: "user",
-		content:
-			"Please interact with the Howl platform as you see fit.  Right now you can only list howls and create howls, so keep that in mind.",
+		content: `Please interact with the Howl platform as you see fit.  Create as few howls as possible.
+			Your user id is ${currentAgentId}.`,
 	},
 ];
 const toolMap = {
@@ -77,12 +72,17 @@ const toolMap = {
 async function main() {
 	const maxIterations = 10;
 	const currentMessages = [...messages];
+	// const model =
+	// 	currentMessages[currentMessages.length - 1].content.type === "tool_use"
+	// 		? "claude-4-sonnet-latest"
+	// 		: "claude-3-7-sonnet-latest";
 
+	const model = "claude-opus-4-0";
 	for (let iteration = 0; iteration < maxIterations; iteration++) {
 		console.log(`\n--- Iteration ${iteration + 1}/${maxIterations} ---`);
 
 		const response = await anthropic.messages.create({
-			model: "claude-3-7-sonnet-latest",
+			model,
 			max_tokens: 1024,
 			system: systemPrompt,
 			messages: currentMessages,
@@ -102,6 +102,7 @@ async function main() {
 		// If no tool calls, the LLM is done
 		if (toolCalls.length === 0) {
 			console.log("LLM completed - no more tool calls needed");
+			console.log("Current messages:", currentMessages);
 			break;
 		}
 
@@ -138,6 +139,7 @@ async function main() {
 	console.log(
 		`\n--- Conversation completed after ${currentMessages.length - messages.length} exchanges ---`,
 	);
+	console.log("Current messages:", currentMessages);
 }
 
 main().catch(console.error);

@@ -1,7 +1,7 @@
 import db from "@howl/db";
 import type { Howl, User } from "@howl/db/schema";
 import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
-import { and, eq, isNull, lte, not } from "drizzle-orm";
+import { and, desc, eq, isNull, lte, not } from "drizzle-orm";
 
 export const getHowls = async ({
 	includeDeleted = false,
@@ -9,33 +9,26 @@ export const getHowls = async ({
 }: {
 	includeDeleted?: boolean;
 	limit?: number;
-}) => {
-	const query = includeDeleted
-		? db.query.howls.findMany({
-				with: {
-					user: {
-						columns: {
-							id: true,
-							username: true,
-						},
-					},
+} = {}) => {
+	const queryOptions: Parameters<typeof db.query.howls.findMany>[0] = {
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
 				},
-				limit,
-			})
-		: db.query.howls.findMany({
-				where: not(howls.isDeleted),
-				with: {
-					user: {
-						columns: {
-							id: true,
-							username: true,
-						},
-					},
-				},
-				limit,
-			});
+			},
+		},
+		limit,
+		orderBy: [desc(howls.createdAt)],
+	};
 
-	return await query;
+	// Only add where clause if we want to exclude deleted items
+	if (!includeDeleted) {
+		queryOptions.where = not(howls.isDeleted);
+	}
+
+	return db.query.howls.findMany(queryOptions);
 };
 
 type CreateHowlParams = {

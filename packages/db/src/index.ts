@@ -4,6 +4,6 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "./lib/env";
 
 // biome-ignore lint/style/noNonNullAssertion: it's fine
-const db = drizzle(env.DATABASE_URL, { schema });
+const db = drizzle(env.DATABASE_URL, { schema, logger: true });
 
 export default db;
