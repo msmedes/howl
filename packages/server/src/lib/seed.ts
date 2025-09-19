@@ -114,7 +114,7 @@ async function generateUsers(
 
 		const bio = faker.helpers.arrayElement(BIO_TEMPLATES);
 
-		const user = await db
+		const [user] = await db
 			.insert(users)
 			.values({
 				username,
@@ -124,7 +124,7 @@ async function generateUsers(
 			.returning();
 
 		generatedUsers.push({
-			id: user[0].id,
+			id: user.id,
 			username,
 			email,
 			bio,
@@ -151,7 +151,7 @@ async function generateHowls(
 		for (let i = 0; i < numHowls; i++) {
 			const content = faker.helpers.arrayElement(HOWL_TEMPLATES);
 
-			const howl = await db
+			const [howl] = await db
 				.insert(howls)
 				.values({
 					content,
@@ -161,7 +161,7 @@ async function generateHowls(
 				.returning();
 
 			const seedHowl: SeedHowl = {
-				id: howl[0].id,
+				id: howl.id,
 				content,
 				userId: user.id,
 				isOriginalPost: true,
@@ -194,7 +194,7 @@ async function generateReplies(
 			const randomUser = faker.helpers.arrayElement(userList);
 			const content = faker.helpers.arrayElement(HOWL_TEMPLATES);
 
-			const reply = await db
+			const [reply] = await db
 				.insert(howls)
 				.values({
 					content,
@@ -205,7 +205,7 @@ async function generateReplies(
 				.returning();
 
 			const seedReply: SeedHowl = {
-				id: reply[0].id,
+				id: reply.id,
 				content,
 				userId: randomUser.id,
 				parentId: howl.id,

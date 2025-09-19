@@ -50,11 +50,9 @@ const app = new Hono()
 				if (!howl) {
 					throw new HTTPException(404, { message: "Howl not found" });
 				}
-				console.log("deleting howl", howl);
 				const deletedHowl = await deleteHowl(howl);
 				return c.json({ success: true, howl: deletedHowl });
 			} catch (error) {
-				console.error("Failed to delete howl:", error);
 				throw new HTTPException(500, { message: "Failed to delete howl" });
 			}
 		},

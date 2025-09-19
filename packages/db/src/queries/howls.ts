@@ -3,16 +3,24 @@ import type { Howl, User } from "@howl/db/schema";
 import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
 import { and, eq, isNull, lte, not } from "drizzle-orm";
 
-export const getHowls = async (includeDeleted = false) => {
+export const getHowls = async ({
+	includeDeleted = false,
+	limit = 100,
+}: {
+	includeDeleted?: boolean;
+	limit?: number;
+}) => {
 	const query = includeDeleted
 		? db.query.howls.findMany({
 				with: {
 					user: {
 						columns: {
 							id: true,
+							username: true,
 						},
 					},
 				},
+				limit,
 			})
 		: db.query.howls.findMany({
 				where: not(howls.isDeleted),
@@ -20,9 +28,11 @@ export const getHowls = async (includeDeleted = false) => {
 					user: {
 						columns: {
 							id: true,
+							username: true,
 						},
 					},
 				},
+				limit,
 			});
 
 	return await query;
