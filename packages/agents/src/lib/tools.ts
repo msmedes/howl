@@ -1,4 +1,9 @@
-import { createHowl, getHowls, getHowlsForUser } from "@howl/db/queries/howls";
+import {
+	createHowl,
+	createHowlLike,
+	getHowls,
+	getHowlsForUser,
+} from "@howl/db/queries/howls";
 import { getUserById } from "@howl/db/queries/users";
 
 const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
@@ -51,8 +56,14 @@ export async function createHowlTool({
 	return "Howl created successfully";
 }
 
+export async function likeHowlTool({ howlId }: { howlId: string }) {
+	await createHowlLike(currentAgentId, howlId);
+	return "Howl liked successfully";
+}
+
 export const toolMap = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
 	getHowlsForUser: getHowlsForUserTool,
+	likeHowl: likeHowlTool,
 };

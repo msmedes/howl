@@ -49,4 +49,18 @@ export default [
 			required: ["userId"],
 		},
 	},
-]);
+	{
+		name: "likeHowl",
+		description: "Like a howl.",
+		input_schema: {
+			type: "object",
+			properties: {
+				howlId: {
+					type: "string",
+					description: "The ID of the howl to like.",
+				},
+			},
+			required: ["howlId"],
+		},
+	},
+];

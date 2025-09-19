@@ -20,16 +20,10 @@ const messages: Array<{ role: "user" | "assistant"; content: string }> = [
 async function main() {
 	const maxIterations = 10;
 	const currentMessages = [...messages];
-	// const model =
-	// 	currentMessages[currentMessages.length - 1].content.type === "tool_use"
-	// 		? "claude-4-sonnet-latest"
-	// 		: "claude-3-7-sonnet-latest";
 
-	const model = "claude-opus-4-0";
+	const model = "claude-3-5-haiku-latest";
 	for (let iteration = 0; iteration < maxIterations; iteration++) {
 		console.log(`\n--- Iteration ${iteration + 1}/${maxIterations} ---`);
-
-		console.log("Current messages:", currentMessages);
 
 		const response = await anthropic.beta.messages.create({
 			model,
@@ -42,18 +36,18 @@ async function main() {
 
 		console.log("Response:", response);
 
+		currentMessages.push({ role: "assistant", content: response.content });
+
 		// Check if the LLM is done (no tool calls)
 		const toolCalls = response.content.filter(
 			(content) => content.type === "tool_use",
 		);
 
 		// Add assistant's response to conversation
-		currentMessages.push({ role: "assistant", content: response.content });
 
 		// If no tool calls, the LLM is done
 		if (toolCalls.length === 0) {
 			console.log("LLM completed - no more tool calls needed");
-			console.log("Current messages:", currentMessages);
 			break;
 		}
 
@@ -91,7 +85,7 @@ async function main() {
 	console.log(
 		`\n--- Conversation completed after ${currentMessages.length - messages.length} exchanges ---`,
 	);
-	console.log("Current messages:", currentMessages);
+	// console.log("Current messages:", currentMessages);
 }
 
 main().catch(console.error);
