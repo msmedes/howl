@@ -19,7 +19,6 @@ export default function AddHowlForm({
 			return api.howls.$post({ json: data });
 		},
 		onSuccess: () => {
-			// Invalidate and refetch howls after successful creation
 			queryClient.invalidateQueries({ queryKey: ["howls"] });
 		},
 	});
@@ -38,11 +37,8 @@ export default function AddHowlForm({
 					console.error("Validation failed:", validationResult.error);
 					return;
 				}
-				console.log("cool");
 				await mutation.mutateAsync(validationResult.data);
-				// Reset form on success
 				form.reset();
-				// Call onSuccess callback if provided
 				onSuccess?.();
 			} catch (error) {
 				console.error("Failed to create howl:", error);
@@ -70,12 +66,6 @@ export default function AddHowlForm({
 					children={(field) => {
 						return (
 							<div>
-								<label
-									htmlFor={field.name}
-									className="block text-sm font-medium text-gray-700 mb-2"
-								>
-									Content
-								</label>
 								<textarea
 									id={field.name}
 									name={field.name}
@@ -85,7 +75,7 @@ export default function AddHowlForm({
 									className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
 									rows={3}
 									placeholder={
-										replying ? "Write your reply..." : "What's happening?"
+										replying ? "Write your reply..." : "Let's hear it!"
 									}
 									maxLength={140}
 								/>
@@ -124,7 +114,6 @@ export default function AddHowlForm({
 }
 
 function FieldInfo({ field }: { field: AnyFieldApi }) {
-	// Client-side validation using Zod
 	const contentValidation = createHowlSchema.shape.content.safeParse(
 		field.state.value,
 	);

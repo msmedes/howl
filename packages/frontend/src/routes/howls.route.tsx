@@ -1,5 +1,6 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { formatRelative } from "date-fns";
 import { useState } from "react";
 import AddHowlForm from "@/components/howls/AddHowlForm";
 import api from "@/utils/client";
@@ -24,6 +25,7 @@ function RouteComponent() {
 					id={howl.id}
 					content={howl.content}
 					timestamp={howl.createdAt}
+					username={howl.user?.username}
 				/>
 			))}
 		</div>
@@ -34,10 +36,12 @@ function Howl({
 	id,
 	content,
 	timestamp,
+	username,
 }: {
 	id: string;
 	content: string;
 	timestamp: string;
+	username: string;
 }) {
 	const [showReplyForm, setShowReplyForm] = useState(false);
 	const queryClient = useQueryClient();
@@ -67,8 +71,11 @@ function Howl({
 
 	return (
 		<div className="border border-gray-200 rounded-lg p-4 mb-4">
+			<div className="flex items-center text-lg font-bold mb-2">{username}</div>
 			<div className="mb-2">{content}</div>
-			<div className="text-sm text-gray-500 mb-3">{timestamp}</div>
+			<div className="text-sm text-gray-500 mb-3">
+				{formatRelative(new Date(timestamp), new Date())}
+			</div>
 			<div className="flex gap-2">
 				<button
 					type="button"

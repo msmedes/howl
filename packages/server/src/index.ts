@@ -1,6 +1,5 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
-// import { showRoutes } from "hono/dev";
 import { logger } from "hono/logger";
 import howlsRouter from "@/src/routers/howls";
 import usersRouter from "@/src/routers/users";
@@ -19,8 +18,6 @@ const app = new Hono().use(logger()).use(
 );
 
 const routes = app.route("/users", usersRouter).route("/howls", howlsRouter);
-
-// showRoutes(app, { verbose: true });
 
 export type AppType = typeof routes;
 
