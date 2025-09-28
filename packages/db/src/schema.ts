@@ -3,11 +3,9 @@ import {
 	boolean,
 	index,
 	integer,
-	json,
 	pgTable,
 	primaryKey,
 	serial,
-	text,
 	timestamp,
 	uniqueIndex,
 	varchar,
@@ -174,7 +172,6 @@ export const howlsRelations = relations(howls, ({ one, many }) => ({
 	children: many(howls, {
 		relationName: "howl_parent_child",
 	}),
-	// Closure table relations
 	ancestors: many(howlAncestors, {
 		relationName: "howl_ancestor",
 	}),
