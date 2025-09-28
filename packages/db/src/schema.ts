@@ -52,7 +52,7 @@ export const howls = pgTable(
 			() => users.id,
 		),
 		parentId: varchar("parent_id", { length: NANOID_LENGTH }).references(
-			() => howls.id,
+			(): any => howls.id,
 		),
 		isOriginalPost: boolean("is_original_post").notNull().default(false),
 		isDeleted: boolean("is_deleted").notNull().default(false),
@@ -222,118 +222,15 @@ export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
 	}),
 }));
 
-// Agent-related tables for tracking thought processes
-export const agentSessions = pgTable(
-	"agent_sessions",
-	{
-		...ids,
-		agentId: varchar("agent_id", { length: NANOID_LENGTH }).notNull(),
-		sessionType: varchar("session_type", { length: 50 })
-			.notNull()
-			.default("interaction"), // e.g., "interaction", "exploration", "maintenance"
-		totalIterations: integer("total_iterations").notNull().default(0),
-		metadata: json("metadata"), // Store any additional session metadata
-		...timestamps,
-	},
-	(table) => [
-		index("idx_agent_sessions_agent").on(table.agentId),
-		index("idx_created_at").on(table.createdAt),
-	],
-);
-
-export const agentThoughts = pgTable(
-	"agent_thoughts",
-	{
-		...ids,
-		sessionId: varchar("session_id", { length: NANOID_LENGTH }).references(
-			() => agentSessions.id,
-		),
-		iterationNumber: integer("iteration_number").notNull(),
-		thoughtType: varchar("thought_type", { length: 50 }).notNull(), // "reasoning", "decision", "observation", "planning", "reflection"
-		content: text("content").notNull(), // The actual thought content
-		context: json("context"), // Additional context about what the agent was thinking about
-		confidence: integer("confidence"), // 1-10 scale of how confident the agent was
-		...timestamps,
-	},
-	(table) => [
-		index("idx_agent_thoughts_session").on(table.sessionId),
-		index("idx_agent_thoughts_iteration").on(
-			table.sessionId,
-			table.iterationNumber,
-		),
-		index("idx_agent_thoughts_type").on(table.thoughtType),
-		index("idx_created_at").on(table.createdAt),
-	],
-);
-
-export const agentToolCalls = pgTable(
-	"agent_tool_calls",
-	{
-		...ids,
-		sessionId: varchar("session_id", { length: NANOID_LENGTH }).references(
-			() => agentSessions.id,
-		),
-		thoughtId: varchar("thought_id", { length: NANOID_LENGTH }).references(
-			() => agentThoughts.id,
-		),
-		iterationNumber: integer("iteration_number").notNull(),
-		toolName: varchar("tool_name", { length: 100 }).notNull(),
-		input: json("input").notNull(), // The parameters passed to the tool
-		output: json("output"), // The result returned by the tool
-		executionTimeMs: integer("execution_time_ms"), // How long the tool took to execute
-		success: boolean("success").notNull().default(true),
-		errorMessage: text("error_message"), // If the tool call failed
-		...timestamps,
-	},
-	(table) => [
-		index("idx_agent_tool_calls_session").on(table.sessionId),
-		index("idx_agent_tool_calls_thought").on(table.thoughtId),
-		index("idx_agent_tool_calls_iteration").on(
-			table.sessionId,
-			table.iterationNumber,
-		),
-		index("idx_agent_tool_calls_tool").on(table.toolName),
-		index("idx_created_at").on(table.createdAt),
-	],
-);
-
-// Agent table relations
-export const agentSessionsRelations = relations(agentSessions, ({ many }) => ({
-	thoughts: many(agentThoughts),
-	toolCalls: many(agentToolCalls),
-}));
-
-export const agentThoughtsRelations = relations(
-	agentThoughts,
-	({ one, many }) => ({
-		session: one(agentSessions, {
-			fields: [agentThoughts.sessionId],
-			references: [agentSessions.id],
-		}),
-		toolCalls: many(agentToolCalls),
-	}),
-);
-
-export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
-	session: one(agentSessions, {
-		fields: [agentToolCalls.sessionId],
-		references: [agentSessions.id],
-	}),
-	thought: one(agentThoughts, {
-		fields: [agentToolCalls.thoughtId],
-		references: [agentThoughts.id],
-	}),
-}));
-
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Howl = typeof howls.$inferSelect;
 export type InsertHowl = typeof howls.$inferInsert;
 export type HowlAncestor = typeof howlAncestors.$inferSelect;
 export type InsertHowlAncestor = typeof howlAncestors.$inferInsert;
-export type AgentSession = typeof agentSessions.$inferSelect;
-export type InsertAgentSession = typeof agentSessions.$inferInsert;
-export type AgentThought = typeof agentThoughts.$inferSelect;
-export type InsertAgentThought = typeof agentThoughts.$inferInsert;
-export type AgentToolCall = typeof agentToolCalls.$inferSelect;
-export type InsertAgentToolCall = typeof agentToolCalls.$inferInsert;
+export type HowlLike = typeof howlLikes.$inferSelect;
+export type InsertHowlLike = typeof howlLikes.$inferInsert;
+export type Follow = typeof follows.$inferSelect;
+export type InsertFollow = typeof follows.$inferInsert;
+export type UserBlock = typeof userBlocks.$inferSelect;
+export type InsertUserBlock = typeof userBlocks.$inferInsert;
