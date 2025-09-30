@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
 	agentDatabaseChanges,
+	agents,
 	agentThoughts,
 	agentThreads,
 	agentToolCalls,
@@ -14,7 +15,6 @@ export const usersRelations = relations(users, ({ many }) => ({
 	blocked: many(userBlocks, { relationName: "blocks" }),
 	following: many(follows, { relationName: "following" }),
 	followers: many(follows, { relationName: "followers" }),
-	agentThreads: many(agentThreads),
 }));
 
 export const howlsRelations = relations(howls, ({ one, many }) => ({
@@ -94,9 +94,9 @@ export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
 export const agentThreadsRelations = relations(
 	agentThreads,
 	({ one, many }) => ({
-		agent: one(users, {
-			fields: [agentThreads.agentFriendlyId],
-			references: [users.id],
+		agent: one(agents, {
+			fields: [agentThreads.agentId],
+			references: [agents.id],
 		}),
 		thoughts: many(agentThoughts),
 		toolCalls: many(agentToolCalls),

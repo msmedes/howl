@@ -6,7 +6,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
-import { NANOID_LENGTH } from "@/src/lib/const";
+import { NANOID_LENGTH } from "../lib/const";
 
 export const users = pgTable(
 	"users",

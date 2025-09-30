@@ -4,11 +4,12 @@ import {
 	integer,
 	pgTable,
 	primaryKey,
+	serial,
 	timestamp,
 	varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
-import { NANOID_LENGTH } from "@/src/lib/const";
+import { NANOID_LENGTH } from "../lib/const";
 import { users } from "./users";
 
 export const howls = pgTable(
@@ -17,7 +18,7 @@ export const howls = pgTable(
 		id: varchar("id", { length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		agentFriendlyId: integer().notNull().unique(),
+		agentFriendlyId: serial().notNull().unique(),
 		content: varchar({ length: 140 }).notNull(),
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		parentId: varchar({ length: NANOID_LENGTH }),

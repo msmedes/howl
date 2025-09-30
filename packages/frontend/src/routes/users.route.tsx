@@ -15,10 +15,7 @@ function UsersComponent() {
 	return (
 		<div className="p-2 flex gap-2">
 			<ul className="list-disc pl-4">
-				{[
-					...usersQuery.data,
-					{ id: "i-do-not-exist", name: "Non-existent User", email: "" },
-				].map((user) => {
+				{usersQuery.data.map((user) => {
 					return (
 						<li key={user.id} className="whitespace-nowrap">
 							<Link

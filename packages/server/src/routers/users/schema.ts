@@ -1,7 +1,7 @@
 import z from "zod";
 
 export const getUserByIdSchema = z.object({
-	id: z.nanoid(),
+	id: z.string().length(10),
 });
 
 export const createUserSchema = z.object({

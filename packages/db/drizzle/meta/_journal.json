@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759174698702,
-      "tag": "0000_bent_lila_cheney",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1759255440800,
-      "tag": "0001_slippery_rhodey",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1759263463703,
-      "tag": "0002_unusual_xavin",
+      "when": 1759265692282,
+      "tag": "0000_orange_quicksilver",
       "breakpoints": true
     }
   ]

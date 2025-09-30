@@ -1,5 +1,5 @@
 {
-  "id": "ae8cb584-901a-4f72-8ce6-6d9faec2c345",
+  "id": "56fe2089-7e46-4357-8970-68a5f3e6dbe9",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -47,6 +47,12 @@
         "changes": {
           "name": "changes",
           "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_id": {
+          "name": "model_id",
+          "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
         },
@@ -160,6 +166,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "agent_database_changes_model_id_models_id_fk": {
+          "name": "agent_database_changes_model_id_models_id_fk",
+          "tableFrom": "agent_database_changes",
+          "tableTo": "models",
+          "columnsFrom": [
+            "model_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -201,6 +220,12 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "model_id": {
+          "name": "model_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -291,6 +316,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "agent_thoughts_model_id_models_id_fk": {
+          "name": "agent_thoughts_model_id_models_id_fk",
+          "tableFrom": "agent_thoughts",
+          "tableTo": "models",
+          "columnsFrom": [
+            "model_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -309,12 +347,6 @@
           "primaryKey": true,
           "notNull": true
         },
-        "agent_id": {
-          "name": "agent_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
         "session_id": {
           "name": "session_id",
           "type": "varchar(10)",
@@ -327,6 +359,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'active'"
+        },
+        "model_id": {
+          "name": "model_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
         },
         "created_at": {
           "name": "created_at",
@@ -344,21 +388,6 @@
         }
       },
       "indexes": {
-        "idx_agent_threads_agent": {
-          "name": "idx_agent_threads_agent",
-          "columns": [
-            {
-              "expression": "agent_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
         "idx_agent_threads_session": {
           "name": "idx_agent_threads_session",
           "columns": [
@@ -406,10 +435,23 @@
         }
       },
       "foreignKeys": {
-        "agent_threads_agent_id_users_id_fk": {
-          "name": "agent_threads_agent_id_users_id_fk",
+        "agent_threads_model_id_models_id_fk": {
+          "name": "agent_threads_model_id_models_id_fk",
           "tableFrom": "agent_threads",
-          "tableTo": "users",
+          "tableTo": "models",
+          "columnsFrom": [
+            "model_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "agent_threads_agent_id_agents_id_fk": {
+          "name": "agent_threads_agent_id_agents_id_fk",
+          "tableFrom": "agent_threads",
+          "tableTo": "agents",
           "columnsFrom": [
             "agent_id"
           ],
@@ -457,6 +499,12 @@
         "arguments": {
           "name": "arguments",
           "type": "jsonb",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_id": {
+          "name": "model_id",
+          "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
         },
@@ -549,6 +597,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "agent_tool_calls_model_id_models_id_fk": {
+          "name": "agent_tool_calls_model_id_models_id_fk",
+          "tableFrom": "agent_tool_calls",
+          "tableTo": "models",
+          "columnsFrom": [
+            "model_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -557,21 +618,15 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.follows": {
-      "name": "follows",
+    "public.agents": {
+      "name": "agents",
       "schema": "",
       "columns": {
-        "follower_id": {
-          "name": "follower_id",
+        "id": {
+          "name": "id",
           "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "following_id": {
-          "name": "following_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
+          "primaryKey": true,
+          "notNull": true
         },
         "created_at": {
           "name": "created_at",
@@ -586,32 +641,29 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "prompt": {
+          "name": "prompt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "last_run_at": {
+          "name": "last_run_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {
-        "unique_follow": {
-          "name": "unique_follow",
-          "columns": [
-            {
-              "expression": "follower_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "following_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_follows_created_at": {
-          "name": "idx_follows_created_at",
+        "idx_agents_created_at": {
+          "name": "idx_agents_created_at",
           "columns": [
             {
               "expression": "created_at",
@@ -624,28 +676,30 @@
           "concurrently": false,
           "method": "btree",
           "with": {}
+        },
+        "idx_agents_updated_at": {
+          "name": "idx_agents_updated_at",
+          "columns": [
+            {
+              "expression": "updated_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
         }
       },
       "foreignKeys": {
-        "follows_follower_id_users_id_fk": {
-          "name": "follows_follower_id_users_id_fk",
-          "tableFrom": "follows",
+        "agents_user_id_users_id_fk": {
+          "name": "agents_user_id_users_id_fk",
+          "tableFrom": "agents",
           "tableTo": "users",
           "columnsFrom": [
-            "follower_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "follows_following_id_users_id_fk": {
-          "name": "follows_following_id_users_id_fk",
-          "tableFrom": "follows",
-          "tableTo": "users",
-          "columnsFrom": [
-            "following_id"
+            "user_id"
           ],
           "columnsTo": [
             "id"
@@ -654,6 +708,31 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.models": {
+      "name": "models",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "varchar(10)",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar(50)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -943,8 +1022,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "agent_id": {
-          "name": "agent_id",
+        "agent_friendly_id": {
+          "name": "agent_friendly_id",
           "type": "serial",
           "primaryKey": false,
           "notNull": true
@@ -1087,14 +1166,117 @@
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "howls_agentId_unique": {
-          "name": "howls_agentId_unique",
+        "howls_agentFriendlyId_unique": {
+          "name": "howls_agentFriendlyId_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "agent_id"
+            "agent_friendly_id"
           ]
         }
       },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.follows": {
+      "name": "follows",
+      "schema": "",
+      "columns": {
+        "follower_id": {
+          "name": "follower_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "following_id": {
+          "name": "following_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {
+        "unique_follow": {
+          "name": "unique_follow",
+          "columns": [
+            {
+              "expression": "follower_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            },
+            {
+              "expression": "following_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_follows_created_at": {
+          "name": "idx_follows_created_at",
+          "columns": [
+            {
+              "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "follows_follower_id_users_id_fk": {
+          "name": "follows_follower_id_users_id_fk",
+          "tableFrom": "follows",
+          "tableTo": "users",
+          "columnsFrom": [
+            "follower_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "follows_following_id_users_id_fk": {
+          "name": "follows_following_id_users_id_fk",
+          "tableFrom": "follows",
+          "tableTo": "users",
+          "columnsFrom": [
+            "following_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -1242,8 +1424,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "agent_id": {
-          "name": "agent_id",
+        "agent_friendly_id": {
+          "name": "agent_friendly_id",
           "type": "serial",
           "primaryKey": false,
           "notNull": true
@@ -1301,11 +1483,11 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_agentId_unique": {
-          "name": "users_agentId_unique",
+        "users_agentFriendlyId_unique": {
+          "name": "users_agentFriendlyId_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "agent_id"
+            "agent_friendly_id"
           ]
         },
         "users_username_unique": {

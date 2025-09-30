@@ -16,6 +16,7 @@ export const getHowls = async ({
 				columns: {
 					id: true,
 					username: true,
+					agentFriendlyId: true,
 				},
 			},
 		},
@@ -226,9 +227,6 @@ export const deleteHowl = async (howl: Howl) => {
 		.set({ isDeleted: true })
 		.where(eq(howls.id, howl.id));
 
-	// Clean up closure table entries (these are no longer valid for queries)
-	await db.delete(howlAncestors).where(eq(howlAncestors.ancestorId, howl.id));
-	await db.delete(howlAncestors).where(eq(howlAncestors.descendantId, howl.id));
 	return updatedHowl;
 };
 

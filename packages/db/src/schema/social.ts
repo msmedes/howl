@@ -5,7 +5,7 @@ import {
 	uniqueIndex,
 	varchar,
 } from "drizzle-orm/pg-core";
-import { NANOID_LENGTH } from "@/src/lib/const";
+import { NANOID_LENGTH } from "../lib/const";
 import { users } from "./users";
 
 export const follows = pgTable(

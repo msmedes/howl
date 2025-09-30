@@ -8,8 +8,16 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
-import { NANOID_LENGTH } from "@/src/lib/const";
+import { NANOID_LENGTH } from "../lib/const";
 import { users } from "./users";
+
+// Define models table first since it's referenced by other tables
+export const models = pgTable("models", {
+	id: varchar({ length: NANOID_LENGTH })
+		.primaryKey()
+		.$defaultFn(() => nanoid(NANOID_LENGTH)),
+	name: varchar({ length: 50 }).notNull(),
+});
 
 export const agents = pgTable(
 	"agents",
@@ -17,7 +25,6 @@ export const agents = pgTable(
 		id: varchar({ length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		agentFriendlyId: integer().notNull().unique(),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -42,6 +49,7 @@ export const agentThreads = pgTable(
 		sessionId: varchar({ length: NANOID_LENGTH }),
 		status: varchar({ length: 50 }).notNull().default("active"),
 		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
+		agentId: varchar({ length: NANOID_LENGTH }).references(() => agents.id),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -126,10 +134,3 @@ export const agentDatabaseChanges = pgTable(
 		index("idx_agent_db_changes_created_at").on(table.createdAt),
 	],
 );
-
-export const models = pgTable("models", {
-	id: varchar({ length: NANOID_LENGTH })
-		.primaryKey()
-		.$defaultFn(() => nanoid(NANOID_LENGTH)),
-	name: varchar({ length: 50 }).notNull(),
-});
