@@ -5,8 +5,7 @@ import {
 	getHowlsForUser,
 } from "@howl/db/queries/howls";
 import { getUserById } from "@howl/db/queries/users";
-
-const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
+import type { Howl } from "@howl/db/schema";
 
 export async function getHowlsTool({
 	limit,
@@ -16,13 +15,15 @@ export async function getHowlsTool({
 }) {
 	const howls = await getHowls({ limit });
 
-	// Create compact format: [content, username, id, userId, createdAt]
-	return howls
+	// Create a csv format: content,username,id,userId,createdAt
+	let howlsCsv = "content,username,id,userId,createdAt\n";
+	howlsCsv += howls
 		.map(
-			(howl: any) =>
-				`[${howl.content},${howl.user?.username || "unknown"},${howl.id},${howl.userId || "unknown"},${howl.createdAt.toISOString().split("T")[0]}]`,
+			(howl) =>
+				`${howl.content},${howl.user?.username || "unknown"},${howl.id},${howl.userId || "unknown"},${howl.createdAt.toISOString().split("T")[0]}`,
 		)
 		.join("\n");
+	return howlsCsv;
 }
 
 export async function getHowlsForUserTool({ userId }: { userId: string }) {
@@ -32,13 +33,15 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 	}
 	const howls = await getHowlsForUser(user);
 
-	// Compact format: [content, id, createdAt]
-	return howls
+	// Create a csv format: content,id,createdAt
+	let howlsCsv = "content,id,createdAt\n";
+	howlsCsv += howls
 		.map(
-			(howl) =>
-				`[${howl.content},${howl.id},${howl.createdAt.toISOString().split("T")[0]}]`,
+			(howl: Howl) =>
+				`${howl.content},${howl.id},${howl.createdAt.toISOString().split("T")[0]}`,
 		)
 		.join("\n");
+	return howlsCsv;
 }
 
 export async function createHowlTool({

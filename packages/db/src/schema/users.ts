@@ -14,7 +14,7 @@ export const users = pgTable(
 		id: varchar("id", { length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		agentId: serial().notNull().unique(),
+		agentFriendlyId: serial().notNull().unique(),
 		username: varchar({ length: 255 }).notNull().unique(),
 		email: varchar({ length: 255 }).notNull().unique(),
 		bio: varchar({ length: 255 }),

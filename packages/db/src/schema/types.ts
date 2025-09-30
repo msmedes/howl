@@ -1,8 +1,10 @@
 import type {
 	agentDatabaseChanges,
+	agents,
 	agentThoughts,
 	agentThreads,
 	agentToolCalls,
+	models,
 } from "./agents";
 import type { howlAncestors, howlLikes, howls } from "./howls";
 import type { follows, userBlocks } from "./social";
@@ -11,6 +13,12 @@ import type { users } from "./users";
 // User types
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
+
+// Agent types
+export type Agent = typeof agents.$inferSelect;
+export type InsertAgent = typeof agents.$inferInsert;
+export type Model = typeof models.$inferSelect;
+export type InsertModel = typeof models.$inferInsert;
 
 // Howl types
 export type Howl = typeof howls.$inferSelect;

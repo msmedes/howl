@@ -95,7 +95,7 @@ export const agentThreadsRelations = relations(
 	agentThreads,
 	({ one, many }) => ({
 		agent: one(users, {
-			fields: [agentThreads.agentId],
+			fields: [agentThreads.agentFriendlyId],
 			references: [users.id],
 		}),
 		thoughts: many(agentThoughts),

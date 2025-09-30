@@ -8,9 +8,30 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
+import { NANOID_LENGTH } from "@/src/lib/const";
 import { users } from "./users";
 
-const NANOID_LENGTH = 10;
+export const agents = pgTable(
+	"agents",
+	{
+		id: varchar({ length: NANOID_LENGTH })
+			.primaryKey()
+			.$defaultFn(() => nanoid(NANOID_LENGTH)),
+		agentFriendlyId: integer().notNull().unique(),
+		createdAt: timestamp().notNull().defaultNow(),
+		updatedAt: timestamp()
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		prompt: text().notNull(),
+		lastRunAt: timestamp(),
+	},
+	(table) => [
+		index("idx_agents_created_at").on(table.createdAt),
+		index("idx_agents_updated_at").on(table.updatedAt),
+	],
+);
 
 export const agentThreads = pgTable(
 	"agent_threads",
@@ -18,11 +39,9 @@ export const agentThreads = pgTable(
 		id: varchar({ length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		agentId: varchar({ length: NANOID_LENGTH })
-			.notNull()
-			.references(() => users.id),
 		sessionId: varchar({ length: NANOID_LENGTH }),
 		status: varchar({ length: 50 }).notNull().default("active"),
+		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -30,7 +49,6 @@ export const agentThreads = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		index("idx_agent_threads_agent").on(table.agentId),
 		index("idx_agent_threads_session").on(table.sessionId),
 		index("idx_agent_threads_status").on(table.status),
 		index("idx_agent_threads_created_at").on(table.createdAt),
@@ -49,6 +67,7 @@ export const agentThoughts = pgTable(
 		stepNumber: integer().notNull(),
 		thoughtType: varchar({ length: 50 }).notNull(),
 		content: text().notNull(),
+		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		createdAt: timestamp().notNull().defaultNow(),
 	},
 	(table) => [
@@ -71,6 +90,7 @@ export const agentToolCalls = pgTable(
 		stepNumber: integer().notNull(),
 		toolName: varchar({ length: 100 }).notNull(),
 		arguments: jsonb(),
+		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		createdAt: timestamp().notNull().defaultNow(),
 	},
 	(table) => [
@@ -95,6 +115,7 @@ export const agentDatabaseChanges = pgTable(
 		tableName: varchar({ length: 50 }).notNull(),
 		recordId: varchar({ length: NANOID_LENGTH }).notNull(),
 		changes: jsonb(),
+		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		createdAt: timestamp().notNull().defaultNow(),
 	},
 	(table) => [
@@ -105,3 +126,10 @@ export const agentDatabaseChanges = pgTable(
 		index("idx_agent_db_changes_created_at").on(table.createdAt),
 	],
 );
+
+export const models = pgTable("models", {
+	id: varchar({ length: NANOID_LENGTH })
+		.primaryKey()
+		.$defaultFn(() => nanoid(NANOID_LENGTH)),
+	name: varchar({ length: 50 }).notNull(),
+});

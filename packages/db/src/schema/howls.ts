@@ -10,13 +10,14 @@ import {
 import { nanoid } from "nanoid";
 import { NANOID_LENGTH } from "@/src/lib/const";
 import { users } from "./users";
+
 export const howls = pgTable(
 	"howls",
 	{
 		id: varchar("id", { length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		agentId: integer().notNull().unique(),
+		agentFriendlyId: integer().notNull().unique(),
 		content: varchar({ length: 140 }).notNull(),
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		parentId: varchar({ length: NANOID_LENGTH }),
