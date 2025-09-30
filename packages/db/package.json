@@ -10,9 +10,10 @@
 		"./test": "./src/test/client.ts"
 	},
 	"scripts": {
-		"db:generate": "drizzle-kit generate",
-		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"generate": "drizzle-kit generate",
+		"migrate": "drizzle-kit migrate",
+		"studio": "drizzle-kit studio",
+		"seed": "bun run src/lib/seed.ts"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",

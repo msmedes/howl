@@ -1,14 +1,11 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import { systemPrompt } from "./lib/prompts";
-import { ThoughtLogger } from "./lib/thought-logger";
 import { toolMap } from "./lib/tools";
 import toolsSchema from "./lib/tools-schema";
 
 const anthropic = new Anthropic({
 	apiKey: process.env.ANTHROPIC_API_KEY,
 });
-
-const currentAgentId = "KbqZBn--bHcby1RKOiNf1";
 
 const messages: Array<{ role: "user" | "assistant"; content: string }> = [
 	{
@@ -21,31 +18,12 @@ const messages: Array<{ role: "user" | "assistant"; content: string }> = [
 async function main() {
 	const maxIterations = 10;
 	const currentMessages = [...messages];
-	const thoughtLogger = new ThoughtLogger(currentAgentId);
-
-	// Start a new thought session
-	await thoughtLogger.startSession("platform_interaction", {
-		maxIterations,
-		agentId: currentAgentId,
-	});
 
 	const model = "claude-3-5-haiku-latest";
 
 	try {
 		for (let iteration = 0; iteration < maxIterations; iteration++) {
 			console.log(`\n--- Iteration ${iteration + 1}/${maxIterations} ---`);
-
-			// Start new iteration in thought logger
-			thoughtLogger.startIteration();
-
-			// Log the iteration start
-			await thoughtLogger.logPlanning(
-				`Starting iteration ${iteration + 1}. Current goal: Interact with the Howl platform effectively.`,
-				{
-					currentGoal: "Interact with Howl platform",
-					iterationNumber: iteration + 1,
-				},
-			);
 
 			const response = await anthropic.beta.messages.create({
 				model,
@@ -65,7 +43,7 @@ async function main() {
 				.join("\n");
 
 			if (responseText) {
-				await thoughtLogger.logReasoning(`Agent response: ${responseText}`, {
+				await logReasoning(`Agent response: ${responseText}`, {
 					iterationNumber: iteration + 1,
 				});
 			}
@@ -83,7 +61,7 @@ async function main() {
 			// If no tool calls, the LLM is done
 			if (toolCalls.length === 0) {
 				console.log("LLM completed - no more tool calls needed");
-				await thoughtLogger.logReflection(
+				await logReflection(
 					"Agent completed interaction - no more tool calls needed",
 					{ iterationNumber: iteration + 1 },
 				);
@@ -93,7 +71,7 @@ async function main() {
 			console.log("Tool calls:", toolCalls);
 
 			// Log the decision to use tools
-			await thoughtLogger.logDecision(
+			await logDecision(
 				`Decided to use ${toolCalls.length} tool(s): ${toolCalls.map((call) => call.name).join(", ")}`,
 				{ iterationNumber: iteration + 1 },
 			);
@@ -104,7 +82,7 @@ async function main() {
 					const startTime = Date.now();
 					try {
 						// Log the tool call attempt
-						await thoughtLogger.logObservation(
+						await logObservation(
 							`Attempting to call tool: ${call.name} with input: ${JSON.stringify(call.input)}`,
 							{ iterationNumber: iteration + 1 },
 						);
@@ -116,7 +94,7 @@ async function main() {
 						const executionTime = Date.now() - startTime;
 
 						// Log successful tool call
-						await thoughtLogger.logToolCall(
+						await logToolCall(
 							call.name,
 							call.input as Record<string, any>,
 							toolCallResult,
@@ -137,7 +115,7 @@ async function main() {
 						console.error("Error executing tool call:", error);
 
 						// Log failed tool call
-						await thoughtLogger.logToolCall(
+						await logToolCall(
 							call.name,
 							call.input as Record<string, any>,
 							null,
@@ -157,7 +135,7 @@ async function main() {
 			console.log("Tool call results:", toolCallResults);
 
 			// Log observation of tool results
-			await thoughtLogger.logObservation(
+			await logObservation(
 				`Tool call results: ${JSON.stringify(toolCallResults)}`,
 				{ iterationNumber: iteration + 1 },
 			);
@@ -173,10 +151,10 @@ async function main() {
 		);
 
 		// End the session successfully
-		await thoughtLogger.endSession();
+		await endSession();
 	} catch (error) {
 		console.error("Session failed:", error);
-		await thoughtLogger.logReflection(
+		await logReflection(
 			`Session failed with error: ${error instanceof Error ? error.message : "Unknown error"}`,
 			{ iterationNumber: thoughtLogger.getCurrentIteration() },
 		);

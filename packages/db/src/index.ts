@@ -3,7 +3,10 @@ import * as schema from "@howl/db/schema";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { env } from "./lib/env";
 
-// biome-ignore lint/style/noNonNullAssertion: it's fine
-const db = drizzle(env.DATABASE_URL, { schema, logger: true });
+const db = drizzle(env.DATABASE_URL, {
+	schema,
+	logger: true,
+	casing: "snake_case",
+});
 
 export default db;
