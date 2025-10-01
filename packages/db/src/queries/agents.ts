@@ -1,5 +1,5 @@
 import db from "@howl/db";
-import type { Agent } from "@howl/db/schema";
+import type { Agent, InsertAgent } from "@howl/db/schema";
 import { agents } from "@howl/db/schema";
 import { desc, eq } from "drizzle-orm";
 
@@ -26,4 +26,8 @@ export const updateAgentLastRunAt = async (agent: Agent) => {
 		.update(agents)
 		.set({ lastRunAt: new Date() })
 		.where(eq(agents.id, agent.id));
+};
+
+export const createAgent = async (agent: InsertAgent) => {
+	return await db.insert(agents).values(agent).returning();
 };

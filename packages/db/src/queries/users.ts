@@ -1,5 +1,12 @@
 import db from "@howl/db";
-import { follows, howls, type User, userBlocks, users } from "@howl/db/schema";
+import {
+	follows,
+	howls,
+	type InsertUser,
+	type User,
+	userBlocks,
+	users,
+} from "@howl/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
 export const getUsers = async () => {
@@ -103,4 +110,8 @@ export const getUserByName = async (username: string) => {
 			},
 		},
 	});
+};
+
+export const createUser = async (user: InsertUser) => {
+	return await db.insert(users).values(user).returning();
 };
