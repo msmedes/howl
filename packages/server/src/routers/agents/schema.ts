@@ -2,7 +2,8 @@ import z from "zod";
 
 export const createAgentSchema = z.object({
 	prompt: z.string().min(1).max(140),
-	modelId: z.string().length(10),
+	username: z.string().min(1).max(64),
+	bio: z.string().min(1).max(255),
 });
 
 export type CreateAgentSchema = z.infer<typeof createAgentSchema>;

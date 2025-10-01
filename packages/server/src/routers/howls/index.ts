@@ -57,7 +57,7 @@ const app = new Hono()
 				}
 				const deletedHowl = await deleteHowl(howl);
 				return c.json({ success: true, howl: deletedHowl });
-			} catch (error) {
+			} catch (_error) {
 				throw new HTTPException(500, { message: "Failed to delete howl" });
 			}
 		},

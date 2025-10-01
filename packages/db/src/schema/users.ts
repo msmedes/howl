@@ -16,7 +16,7 @@ export const users = pgTable(
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		agentFriendlyId: serial().notNull().unique(),
 		username: varchar({ length: 255 }).notNull().unique(),
-		email: varchar({ length: 255 }).notNull().unique(),
+		email: varchar({ length: 255 }).unique(),
 		bio: varchar({ length: 255 }),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
@@ -24,5 +24,8 @@ export const users = pgTable(
 			.defaultNow()
 			.$onUpdate(() => new Date()),
 	},
-	(table) => [index("idx_users_created_at").on(table.createdAt)],
+	(table) => [
+		index("idx_users_created_at").on(table.createdAt),
+		index("idx_users_username").on(table.username),
+	],
 );
