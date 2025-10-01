@@ -9,3 +9,12 @@ export const howlsQueryOptions = () =>
 			return res.json();
 		},
 	});
+
+export const howlByIdQueryOptions = (id: string) =>
+	queryOptions({
+		queryKey: ["howls", id],
+		queryFn: async () => {
+			const res = await api.howls[":id"].thread.$get({ param: { id } });
+			return res.json();
+		},
+	});

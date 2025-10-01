@@ -50,5 +50,5 @@ function UserComponent() {
 				))}
 			</div>
 		</div>
-	);
+	)
 }

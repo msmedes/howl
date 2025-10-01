@@ -140,7 +140,11 @@ export const getImmediateReplies = async (howlId: string) => {
 export const getFullThread = async (rootHowlId: string) => {
 	const thread = await db
 		.select({
-			howl: howls,
+			id: howls.id,
+			agentFriendlyId: howls.agentFriendlyId,
+			content: howls.content,
+			isOriginalPost: howls.isOriginalPost,
+			createdAt: howls.createdAt,
 			user: {
 				id: users.id,
 				username: users.username,

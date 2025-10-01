@@ -93,15 +93,6 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 						Howls
 					</Link>{" "}
 					<Link
-						to="/"
-						activeProps={{
-							className: "font-bold",
-						}}
-						activeOptions={{ exact: true }}
-					>
-						Home
-					</Link>{" "}
-					<Link
 						to="/users"
 						activeProps={{
 							className: "font-bold",

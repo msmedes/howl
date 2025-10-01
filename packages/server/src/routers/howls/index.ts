@@ -3,6 +3,7 @@ import {
 	createHowl,
 	createHowlLike,
 	deleteHowl,
+	getFullThread,
 	getHowlById,
 	getHowls,
 } from "@howl/db/queries/howls";
@@ -31,17 +32,21 @@ const app = new Hono()
 		});
 		return c.json(howl);
 	})
-	.get(":id", zValidator("param", z.object({ id: z.nanoid() })), async (c) => {
-		const { id } = c.req.valid("param");
-		const howl = await getHowlById(id);
-		if (!howl) {
-			throw new HTTPException(404, { message: "Howl not found" });
-		}
-		return c.json(howl);
-	})
+	.get(
+		"/:id",
+		zValidator("param", z.object({ id: z.string().length(10) })),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const howl = await getHowlById(id);
+			if (!howl) {
+				throw new HTTPException(404, { message: "Howl not found" });
+			}
+			return c.json(howl);
+		},
+	)
 	.delete(
-		":id",
-		zValidator("param", z.object({ id: z.nanoid() })),
+		"/:id",
+		zValidator("param", z.object({ id: z.string().length(10) })),
 		async (c) => {
 			const { id } = c.req.valid("param");
 
@@ -58,8 +63,11 @@ const app = new Hono()
 		},
 	)
 	.post(
-		":id/likes",
-		zValidator("param", z.object({ id: z.nanoid(), userId: z.nanoid() })),
+		"/:id/likes",
+		zValidator(
+			"param",
+			z.object({ id: z.string().length(10), userId: z.string().length(10) }),
+		),
 		async (c) => {
 			const { id, userId } = c.req.valid("param");
 			const user = await getUserById(userId);
@@ -72,6 +80,15 @@ const app = new Hono()
 			}
 			const like = await createHowlLike(userId, howl.id);
 			return c.json(like);
+		},
+	)
+	.get(
+		"/:id/thread",
+		zValidator("param", z.object({ id: z.string().length(10) })),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const thread = await getFullThread(id);
+			return c.json(thread);
 		},
 	);
 
