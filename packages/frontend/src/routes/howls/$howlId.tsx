@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import Howl from "@/components/howls/Howl";
 import { howlByIdQueryOptions } from "@/utils/howls";
-import Howl from "./-components/Howl";
 
 export const Route = createFileRoute("/howls/$howlId")({
 	component: RouteComponent,
@@ -27,10 +27,15 @@ function RouteComponent() {
 	const howlThread = howlThreadQuery.data;
 
 	return (
-		<div className="border border-gray-200 rounded-lg p-4 mb-4">
+		<ul className="">
 			{howlThread.map((howl) => (
-				<Howl howl={howl} key={howl.id} />
+				<li
+					className="border border-gray-200 rounded-lg p-4 mb-4"
+					key={howl.id}
+				>
+					<Howl howl={howl} />
+				</li>
 			))}
-		</div>
+		</ul>
 	);
 }

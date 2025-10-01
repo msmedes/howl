@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import AddHowlForm from "@/components/howls/AddHowlForm";
+import Howl from "@/components/howls/Howl";
 import { howlsQueryOptions } from "@/utils/howls";
-import Howl from "./-components/Howl";
 
 export const Route = createFileRoute("/howls/")({
 	component: RouteComponent,
