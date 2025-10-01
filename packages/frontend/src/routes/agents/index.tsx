@@ -1,9 +1,14 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from "@tanstack/react-router";
+import AddAgentForm from "@/components/agents/AddAgentForm";
 
-export const Route = createFileRoute('/agents/')({
-  component: RouteComponent,
-})
+export const Route = createFileRoute("/agents/")({
+	component: RouteComponent,
+});
 
 function RouteComponent() {
-  return <div>Hello "/agents/"!</div>
+	return (
+		<div className="flex flex-col gap-2 text-2xl">
+			<AddAgentForm />
+		</div>
+	);
 }

@@ -1,84 +1,36 @@
 import type { Howl as HowlType } from "@howl/db/schema";
-import { useQueryClient } from "@tanstack/react-query";
 import { Link } from "@tanstack/react-router";
-import { formatRelative } from "date-fns";
-import { useState } from "react";
-import AddHowlForm from "@/components/howls/AddHowlForm";
-import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardFooter,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
-import api from "@/utils/client";
+import { formatDistanceToNow } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function Howl({ howl }: { howl: HowlType }) {
-	const [showReplyForm, setShowReplyForm] = useState(false);
-	const queryClient = useQueryClient();
-	const handleReplySuccess = () => {
-		setShowReplyForm(false);
-	};
-
-	const handleDeleteHowl = async (howlId: string) => {
-		if (confirm("Are you sure you want to delete this howl?")) {
-			try {
-				const response = await api.howls[":id"].$delete({
-					param: { id: howlId },
-				});
-
-				if (!response.ok) {
-					throw new Error("Failed to delete howl");
-				}
-				queryClient.invalidateQueries({ queryKey: ["howls", howlId] });
-			} catch (error) {
-				console.error("Error deleting howl:", error);
-			}
-		}
-	};
-
 	return (
-		<Card className="w-full max-w-md shadow-none">
-			<CardHeader>
-				<CardTitle>
-					<Link to={`/users/$userId`} params={{ userId: String(howl.user.id) }}>
-						{howl.user.username}
-					</Link>
-				</CardTitle>
-			</CardHeader>
-			<CardContent>
-				<Link to={`/howls/$howlId`} params={{ howlId: howl.id }}>
-					<p className="text-lg">{howl.content}</p>
-					<p className="text-sm text-muted-foreground">
-						{formatRelative(new Date(howl.createdAt), new Date())}
-					</p>
-				</Link>
-			</CardContent>
-			<CardFooter className="flex justify-between items-center">
-				<Button
-					className="shadow"
-					onClick={() => setShowReplyForm(!showReplyForm)}
-				>
-					{showReplyForm ? "Cancel" : "Reply"}
-				</Button>
-				<Button
-					className="shadow"
-					variant="destructive"
-					onClick={() => handleDeleteHowl(howl.id)}
-				>
-					Delete
-				</Button>
-				{showReplyForm && (
-					<div className="mt-4 pt-4 border-t border-gray-200">
-						<AddHowlForm
-							parentId={howl.id}
-							replying={true}
-							onSuccess={handleReplySuccess}
-						/>
+		<Link
+			key={howl.id}
+			to={`/howls/$howlId`}
+			params={{ howlId: howl.id }}
+			className={cn(
+				"hover:bg-accent hover:text-accent-foreground flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all",
+			)}
+			type="button"
+		>
+			<div className="flex w-full flex-col gap-1">
+				<div className="flex items-center">
+					<div className="flex items-center gap-2">
+						<div className="font-semibold text-sm">
+							<Link to={`/users/$userId`} params={{ userId: howl.userId }}>
+								{howl.user.username}
+							</Link>
+						</div>
 					</div>
-				)}
-			</CardFooter>
-		</Card>
+				</div>
+				<div className="text-muted-foreground line-clamp-2 text-xl">
+					{howl.content}
+				</div>
+				<div className="text-muted-foreground text-xs">
+					{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
+				</div>
+			</div>
+		</Link>
 	);
 }
