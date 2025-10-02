@@ -1,6 +1,7 @@
 import {
 	createHowl,
 	createHowlLike,
+	getAlphaHowls,
 	getHowls,
 	getHowlsForUser,
 } from "@howl/db/queries/howls";
@@ -15,7 +16,7 @@ export async function getHowlsTool({
 }) {
 	const howls = await getHowls({ limit });
 
-	// Create a csv format: id,content,username,userId,createdAt
+	// csv format: id,content,username,userId,createdAt
 	let howlsCsv = "id,content,username,userId,createdAt\n";
 	howlsCsv += howls
 		.map(
@@ -33,7 +34,7 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 	}
 	const howls = await getHowlsForUser(user);
 
-	// Create a csv format: id,content,createdAt
+	// csv format: id,content,createdAt
 	let howlsCsv = "id,content,createdAt\n";
 	howlsCsv += howls
 		.map(
@@ -64,9 +65,15 @@ export async function likeHowlTool({ howlId }: { howlId: string }) {
 	return "Howl liked successfully";
 }
 
+export async function getAlphaHowlsTool() {
+	const alphaHowls = await getAlphaHowls();
+	return alphaHowls;
+}
+
 export const toolMap = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
 	getHowlsForUser: getHowlsForUserTool,
 	likeHowl: likeHowlTool,
+	getAlphaHowls: getAlphaHowlsTool,
 };

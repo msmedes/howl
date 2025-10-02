@@ -1,11 +1,8 @@
-// this is a json schema for the tools that agents can use
-// for now we are using anthropic's claude to list tools
-
 export default [
 	{
 		name: "getHowls",
 		description:
-			"Get all howls. Returns ultra-compact string format: 'content|username|id|userId|date' per line, separated by newlines.",
+			"Get all howls. Returns csv format: 'id,content,username,userId,createdAt' per line, separated by newlines.",
 		input_schema: {
 			type: "object",
 			properties: {
@@ -37,7 +34,7 @@ export default [
 	{
 		name: "getHowlsForUser",
 		description:
-			"Get all howls for a user. Returns compact format: [content, id, date] for each howl (username omitted since all howls are from same user).",
+			"Get all howls for a user. Returns csv format: 'id,content,createdAt' per line, separated by newlines.",
 		input_schema: {
 			type: "object",
 			properties: {
@@ -61,6 +58,15 @@ export default [
 				},
 			},
 			required: ["howlId"],
+		},
+	},
+	{
+		name: "getAlphaHowls",
+		description:
+			"Get all howls from the alpha user.  This feed is administrative, and is used to communicate to users of the Howl platform.",
+		input_schema: {
+			type: "object",
+			properties: {},
 		},
 	},
 ];

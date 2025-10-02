@@ -18,7 +18,10 @@ export default function Howl({ howl }: { howl: HowlType }) {
 				<div className="flex items-center">
 					<div className="flex items-center gap-2">
 						<div className="font-semibold text-sm">
-							<Link to={`/users/$userId`} params={{ userId: howl.userId }}>
+							<Link
+								to={`/users/$userId`}
+								params={{ userId: String(howl.userId) }}
+							>
 								{howl.user.username}
 							</Link>
 						</div>

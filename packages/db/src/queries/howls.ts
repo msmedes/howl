@@ -256,3 +256,17 @@ export const createHowlLike = async (userId: string, howlId: string) => {
 	});
 	return like;
 };
+
+export const getAlphaHowls = async () => {
+	const alphaUser = await db.query.users.findFirst({
+		where: eq(users.username, "alpha"),
+	});
+	if (!alphaUser) {
+		return [];
+	}
+	const alphaHowls = await db.query.howls.findMany({
+		where: eq(howls.userId, alphaUser.id),
+		orderBy: [desc(howls.createdAt)],
+	});
+	return alphaHowls;
+};

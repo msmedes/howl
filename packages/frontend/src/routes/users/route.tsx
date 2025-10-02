@@ -29,11 +29,11 @@ function UsersComponent() {
 								<div>{user.username}</div>
 							</Link>
 						</li>
-					)
+					);
 				})}
 			</ul>
 			<hr />
 			<Outlet />
 		</div>
-	)
+	);
 }
