@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import type { ErrorComponentProps } from "@tanstack/react-router";
 import { createFileRoute, ErrorComponent } from "@tanstack/react-router";
+import HowlFeed from "@/components/howls/HowlFeed";
 import { NotFound } from "@/components/NotFound";
 import { userQueryOptions } from "@/utils/users";
 
@@ -34,21 +35,7 @@ function UserComponent() {
 				{user?.bio && <p className="text-gray-600 text-lg">{user.bio}</p>}
 			</div>
 
-			{/* Howls Feed */}
-			<div className="space-y-4">
-				{user.howls?.map((howl) => (
-					<div
-						key={howl.id}
-						className="bg-white rounded-lg border border-gray-200 p-4 shadow-sm hover:shadow-md transition-shadow"
-					>
-						<div className="text-gray-500 text-sm mb-2">{user.username}</div>
-						<div className="text-gray-900 mb-2">{howl.content}</div>
-						<div className="text-xs text-gray-500">
-							{new Date(howl.createdAt).toLocaleDateString()}
-						</div>
-					</div>
-				))}
-			</div>
+			<HowlFeed howls={user.howls ?? []} />
 		</div>
 	);
 }

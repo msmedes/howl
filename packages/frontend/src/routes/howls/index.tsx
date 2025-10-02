@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import Howl from "@/components/howls/Howl";
+import HowlFeed from "@/components/howls/HowlFeed";
 import { howlsQueryOptions } from "@/utils/howls";
 
 export const Route = createFileRoute("/howls/")({
@@ -15,11 +15,7 @@ function RouteComponent() {
 
 	return (
 		<div className="mt-8">
-			<div className="flex flex-col gap-2 p-4 pt-0 w-1/2 mx-auto">
-				{howlsQuery.data?.map((howl) => (
-					<Howl howl={howl} key={howl.id} />
-				))}
-			</div>
+			<HowlFeed howls={howlsQuery.data ?? []} />
 			<Outlet />
 		</div>
 	);

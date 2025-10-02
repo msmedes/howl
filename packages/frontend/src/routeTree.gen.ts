@@ -13,7 +13,6 @@ import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
 import { Route as HowlsRouteRouteImport } from './routes/howls/route'
 import { Route as AgentsRouteRouteImport } from './routes/agents/route'
-import { Route as UsersIndexRouteImport } from './routes/users/index'
 import { Route as HowlsIndexRouteImport } from './routes/howls/index'
 import { Route as AgentsIndexRouteImport } from './routes/agents/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
@@ -38,11 +37,6 @@ const AgentsRouteRoute = AgentsRouteRouteImport.update({
   id: '/agents',
   path: '/agents',
   getParentRoute: () => rootRouteImport,
-} as any)
-const UsersIndexRoute = UsersIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => UsersRouteRoute,
 } as any)
 const HowlsIndexRoute = HowlsIndexRouteImport.update({
   id: '/',
@@ -74,15 +68,14 @@ export interface FileRoutesByFullPath {
   '/users/$userId': typeof UsersUserIdRoute
   '/agents/': typeof AgentsIndexRoute
   '/howls/': typeof HowlsIndexRoute
-  '/users/': typeof UsersIndexRoute
 }
 export interface FileRoutesByTo {
+  '/users': typeof UsersRouteRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/agents': typeof AgentsIndexRoute
   '/howls': typeof HowlsIndexRoute
-  '/users': typeof UsersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -94,7 +87,6 @@ export interface FileRoutesById {
   '/users/$userId': typeof UsersUserIdRoute
   '/agents/': typeof AgentsIndexRoute
   '/howls/': typeof HowlsIndexRoute
-  '/users/': typeof UsersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,15 +99,14 @@ export interface FileRouteTypes {
     | '/users/$userId'
     | '/agents/'
     | '/howls/'
-    | '/users/'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/users'
     | '/redirect'
     | '/howls/$howlId'
     | '/users/$userId'
     | '/agents'
     | '/howls'
-    | '/users'
   id:
     | '__root__'
     | '/agents'
@@ -126,7 +117,6 @@ export interface FileRouteTypes {
     | '/users/$userId'
     | '/agents/'
     | '/howls/'
-    | '/users/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -165,13 +155,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/agents'
       preLoaderRoute: typeof AgentsRouteRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/users/': {
-      id: '/users/'
-      path: '/'
-      fullPath: '/users/'
-      preLoaderRoute: typeof UsersIndexRouteImport
-      parentRoute: typeof UsersRouteRoute
     }
     '/howls/': {
       id: '/howls/'
@@ -232,12 +215,10 @@ const HowlsRouteRouteWithChildren = HowlsRouteRoute._addFileChildren(
 
 interface UsersRouteRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
-  UsersIndexRoute: typeof UsersIndexRoute
 }
 
 const UsersRouteRouteChildren: UsersRouteRouteChildren = {
   UsersUserIdRoute: UsersUserIdRoute,
-  UsersIndexRoute: UsersIndexRoute,
 }
 
 const UsersRouteRouteWithChildren = UsersRouteRoute._addFileChildren(
