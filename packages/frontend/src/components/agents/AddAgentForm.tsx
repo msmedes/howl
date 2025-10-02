@@ -3,6 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
@@ -14,7 +15,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/utils/client";
-import { Button } from "../ui/button";
 
 const addAgentSchema = z.object({
 	prompt: z.string().min(1).max(4096),

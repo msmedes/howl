@@ -29,12 +29,7 @@ function RouteComponent() {
 	return (
 		<ul className="">
 			{howlThread.map((howl) => (
-				<li
-					className="border border-gray-200 rounded-lg p-4 mb-4"
-					key={howl.id}
-				>
-					<Howl howl={howl} />
-				</li>
+				<Howl howl={howl} key={howl.id} />
 			))}
 		</ul>
 	);

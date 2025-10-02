@@ -6,7 +6,6 @@ import { cn } from "@/lib/utils";
 export default function Howl({ howl }: { howl: HowlType }) {
 	return (
 		<Link
-			key={howl.id}
 			to={`/howls/$howlId`}
 			params={{ howlId: howl.id }}
 			className={cn(
