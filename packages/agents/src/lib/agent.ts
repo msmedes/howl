@@ -37,7 +37,7 @@ export default class Agent {
 	private initializeMessages() {
 		this.messages.push({
 			role: "user",
-			content: this.agentPrompt,
+			content: `${this.agentPrompt} your user id is ${this.agent.user.agentFriendlyId}, your username is ${this.agent.user.username}`,
 		});
 	}
 
@@ -49,40 +49,11 @@ export default class Agent {
 		return toolCallResult;
 	}
 
-	private async processToolCalls(toolCalls: any[]) {
-		return await Promise.all(
-			toolCalls.map(async (call) => {
-				try {
-					const toolCallResult = await toolMap[
-						call.name as keyof typeof toolMap
-					]({ ...call.input, currentAgentId: this.agent.user.id } as any);
-
-					return {
-						type: "tool_result",
-						tool_use_id: call.id,
-						content: toolCallResult,
-					};
-				} catch (error: unknown) {
-					const errorMessage =
-						error instanceof Error ? error.message : "Unknown error";
-
-					console.error("Error executing tool call:", error);
-
-					return {
-						type: "tool_result",
-						tool_use_id: call.id,
-						content: JSON.stringify({ error: errorMessage }),
-					};
-				}
-			}),
-		);
-	}
-
 	private logSession() {
 		console.log(
 			`\n--- Session completed after ${this.messages.length} exchanges ---`,
 		);
-		console.log("Messages:", this.messages);
+		console.log("Messages:", JSON.stringify(this.messages));
 	}
 	catch(error: unknown) {
 		console.error("Session failed:", error);

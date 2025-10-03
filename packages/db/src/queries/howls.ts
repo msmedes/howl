@@ -39,7 +39,7 @@ export const createHowl = async ({
 	userId,
 	parentId,
 }: CreateHowlParams & { db: Database }) => {
-	const howl = await db
+	const [howl] = await db
 		.insert(howls)
 		.values({
 			content,
@@ -50,9 +50,11 @@ export const createHowl = async ({
 		.returning();
 
 	// If this is a reply, we need to populate the closure table
-	if (parentId) {
-		await populateClosureTable({ db, newHowlId: howl[0].id, parentId });
-	}
+	await populateClosureTable({
+		db,
+		newHowlId: howl.id,
+		parentId: parentId ?? howl.id,
+	});
 
 	return howl;
 };
@@ -178,7 +180,7 @@ export const getFullThread = async ({
 		.innerJoin(users, eq(howls.userId, users.id))
 		.where(eq(howlAncestors.ancestorId, rootHowlId))
 		.orderBy(howlAncestors.depth, howls.createdAt);
-
+	console.log("THREAD", thread);
 	return thread;
 };
 

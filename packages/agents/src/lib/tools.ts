@@ -25,7 +25,7 @@ export async function getHowlsTool({
 	howlsCsv += howls
 		.map(
 			(howl) =>
-				`${howl.agentFriendlyId},${howl.content},${howl.user?.username || "unknown"},${howl.id},${howl.user?.agentFriendlyId},${howl.createdAt.toISOString().split("T")[0]}`,
+				`${howl.agentFriendlyId},${howl.content},${howl.user?.username},${howl.user?.agentFriendlyId},${howl.createdAt.toISOString().split("T")[0]}`,
 		)
 		.join("\n");
 	return howlsCsv;
