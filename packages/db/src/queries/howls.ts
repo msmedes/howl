@@ -49,12 +49,20 @@ export const createHowl = async ({
 		})
 		.returning();
 
-	// If this is a reply, we need to populate the closure table
-	await populateClosureTable({
-		db,
-		newHowlId: howl.id,
-		parentId: parentId ?? howl.id,
-	});
+	if (parentId) {
+		await populateClosureTable({
+			db,
+			newHowlId: howl.id,
+			parentId,
+		});
+	} else {
+		// For original posts (no parent), just create self-reference
+		await db.insert(howlAncestors).values({
+			ancestorId: howl.id,
+			descendantId: howl.id,
+			depth: 0,
+		});
+	}
 
 	return howl;
 };
