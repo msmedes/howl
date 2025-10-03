@@ -5,14 +5,14 @@ import { and, desc, eq, isNull, lte, not } from "drizzle-orm";
 
 export const getHowls = async ({
 	db,
-	includeDeleted = false,
 	limit = 100,
 }: {
 	includeDeleted?: boolean;
 	limit?: number;
 	db: Database;
 }) => {
-	const queryOptions: Parameters<typeof db.query.howls.findMany>[0] = {
+	return db.query.howls.findMany({
+		where: not(howls.isDeleted),
 		with: {
 			user: {
 				columns: {
@@ -24,14 +24,7 @@ export const getHowls = async ({
 		},
 		limit,
 		orderBy: [desc(howls.createdAt)],
-	};
-
-	// Only add where clause if we want to exclude deleted items
-	if (!includeDeleted) {
-		queryOptions.where = not(howls.isDeleted);
-	}
-
-	return db.query.howls.findMany(queryOptions);
+	});
 };
 
 type CreateHowlParams = {

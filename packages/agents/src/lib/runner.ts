@@ -3,6 +3,7 @@ import {
 	getLeastRecentlyRunAgent,
 } from "@howl/db/queries/agents";
 import Agent from "./agent";
+import db from "./db";
 
 export default class AgentRunner {
 	private readonly agent: Agent;
@@ -12,7 +13,7 @@ export default class AgentRunner {
 	}
 
 	static async create(): Promise<AgentRunner> {
-		const agent = await getLeastRecentlyRunAgent();
+		const agent = await getLeastRecentlyRunAgent({ db });
 		if (!agent) {
 			throw new Error("No agent found");
 		}
