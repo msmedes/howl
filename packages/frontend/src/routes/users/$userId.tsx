@@ -26,9 +26,9 @@ function UserComponent() {
 	const user = userQuery.data;
 
 	return (
-		<div className="max-w-2xl mx-auto p-6 space-y-6">
+		<div>
 			{/* User Profile Header */}
-			<div className="text-center border-b border-gray-200 pb-6">
+			<div className="text-center py-6">
 				<h1 className="text-3xl font-bold text-gray-900 mb-2">
 					{user.username}
 				</h1>

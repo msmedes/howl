@@ -1,15 +1,17 @@
-import db from "@howl/db";
+import type { Database } from "@howl/db";
 import type { Howl, User } from "@howl/db/schema";
 import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
 import { and, desc, eq, isNull, lte, not } from "drizzle-orm";
 
 export const getHowls = async ({
+	db,
 	includeDeleted = false,
 	limit = 100,
 }: {
 	includeDeleted?: boolean;
 	limit?: number;
-} = {}) => {
+	db: Database;
+}) => {
 	const queryOptions: Parameters<typeof db.query.howls.findMany>[0] = {
 		with: {
 			user: {
@@ -39,10 +41,11 @@ type CreateHowlParams = {
 };
 
 export const createHowl = async ({
+	db,
 	content,
 	userId,
 	parentId,
-}: CreateHowlParams) => {
+}: CreateHowlParams & { db: Database }) => {
 	const howl = await db
 		.insert(howls)
 		.values({
@@ -55,20 +58,33 @@ export const createHowl = async ({
 
 	// If this is a reply, we need to populate the closure table
 	if (parentId) {
-		await populateClosureTable(howl[0].id, parentId);
+		await populateClosureTable({ db, newHowlId: howl[0].id, parentId });
 	}
 
 	return howl;
 };
 
-export const getHowlsForUser = async (user: User) => {
+export const getHowlsForUser = async ({
+	db,
+	user,
+}: {
+	db: Database;
+	user: User;
+}) => {
 	const howlsForUser = await db.query.howls.findMany({
 		where: eq(howls.userId, user.id),
+		with: {
+			user: {
+				columns: {
+					username: true,
+				},
+			},
+		},
 	});
 	return howlsForUser;
 };
 
-export const getHowlById = async (id: string) => {
+export const getHowlById = async ({ db, id }: { db: Database; id: string }) => {
 	const howl = await db.query.howls.findFirst({
 		where: eq(howls.id, id),
 		with: {
@@ -85,7 +101,7 @@ export const getHowlById = async (id: string) => {
 };
 
 // Get original posts only (no parent)
-export const getOriginalPosts = async () => {
+export const getOriginalPosts = async ({ db }: { db: Database }) => {
 	const originalPosts = await db.query.howls.findMany({
 		where: eq(howls.isOriginalPost, true),
 		with: {
@@ -102,7 +118,7 @@ export const getOriginalPosts = async () => {
 };
 
 // Get replies only (has parent)
-export const getReplies = async () => {
+export const getReplies = async ({ db }: { db: Database }) => {
 	const replies = await db.query.howls.findMany({
 		where: isNull(howls.parentId),
 		with: {
@@ -119,7 +135,13 @@ export const getReplies = async () => {
 };
 
 // Get immediate replies to a specific howl
-export const getImmediateReplies = async (howlId: string) => {
+export const getImmediateReplies = async ({
+	db,
+	howlId,
+}: {
+	db: Database;
+	howlId: string;
+}) => {
 	const replies = await db.query.howls.findMany({
 		where: eq(howls.parentId, howlId),
 		with: {
@@ -137,7 +159,13 @@ export const getImmediateReplies = async (howlId: string) => {
 };
 
 // Get entire thread using closure table
-export const getFullThread = async (rootHowlId: string) => {
+export const getFullThread = async ({
+	db,
+	rootHowlId,
+}: {
+	db: Database;
+	rootHowlId: string;
+}) => {
 	const thread = await db
 		.select({
 			id: howls.id,
@@ -162,10 +190,15 @@ export const getFullThread = async (rootHowlId: string) => {
 };
 
 // Get all descendants up to a certain depth
-export const getDescendantsUpToDepth = async (
-	howlId: string,
-	maxDepth: number,
-) => {
+export const getDescendantsUpToDepth = async ({
+	db,
+	howlId,
+	maxDepth,
+}: {
+	db: Database;
+	howlId: string;
+	maxDepth: number;
+}) => {
 	const descendants = await db
 		.select({
 			howl: howls,
@@ -191,7 +224,15 @@ export const getDescendantsUpToDepth = async (
 };
 
 // Helper function to populate closure table when adding replies
-const populateClosureTable = async (newHowlId: string, parentId: string) => {
+const populateClosureTable = async ({
+	db,
+	newHowlId,
+	parentId,
+}: {
+	db: Database;
+	newHowlId: string;
+	parentId: string;
+}) => {
 	// Insert self-reference (depth 0)
 	await db.insert(howlAncestors).values({
 		ancestorId: newHowlId,
@@ -224,7 +265,13 @@ const populateClosureTable = async (newHowlId: string, parentId: string) => {
 };
 
 // Soft delete howls with closure table cleanup
-export const deleteHowl = async (howl: Howl) => {
+export const deleteHowl = async ({
+	db,
+	howl,
+}: {
+	db: Database;
+	howl: Howl;
+}) => {
 	// Mark the howl as deleted
 	const updatedHowl = await db
 		.update(howls)
@@ -235,7 +282,7 @@ export const deleteHowl = async (howl: Howl) => {
 };
 
 // Get only non-deleted howls
-export const getActiveHowls = async () => {
+export const getActiveHowls = async ({ db }: { db: Database }) => {
 	const activeHowls = await db.query.howls.findMany({
 		where: not(howls.isDeleted),
 		with: {
@@ -249,7 +296,15 @@ export const getActiveHowls = async () => {
 	return activeHowls;
 };
 
-export const createHowlLike = async (userId: string, howlId: string) => {
+export const createHowlLike = async ({
+	db,
+	userId,
+	howlId,
+}: {
+	db: Database;
+	userId: string;
+	howlId: string;
+}) => {
 	const like = await db.insert(howlLikes).values({
 		userId,
 		howlId,
@@ -257,7 +312,7 @@ export const createHowlLike = async (userId: string, howlId: string) => {
 	return like;
 };
 
-export const getAlphaHowls = async () => {
+export const getAlphaHowls = async ({ db }: { db: Database }) => {
 	const alphaUser = await db.query.users.findFirst({
 		where: eq(users.username, "alpha"),
 	});

@@ -35,7 +35,7 @@ export default function Howl({ howl }: { howl: HowlResponse[number] }) {
 								data-username-link
 								onClick={(e) => e.stopPropagation()}
 							>
-								{howl.user.username}
+								{howl.user?.username}
 							</Link>
 						</div>
 					</div>

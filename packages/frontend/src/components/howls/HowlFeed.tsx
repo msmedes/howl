@@ -3,6 +3,7 @@ import Howl from "@/components/howls/Howl";
 import type api from "@/utils/client";
 
 type HowlResponse = InferResponseType<typeof api.howls.$get>;
+type HowlUserResponse = InferResponseType<typeof api.users.$get>;
 
 export default function HowlFeed({ howls }: { howls: HowlResponse }) {
 	return (

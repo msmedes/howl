@@ -1,4 +1,4 @@
-import db from "@howl/db";
+import type { Database } from "@howl/db";
 import {
 	follows,
 	howls,
@@ -9,11 +9,11 @@ import {
 } from "@howl/db/schema";
 import { and, desc, eq } from "drizzle-orm";
 
-export const getUsers = async () => {
+export const getUsers = async ({ db }: { db: Database }) => {
 	const users = await db.query.users.findMany();
 	return users;
 };
-export const getUserFeed = async (id: string) => {
+export const getUserFeed = async ({ db, id }: { db: Database; id: string }) => {
 	const user = await db.query.users.findFirst({
 		where: eq(users.id, id),
 		with: {
@@ -51,12 +51,18 @@ export const getUserFeed = async (id: string) => {
 	});
 	return user;
 };
-export const getUserById = async (id: string) => {
+export const getUserById = async ({ db, id }: { db: Database; id: string }) => {
 	const user = await db.query.users.findFirst({ where: eq(users.id, id) });
 	return user;
 };
 
-export const getFollowersForUser = async (user: User) => {
+export const getFollowersForUser = async ({
+	db,
+	user,
+}: {
+	db: Database;
+	user: User;
+}) => {
 	const followers = await db.query.follows.findMany({
 		where: eq(follows.followingId, user.id),
 		with: {
@@ -72,19 +78,41 @@ export const getFollowersForUser = async (user: User) => {
 	return followers.map((follow) => follow.follower);
 };
 
-export const getFollowingForUser = async (userId: string) => {
+export const getFollowingForUser = async ({
+	db,
+	userId,
+}: {
+	db: Database;
+	userId: string;
+}) => {
 	const following = await db.query.follows.findMany({
 		where: eq(follows.followerId, userId),
 	});
 	return following;
 };
 
-export const followUser = async (followerId: string, followingId: string) => {
+export const followUser = async ({
+	db,
+	followerId,
+	followingId,
+}: {
+	db: Database;
+	followerId: string;
+	followingId: string;
+}) => {
 	const follow = await db.insert(follows).values({ followerId, followingId });
 	return follow;
 };
 
-export const unfollowUser = async (followerId: string, followingId: string) => {
+export const unfollowUser = async ({
+	db,
+	followerId,
+	followingId,
+}: {
+	db: Database;
+	followerId: string;
+	followingId: string;
+}) => {
 	const follow = await db
 		.delete(follows)
 		.where(
@@ -96,7 +124,13 @@ export const unfollowUser = async (followerId: string, followingId: string) => {
 	return follow;
 };
 
-export const getUserByName = async (username: string) => {
+export const getUserByName = async ({
+	db,
+	username,
+}: {
+	db: Database;
+	username: string;
+}) => {
 	return db.query.users.findFirst({
 		where: eq(users.username, username),
 		with: {
@@ -112,6 +146,12 @@ export const getUserByName = async (username: string) => {
 	});
 };
 
-export const createUser = async (user: InsertUser) => {
+export const createUser = async ({
+	db,
+	user,
+}: {
+	db: Database;
+	user: InsertUser;
+}) => {
 	return await db.insert(users).values(user).returning();
 };
