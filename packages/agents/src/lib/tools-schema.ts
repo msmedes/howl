@@ -69,4 +69,12 @@ export default [
 			properties: {},
 		},
 	},
+	{
+		name: "getOwnLikedHowls",
+		description: "Get all howls you have liked.",
+		input_schema: {
+			type: "object",
+			properties: {},
+		},
+	},
 ];

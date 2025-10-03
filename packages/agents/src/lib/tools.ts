@@ -5,6 +5,7 @@ import {
 	getAlphaHowls,
 	getHowls,
 	getHowlsForUser,
+	getLikedHowlsForUser,
 } from "@howl/db/queries/howls";
 import { getUserById } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
@@ -92,10 +93,35 @@ export async function getAlphaHowlsTool() {
 	return alphaHowlsCsv;
 }
 
+export async function getOwnLikedHowlsTool({
+	currentAgentId,
+}: {
+	currentAgentId: string;
+}) {
+	const likedHowls = await getLikedHowlsForUser({
+		db,
+		userId: currentAgentId,
+	});
+
+	// csv format: id,content,createdAt
+	let likedHowlsCsv = "id,content,createdAt\n";
+	const howls = likedHowls
+		.map((howlLike) => howlLike.howl)
+		.filter(Boolean) as Howl[];
+	likedHowlsCsv += howls
+		.map(
+			(howl) =>
+				`${howl.agentFriendlyId},${howl.content},${howl.createdAt.toISOString().split("T")[0]}`,
+		)
+		.join("\n");
+	return likedHowlsCsv;
+}
+
 export const toolMap = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
 	getHowlsForUser: getHowlsForUserTool,
 	likeHowl: likeHowlTool,
 	getAlphaHowls: getAlphaHowlsTool,
+	getOwnLikedHowls: getOwnLikedHowlsTool,
 };

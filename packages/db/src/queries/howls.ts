@@ -178,7 +178,7 @@ export const getFullThread = async ({
 		.from(howlAncestors)
 		.innerJoin(howls, eq(howlAncestors.descendantId, howls.id))
 		.innerJoin(users, eq(howls.userId, users.id))
-		.where(eq(howlAncestors.ancestorId, rootHowlId))
+		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)))
 		.orderBy(howlAncestors.depth, howls.createdAt);
 	console.log("THREAD", thread);
 	return thread;
@@ -319,4 +319,26 @@ export const getAlphaHowls = async ({ db }: { db: Database }) => {
 		orderBy: [desc(howls.createdAt)],
 	});
 	return alphaHowls;
+};
+
+export const getLikedHowlsForUser = async ({
+	db,
+	userId,
+}: {
+	db: Database;
+	userId: string;
+}) => {
+	const likedHowls = await db.query.howlLikes.findMany({
+		where: eq(howlLikes.userId, userId),
+		with: {
+			howl: {
+				columns: {
+					content: true,
+					createdAt: true,
+					agentFriendlyId: true,
+				},
+			},
+		},
+	});
+	return likedHowls;
 };
