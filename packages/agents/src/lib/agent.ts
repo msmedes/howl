@@ -1,25 +1,32 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import type { GetLeastRecentlyRunAgent } from "@howl/db/queries/agents";
 import type { Model } from "@howl/db/schema";
+import { systemPrompt } from "./prompts";
 import { toolMap } from "./tools";
 import toolsSchema from "./tools-schema";
 
 export default class Agent {
 	private maxIterations: number;
 	private model: Model;
-	private prompt: string;
+	private agent: GetLeastRecentlyRunAgent;
+	private agentPrompt: string;
+	private systemPrompt: string;
 	private messages: Array<{ role: "user" | "assistant"; content: string }>;
 	private client: Anthropic;
 	private maxTokens: number;
 
-	constructor(private readonly agent: GetLeastRecentlyRunAgent) {
+	constructor(agent: GetLeastRecentlyRunAgent) {
 		if (!agent) {
 			throw new Error("Agent not found");
 		}
 		this.agent = agent;
 		this.maxIterations = 10;
-		this.model = agent.model as Model;
-		this.prompt = agent.prompt;
+		this.model = {
+			name: "claude-3-7-sonnet-latest",
+			id: "claude-3-7-sonnet-latest",
+		};
+		this.agentPrompt = agent.prompt;
+		this.systemPrompt = systemPrompt;
 		this.messages = [];
 		this.maxTokens = 1024;
 		this.client = new Anthropic({
@@ -30,8 +37,16 @@ export default class Agent {
 	private initializeMessages() {
 		this.messages.push({
 			role: "user",
-			content: this.prompt,
+			content: this.agentPrompt,
 		});
+	}
+
+	private async processToolCall(toolCall: any) {
+		const toolCallResult = await toolMap[toolCall.name as keyof typeof toolMap](
+			{ ...toolCall.input, currentAgentId: this.agent.user.id } as any,
+		);
+
+		return toolCallResult;
 	}
 
 	private async processToolCalls(toolCalls: any[]) {
@@ -40,7 +55,7 @@ export default class Agent {
 				try {
 					const toolCallResult = await toolMap[
 						call.name as keyof typeof toolMap
-					](call.input as any);
+					]({ ...call.input, currentAgentId: this.agent.user.id } as any);
 
 					return {
 						type: "tool_result",
@@ -74,33 +89,56 @@ export default class Agent {
 		throw error;
 	}
 
+	async runConversationTurn() {
+		const assistantContent = [];
+		const toolResults = [];
+
+		const response = await this.client.beta.messages.create({
+			model: this.model.name,
+			max_tokens: this.maxTokens,
+			system: this.systemPrompt,
+			messages: this.messages,
+			tools: toolsSchema as any,
+			betas: ["token-efficient-tools-2025-02-19"],
+		});
+
+		for (const content of response.content) {
+			if (content.type === "text") {
+				assistantContent.push({ type: "text", text: content.text });
+			} else if (content.type === "tool_use") {
+				const toolResult = await this.processToolCall(content);
+				assistantContent.push({
+					type: "tool_use",
+					id: content.id,
+					name: content.name,
+					input: content.input,
+				});
+				toolResults.push({
+					type: "tool_result",
+					tool_use_id: content.id,
+					content: toolResult,
+				});
+			}
+		}
+		return { response, assistantContent, toolResults };
+	}
+
 	async run() {
 		this.initializeMessages();
-		for (let iteration = 0; iteration < this.maxIterations; iteration++) {
+		let turn = 1;
+		while (turn <= this.maxIterations) {
 			try {
-				console.log(
-					`\n--- Iteration ${iteration + 1}/${this.maxIterations} ---`,
-				);
-				const response = await this.client.beta.messages.create({
-					model: this.model.name,
-					max_tokens: this.maxTokens,
-					system: this.prompt,
-					messages: this.messages,
-					tools: toolsSchema as any,
-					betas: ["token-efficient-tools-2025-02-19"],
-				});
+				console.log(`\n--- Iteration ${turn + 1}/${this.maxIterations} ---`);
+				const { response, assistantContent, toolResults } =
+					await this.runConversationTurn();
 
-				this.messages.push({
-					role: "assistant",
-					content: JSON.stringify(response.content),
-				});
-
-				const toolCallResults = await this.processToolCalls(response.content);
-
-				this.messages.push({
-					role: "user",
-					content: JSON.stringify(toolCallResults),
-				});
+				this.messages.push({ role: "assistant", content: assistantContent });
+				if (toolResults.length > 0) {
+					this.messages.push({ role: "user", content: toolResults });
+					turn++;
+				} else {
+					break;
+				}
 			} catch (error: unknown) {
 				console.error("Iteration failed:", error);
 				throw error;

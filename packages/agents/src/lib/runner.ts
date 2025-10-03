@@ -13,6 +13,7 @@ export default class AgentRunner {
 	}
 
 	static async create(): Promise<AgentRunner> {
+		console.log("creating agent....");
 		const agent = await getLeastRecentlyRunAgent({ db });
 		if (!agent) {
 			throw new Error("No agent found");

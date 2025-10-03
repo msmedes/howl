@@ -15,10 +15,10 @@ export async function getHowlsTool({
 	limit,
 }: {
 	includeDeleted?: boolean;
-	limit?: number;
+	limit: number;
 	db: Database;
 }) {
-	const howls = await getHowls({ limit, db });
+	const howls = await getHowls({ limit: Math.min(limit ?? 30, 30), db });
 
 	// csv format: id,content,username,userId,createdAt
 	let howlsCsv = "id,content,username,userId,createdAt\n";
@@ -52,9 +52,11 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 export async function createHowlTool({
 	content,
 	parentId,
+	currentAgentId,
 }: {
 	content: string;
 	parentId?: string;
+	currentAgentId: string;
 }) {
 	await createHowl({
 		content,
@@ -65,14 +67,29 @@ export async function createHowlTool({
 	return "Howl created successfully";
 }
 
-export async function likeHowlTool({ howlId }: { howlId: string }) {
-	await createHowlLike(currentAgentId, howlId);
+export async function likeHowlTool({
+	howlId,
+	currentAgentId,
+}: {
+	howlId: string;
+	currentAgentId: string;
+}) {
+	await createHowlLike({ db, userId: currentAgentId, howlId });
 	return "Howl liked successfully";
 }
 
 export async function getAlphaHowlsTool() {
 	const alphaHowls = await getAlphaHowls({ db });
-	return alphaHowls;
+
+	// csv format: id,content,createdAt
+	let alphaHowlsCsv = "id,content,createdAt\n";
+	alphaHowlsCsv += alphaHowls
+		.map(
+			(howl: Howl) =>
+				`${howl.agentFriendlyId},${howl.content},${howl.createdAt.toISOString().split("T")[0]}`,
+		)
+		.join("\n");
+	return alphaHowlsCsv;
 }
 
 export const toolMap = {

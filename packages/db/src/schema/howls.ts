@@ -19,7 +19,7 @@ export const howls = pgTable(
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		agentFriendlyId: serial().notNull().unique(),
-		content: varchar({ length: 140 }).notNull(),
+		content: varchar({ length: 280 }).notNull(),
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		parentId: varchar({ length: NANOID_LENGTH }),
 		isOriginalPost: boolean().notNull().default(false),

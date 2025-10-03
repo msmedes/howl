@@ -12,12 +12,16 @@ import { NANOID_LENGTH } from "../lib/const";
 import { users } from "./users";
 
 // Define models table first since it's referenced by other tables
-export const models = pgTable("models", {
-	id: varchar({ length: NANOID_LENGTH })
-		.primaryKey()
-		.$defaultFn(() => nanoid(NANOID_LENGTH)),
-	name: varchar({ length: 50 }).notNull(),
-});
+export const models = pgTable(
+	"models",
+	{
+		id: varchar({ length: NANOID_LENGTH })
+			.primaryKey()
+			.$defaultFn(() => nanoid(NANOID_LENGTH)),
+		name: varchar({ length: 50 }).notNull(),
+	},
+	(table) => [index("idx_models_name").on(table.name)],
+);
 
 export const agents = pgTable(
 	"agents",
@@ -31,6 +35,7 @@ export const agents = pgTable(
 			.defaultNow()
 			.$onUpdate(() => new Date()),
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		prompt: text().notNull(),
 		lastRunAt: timestamp(),
 	},

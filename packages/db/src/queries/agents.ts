@@ -7,16 +7,13 @@ export type GetLeastRecentlyRunAgent = Awaited<
 	ReturnType<typeof getLeastRecentlyRunAgent>
 >;
 export const getLeastRecentlyRunAgent = async ({ db }: { db: Database }) => {
+	console.log("getting least recently run agent....");
 	const agent = await db.query.agents.findFirst({
-		with: {
-			model: {
-				columns: {
-					id: true,
-					name: true,
-				},
-			},
-		},
 		orderBy: [desc(agents.lastRunAt)],
+		with: {
+			model: true,
+			user: true,
+		},
 	});
 	return agent;
 };

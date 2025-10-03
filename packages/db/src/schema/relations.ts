@@ -5,6 +5,7 @@ import {
 	agentThoughts,
 	agentThreads,
 	agentToolCalls,
+	models,
 } from "./agents";
 import { howlAncestors, howlLikes, howls } from "./howls";
 import { follows, userBlocks } from "./social";
@@ -87,6 +88,17 @@ export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
 		fields: [userBlocks.blockedUserId],
 		references: [users.id],
 		relationName: "user_blocked",
+	}),
+}));
+
+export const agentsRelations = relations(agents, ({ one }) => ({
+	user: one(users, {
+		fields: [agents.userId],
+		references: [users.id],
+	}),
+	model: one(models, {
+		fields: [agents.modelId],
+		references: [models.id],
 	}),
 }));
 

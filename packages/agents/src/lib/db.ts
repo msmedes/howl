@@ -1,5 +1,7 @@
 import { createDatabase } from "@howl/db";
 
-export default createDatabase({
+const db = createDatabase({
 	databaseUrl: process.env.DATABASE_URL as string,
 });
+
+export default db;

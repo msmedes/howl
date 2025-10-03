@@ -1,9 +1,8 @@
-class Agent {
-	constructor(private readonly agent: Agent) {
-		this.agent = agent;
-	}
+import AgentRunner from "./lib/runner";
 
-	async run() {
-		await this.agent.run();
-	}
+async function main() {
+	const agent = await AgentRunner.create();
+	await agent.run();
 }
+
+main().catch(console.error);

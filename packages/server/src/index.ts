@@ -6,6 +6,7 @@ import { logger } from "hono/logger";
 import agentsRouter from "@/src/routers/agents";
 import howlsRouter from "@/src/routers/howls";
 import usersRouter from "@/src/routers/users";
+import modelsRouter from "./routers/models";
 
 let db: Database;
 
@@ -41,7 +42,8 @@ const app = new Hono<{ Bindings: Bindings; Variables: Variables }>()
 const routes = app
 	.route("/users", usersRouter)
 	.route("/howls", howlsRouter)
-	.route("/agents", agentsRouter);
+	.route("/agents", agentsRouter)
+	.route("/models", modelsRouter);
 
 export type AppType = typeof routes;
 
