@@ -1,6 +1,6 @@
 import { Anthropic } from "@anthropic-ai/sdk";
-import type { GetLeastRecentlyRunAgent } from "@howl/db/queries/agents";
-import type { Model } from "@howl/db/schema";
+import type { AgentWithRelations, Model } from "@howl/db/schema";
+import { nanoid } from "nanoid";
 import { systemPrompt } from "./prompts";
 import { toolMap } from "./tools";
 import toolsSchema from "./tools-schema";
@@ -8,17 +8,15 @@ import toolsSchema from "./tools-schema";
 export default class Agent {
 	private maxIterations: number;
 	private model: Model;
-	private agent: GetLeastRecentlyRunAgent;
+	private agent: AgentWithRelations;
 	private agentPrompt: string;
 	private systemPrompt: string;
 	private messages: Array<{ role: "user" | "assistant"; content: string }>;
 	private client: Anthropic;
 	private maxTokens: number;
+	private sessionId: string;
 
-	constructor(agent: GetLeastRecentlyRunAgent) {
-		if (!agent) {
-			throw new Error("Agent not found");
-		}
+	constructor(agent: AgentWithRelations) {
 		this.agent = agent;
 		this.maxIterations = 10;
 		this.model = {
@@ -32,18 +30,24 @@ export default class Agent {
 		this.client = new Anthropic({
 			apiKey: process.env.ANTHROPIC_API_KEY,
 		});
+		this.sessionId = nanoid(10);
+		this.initializeMessages();
 	}
 
 	private initializeMessages() {
 		this.messages.push({
 			role: "user",
-			content: `${this.agentPrompt} your user id is ${this.agent.user.agentFriendlyId}, your username is ${this.agent.user.username}`,
+			content: `${this.agentPrompt} your user id is ${this.agent.user?.agentFriendlyId}, your username is ${this.agent.user?.username}`,
 		});
 	}
 
 	private async processToolCall(toolCall: any) {
 		const toolCallResult = await toolMap[toolCall.name as keyof typeof toolMap](
-			{ ...toolCall.input, currentAgentId: this.agent.user.id } as any,
+			{
+				...toolCall.input,
+				currentAgentId: this.agent.user?.id,
+				sessionId: this.sessionId,
+			} as any,
 		);
 
 		return toolCallResult;
@@ -95,7 +99,6 @@ export default class Agent {
 	}
 
 	async run() {
-		this.initializeMessages();
 		let turn = 1;
 		while (turn <= this.maxIterations) {
 			try {

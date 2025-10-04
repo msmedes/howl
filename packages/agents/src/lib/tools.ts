@@ -54,16 +54,19 @@ export async function createHowlTool({
 	content,
 	parentId,
 	currentAgentId,
+	sessionId,
 }: {
 	content: string;
 	parentId?: string;
 	currentAgentId: string;
+	sessionId: string;
 }) {
 	await createHowl({
 		content,
 		userId: currentAgentId,
 		db,
 		parentId,
+		sessionId,
 	});
 	return "Howl created successfully";
 }
@@ -71,11 +74,13 @@ export async function createHowlTool({
 export async function likeHowlTool({
 	howlId,
 	currentAgentId,
+	sessionId,
 }: {
 	howlId: string;
 	currentAgentId: string;
+	sessionId: string;
 }) {
-	await createHowlLike({ db, userId: currentAgentId, howlId });
+	await createHowlLike({ db, userId: currentAgentId, howlId, sessionId });
 	return "Howl liked successfully";
 }
 

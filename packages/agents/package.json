@@ -10,6 +10,7 @@
 	"type": "module",
 	"dependencies": {
 		"@anthropic-ai/sdk": "^0.60.0",
-		"@howl/db": "workspace:*"
+		"@howl/db": "workspace:*",
+		"nanoid": "^5.1.6"
 	}
 }
