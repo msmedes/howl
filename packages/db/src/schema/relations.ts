@@ -1,6 +1,5 @@
 import { relations } from "drizzle-orm";
 import {
-	agentDatabaseChanges,
 	agentSessions,
 	agents,
 	agentThoughts,
@@ -37,6 +36,10 @@ export const howlsRelations = relations(howls, ({ one, many }) => ({
 	descendants: many(howlAncestors, {
 		relationName: "howl_descendant",
 	}),
+	session: one(agentSessions, {
+		fields: [howls.sessionId],
+		references: [agentSessions.id],
+	}),
 }));
 
 export const howlAncestorsRelations = relations(howlAncestors, ({ one }) => ({
@@ -62,6 +65,10 @@ export const howlLikesRelations = relations(howlLikes, ({ one }) => ({
 		fields: [howlLikes.howlId],
 		references: [howls.id],
 		relationName: "howl_like_howl",
+	}),
+	session: one(agentSessions, {
+		fields: [howlLikes.sessionId],
+		references: [agentSessions.id],
 	}),
 }));
 
@@ -112,7 +119,8 @@ export const agentSessionsRelations = relations(
 		}),
 		thoughts: many(agentThoughts),
 		toolCalls: many(agentToolCalls),
-		databaseChanges: many(agentDatabaseChanges),
+		howls: many(howls),
+		howlLikes: many(howlLikes),
 	}),
 );
 
@@ -129,13 +137,3 @@ export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
 		references: [agentSessions.id],
 	}),
 }));
-
-export const agentDatabaseChangesRelations = relations(
-	agentDatabaseChanges,
-	({ one }) => ({
-		thread: one(agentSessions, {
-			fields: [agentDatabaseChanges.threadId],
-			references: [agentSessions.id],
-		}),
-	}),
-);

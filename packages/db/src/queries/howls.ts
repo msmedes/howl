@@ -31,6 +31,7 @@ type CreateHowlParams = {
 	content: string;
 	userId: string;
 	parentId?: string;
+	sessionId?: string;
 };
 
 export const createHowl = async ({
@@ -38,6 +39,7 @@ export const createHowl = async ({
 	content,
 	userId,
 	parentId,
+	sessionId,
 }: CreateHowlParams & { db: Database }) => {
 	const [howl] = await db
 		.insert(howls)
@@ -45,6 +47,7 @@ export const createHowl = async ({
 			content,
 			userId,
 			parentId,
+			sessionId,
 			isOriginalPost: !parentId, // If no parent, it's an original post
 		})
 		.returning();
@@ -303,14 +306,17 @@ export const createHowlLike = async ({
 	db,
 	userId,
 	howlId,
+	sessionId,
 }: {
 	db: Database;
 	userId: string;
 	howlId: string;
+	sessionId?: string;
 }) => {
 	const like = await db.insert(howlLikes).values({
 		userId,
 		howlId,
+		sessionId,
 	});
 	return like;
 };
@@ -349,4 +355,190 @@ export const getLikedHowlsForUser = async ({
 		},
 	});
 	return likedHowls;
+};
+
+// New functions that leverage sessionId relationships
+
+// Get all howls created by a specific session
+export const getHowlsBySession = async ({
+	db,
+	sessionId,
+}: {
+	db: Database;
+	sessionId: string;
+}) => {
+	return await db.query.howls.findMany({
+		where: eq(howls.sessionId, sessionId),
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					agentFriendlyId: true,
+				},
+			},
+			session: {
+				with: {
+					agent: {
+						with: {
+							user: true,
+							model: true,
+						},
+					},
+				},
+			},
+		},
+		orderBy: [desc(howls.createdAt)],
+	});
+};
+
+// Get all likes created by a specific session
+export const getLikesBySession = async ({
+	db,
+	sessionId,
+}: {
+	db: Database;
+	sessionId: string;
+}) => {
+	return await db.query.howlLikes.findMany({
+		where: eq(howlLikes.sessionId, sessionId),
+		with: {
+			howl: {
+				columns: {
+					id: true,
+					content: true,
+					agentFriendlyId: true,
+					createdAt: true,
+				},
+				with: {
+					user: {
+						columns: {
+							id: true,
+							username: true,
+						},
+					},
+				},
+			},
+			user: {
+				columns: {
+					id: true,
+					username: true,
+				},
+			},
+			session: {
+				with: {
+					agent: {
+						with: {
+							user: true,
+							model: true,
+						},
+					},
+				},
+			},
+		},
+		orderBy: [desc(howlLikes.createdAt)],
+	});
+};
+
+// Get a howl and all sessions that interacted with it
+export const getHowlWithSessionHistory = async ({
+	db,
+	howlId,
+}: {
+	db: Database;
+	howlId: string;
+}) => {
+	// Get the howl itself
+	const howl = await db.query.howls.findFirst({
+		where: eq(howls.id, howlId),
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					agentFriendlyId: true,
+				},
+			},
+			session: {
+				with: {
+					agent: {
+						with: {
+							user: true,
+							model: true,
+						},
+					},
+				},
+			},
+		},
+	});
+
+	if (!howl) {
+		return null;
+	}
+
+	// Get all likes on this howl with their sessions
+	const likes = await db.query.howlLikes.findMany({
+		where: eq(howlLikes.howlId, howlId),
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+				},
+			},
+			session: {
+				with: {
+					agent: {
+						with: {
+							user: true,
+							model: true,
+						},
+					},
+				},
+			},
+		},
+		orderBy: [desc(howlLikes.createdAt)],
+	});
+
+	// Get all replies to this howl with their sessions
+	const replies = await db.query.howls.findMany({
+		where: eq(howls.parentId, howlId),
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					agentFriendlyId: true,
+				},
+			},
+			session: {
+				with: {
+					agent: {
+						with: {
+							user: true,
+							model: true,
+						},
+					},
+				},
+			},
+		},
+		orderBy: [desc(howls.createdAt)],
+	});
+
+	// Extract unique session IDs
+	const sessionIds = new Set<string>();
+	if (howl.sessionId) sessionIds.add(howl.sessionId);
+	likes.forEach((like) => {
+		if (like.sessionId) sessionIds.add(like.sessionId);
+	});
+	replies.forEach((reply) => {
+		if (reply.sessionId) sessionIds.add(reply.sessionId);
+	});
+
+	return {
+		howl,
+		likes,
+		replies,
+		sessionIds: Array.from(sessionIds),
+	};
 };

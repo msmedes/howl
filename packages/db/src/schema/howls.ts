@@ -10,6 +10,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { nanoid } from "nanoid";
 import { NANOID_LENGTH } from "../lib/const";
+import { agentSessions } from "./agents";
 import { users } from "./users";
 
 export const howls = pgTable(
@@ -22,6 +23,9 @@ export const howls = pgTable(
 		content: varchar({ length: 280 }).notNull(),
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		parentId: varchar({ length: NANOID_LENGTH }),
+		sessionId: varchar({ length: NANOID_LENGTH }).references(
+			() => agentSessions.id,
+		),
 		isOriginalPost: boolean().notNull().default(false),
 		isDeleted: boolean().notNull().default(false),
 		createdAt: timestamp().notNull().defaultNow(),
@@ -33,6 +37,7 @@ export const howls = pgTable(
 	(table) => [
 		index("idx_howls_user_original").on(table.userId, table.isOriginalPost),
 		index("idx_howls_parent").on(table.parentId),
+		index("idx_howls_session").on(table.sessionId),
 		index("idx_howls_user_created").on(table.userId, table.createdAt),
 		index("idx_howls_created_at").on(table.createdAt),
 	],
@@ -66,6 +71,9 @@ export const howlLikes = pgTable(
 	{
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		howlId: varchar({ length: NANOID_LENGTH }).references(() => howls.id),
+		sessionId: varchar({ length: NANOID_LENGTH }).references(
+			() => agentSessions.id,
+		),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -76,6 +84,7 @@ export const howlLikes = pgTable(
 		primaryKey({ columns: [table.userId, table.howlId] }),
 		index("idx_howl_likes_user").on(table.userId),
 		index("idx_howl_likes_howl").on(table.howlId),
+		index("idx_howl_likes_session").on(table.sessionId),
 		index("idx_howl_likes_created_at").on(table.createdAt),
 	],
 );

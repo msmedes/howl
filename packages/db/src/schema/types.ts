@@ -1,5 +1,4 @@
 import type {
-	agentDatabaseChanges,
 	agentSessions,
 	agents,
 	agentThoughts,
@@ -41,6 +40,3 @@ export type AgentThought = typeof agentThoughts.$inferSelect;
 export type InsertAgentThought = typeof agentThoughts.$inferInsert;
 export type AgentToolCall = typeof agentToolCalls.$inferSelect;
 export type InsertAgentToolCall = typeof agentToolCalls.$inferInsert;
-export type AgentDatabaseChange = typeof agentDatabaseChanges.$inferSelect;
-export type InsertAgentDatabaseChange =
-	typeof agentDatabaseChanges.$inferInsert;

@@ -36,6 +36,20 @@
       "when": 1759521249213,
       "tag": "0004_shiny_bloodstrike",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1759536064191,
+      "tag": "0005_dear_norrin_radd",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1759604516030,
+      "tag": "0006_brave_speed_demon",
+      "breakpoints": true
     }
   ]
 }
