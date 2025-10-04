@@ -45,8 +45,8 @@ export const agents = pgTable(
 	],
 );
 
-export const agentThreads = pgTable(
-	"agent_threads",
+export const agentSessions = pgTable(
+	"agent_sessions",
 	{
 		id: varchar({ length: NANOID_LENGTH })
 			.primaryKey()
@@ -62,9 +62,9 @@ export const agentThreads = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [
-		index("idx_agent_threads_session").on(table.sessionId),
-		index("idx_agent_threads_status").on(table.status),
-		index("idx_agent_threads_created_at").on(table.createdAt),
+		index("idx_agent_sessions_session").on(table.sessionId),
+		index("idx_agent_sessions_status").on(table.status),
+		index("idx_agent_sessions_created_at").on(table.createdAt),
 	],
 );
 
@@ -76,7 +76,7 @@ export const agentThoughts = pgTable(
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		threadId: varchar({ length: NANOID_LENGTH })
 			.notNull()
-			.references(() => agentThreads.id),
+			.references(() => agentSessions.id),
 		stepNumber: integer().notNull(),
 		thoughtType: varchar({ length: 50 }).notNull(),
 		content: text().notNull(),
@@ -99,7 +99,7 @@ export const agentToolCalls = pgTable(
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		threadId: varchar({ length: NANOID_LENGTH })
 			.notNull()
-			.references(() => agentThreads.id),
+			.references(() => agentSessions.id),
 		stepNumber: integer().notNull(),
 		toolName: varchar({ length: 100 }).notNull(),
 		arguments: jsonb(),
@@ -122,7 +122,7 @@ export const agentDatabaseChanges = pgTable(
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		threadId: varchar({ length: NANOID_LENGTH })
 			.notNull()
-			.references(() => agentThreads.id),
+			.references(() => agentSessions.id),
 		stepNumber: integer().notNull(),
 		operationType: varchar({ length: 20 }).notNull(),
 		tableName: varchar({ length: 50 }).notNull(),

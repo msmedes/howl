@@ -1,9 +1,9 @@
 import { relations } from "drizzle-orm";
 import {
 	agentDatabaseChanges,
+	agentSessions,
 	agents,
 	agentThoughts,
-	agentThreads,
 	agentToolCalls,
 	models,
 } from "./agents";
@@ -102,12 +102,12 @@ export const agentsRelations = relations(agents, ({ one }) => ({
 	}),
 }));
 
-// Agent Thread Relations
-export const agentThreadsRelations = relations(
-	agentThreads,
+// Agent Session Relations
+export const agentSessionsRelations = relations(
+	agentSessions,
 	({ one, many }) => ({
 		agent: one(agents, {
-			fields: [agentThreads.agentId],
+			fields: [agentSessions.agentId],
 			references: [agents.id],
 		}),
 		thoughts: many(agentThoughts),
@@ -117,25 +117,25 @@ export const agentThreadsRelations = relations(
 );
 
 export const agentThoughtsRelations = relations(agentThoughts, ({ one }) => ({
-	thread: one(agentThreads, {
+	thread: one(agentSessions, {
 		fields: [agentThoughts.threadId],
-		references: [agentThreads.id],
+		references: [agentSessions.id],
 	}),
 }));
 
 export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
-	thread: one(agentThreads, {
+	thread: one(agentSessions, {
 		fields: [agentToolCalls.threadId],
-		references: [agentThreads.id],
+		references: [agentSessions.id],
 	}),
 }));
 
 export const agentDatabaseChangesRelations = relations(
 	agentDatabaseChanges,
 	({ one }) => ({
-		thread: one(agentThreads, {
+		thread: one(agentSessions, {
 			fields: [agentDatabaseChanges.threadId],
-			references: [agentThreads.id],
+			references: [agentSessions.id],
 		}),
 	}),
 );

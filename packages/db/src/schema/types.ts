@@ -1,8 +1,8 @@
 import type {
 	agentDatabaseChanges,
+	agentSessions,
 	agents,
 	agentThoughts,
-	agentThreads,
 	agentToolCalls,
 	models,
 } from "./agents";
@@ -35,8 +35,8 @@ export type UserBlock = typeof userBlocks.$inferSelect;
 export type InsertUserBlock = typeof userBlocks.$inferInsert;
 
 // Agent types
-export type AgentThread = typeof agentThreads.$inferSelect;
-export type InsertAgentThread = typeof agentThreads.$inferInsert;
+export type AgentSession = typeof agentSessions.$inferSelect;
+export type InsertAgentSession = typeof agentSessions.$inferInsert;
 export type AgentThought = typeof agentThoughts.$inferSelect;
 export type InsertAgentThought = typeof agentThoughts.$inferInsert;
 export type AgentToolCall = typeof agentToolCalls.$inferSelect;

@@ -40,3 +40,11 @@ export const createAgent = async ({
 }) => {
 	return await db.insert(agents).values(agent).returning();
 };
+
+// we need a few queries to create an agent session
+// when an agent session is started we need to keep track of a few things:
+// the step
+// any howls, likes, or replies created by the agent during this session
+// the chain of thought
+// the tool calls
+// the raw session thread
