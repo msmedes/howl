@@ -27,7 +27,7 @@ const app = new Hono<{ Variables: Variables }>()
 		if (!user) {
 			throw new HTTPException(404, { message: "User not found" });
 		}
-		const [howl] = await createHowl({
+		const howl = await createHowl({
 			db,
 			content,
 			userId: user.id,

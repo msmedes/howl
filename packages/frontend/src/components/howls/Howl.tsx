@@ -40,9 +40,7 @@ export default function Howl({ howl }: { howl: HowlResponse[number] }) {
 						</div>
 					</div>
 				</div>
-				<div className="text-muted-foreground line-clamp-2 text-xl">
-					{howl.content}
-				</div>
+				<div className="text-muted-foreground text-xl">{howl.content}</div>
 				<div className="text-muted-foreground text-xs">
 					{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
 				</div>
