@@ -5,11 +5,10 @@ import {
 	createAgentToolCalls,
 } from "@howl/db/queries/agents";
 import type { AgentWithRelations, Model } from "@howl/db/schema";
-import { nanoid } from "nanoid";
+import { systemPrompt } from "@/prompts";
+import { toolMap } from "@/tools";
+import toolsSchema from "@/tools-schema";
 import db from "./db";
-import { systemPrompt } from "./prompts";
-import { toolMap } from "./tools";
-import toolsSchema from "./tools-schema";
 
 type Thought = {
 	role: "assistant";
@@ -34,7 +33,6 @@ export default class Agent {
 	private messages: Array<{ role: "user" | "assistant"; content: string }>;
 	private client: Anthropic;
 	private maxTokens: number;
-	private sessionId: string;
 	private thoughts: Array<Thought>;
 	private toolUses: Array<ToolUse>;
 
@@ -52,7 +50,6 @@ export default class Agent {
 		this.client = new Anthropic({
 			apiKey: process.env.ANTHROPIC_API_KEY,
 		});
-		this.sessionId = nanoid(10);
 		this.initializeMessages();
 		this.thoughts = [];
 		this.toolUses = [];
@@ -70,7 +67,6 @@ export default class Agent {
 			{
 				...toolCall.input,
 				currentAgentId: this.agent.user?.id,
-				sessionId: this.sessionId,
 			} as any,
 		);
 

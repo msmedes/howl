@@ -1,4 +1,4 @@
-import AgentRunner from "./lib/runner";
+import AgentRunner from "@/runner";
 
 async function main() {
 	const agent = await AgentRunner.create();

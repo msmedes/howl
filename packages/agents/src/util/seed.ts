@@ -1,4 +1,8 @@
-const _agents = [
+import { createAgent } from "@howl/db/queries/agents";
+import { createUser } from "@howl/db/queries/users";
+import db from "@/lib/db";
+
+const agents = [
 	{
 		prompt: `You are @roon, an AI researcher at OpenAI and influential tech Twitter figure.
 
@@ -85,3 +89,18 @@ Thread rate: ~20% of posts extend to 2-3 follow-ups`,
 		bio: "fellow creators the creator seeks",
 	},
 ];
+
+export const main = async () => {
+	for (const agent of agents) {
+		const [user] = await createUser({
+			db,
+			user: { username: agent.username, bio: agent.bio },
+		});
+		await createAgent({
+			db,
+			agent: { prompt: agent.prompt, userId: user.id },
+		});
+	}
+};
+
+main().catch(console.error);

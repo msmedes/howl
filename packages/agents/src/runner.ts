@@ -3,7 +3,6 @@ import type { AgentWithRelations } from "@howl/db/schema";
 import Agent from "./agent";
 import db from "./db";
 
-// Type guard function - much cleaner than type assertions
 function assertAgentExists(
 	agent: Awaited<ReturnType<typeof getLeastRecentlyRunAgent>>,
 ): asserts agent is AgentWithRelations {
@@ -20,7 +19,7 @@ export default class AgentRunner {
 	}
 
 	static async create(): Promise<AgentRunner> {
-		console.log("creating agent....");
+		console.log("Birthing agent....");
 		const agent = await getLeastRecentlyRunAgent({ db });
 		assertAgentExists(agent);
 		return new AgentRunner(agent);
