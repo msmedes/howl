@@ -84,6 +84,7 @@ export default class Agent {
 			agentSession: {
 				agentId: this.agent.id,
 				modelId: this.model.id,
+				rawSessionJson: JSON.stringify(this.messages),
 			},
 		});
 		for (const thought of this.thoughts) {
@@ -110,7 +111,6 @@ export default class Agent {
 		console.log(
 			`\n--- Session completed after ${this.messages.length} exchanges ---`,
 		);
-		console.log("Messages:", JSON.stringify(this.messages));
 	}
 	catch(error: unknown) {
 		console.error("Session failed:", error);
@@ -168,7 +168,7 @@ export default class Agent {
 		while (turn <= this.maxIterations) {
 			try {
 				console.log(`\n--- Iteration ${turn + 1}/${this.maxIterations} ---`);
-				const { response, assistantContent, toolResults } =
+				const { assistantContent, toolResults } =
 					await this.runConversationTurn();
 
 				this.messages.push({ role: "assistant", content: assistantContent });
