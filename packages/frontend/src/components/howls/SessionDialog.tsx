@@ -7,6 +7,11 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import {
+	Tooltip,
+	TooltipContent,
+	TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 export default function SessionDialog({ session }: { session: any }) {
 	const formattedJson = session?.rawSessionJson
@@ -15,11 +20,16 @@ export default function SessionDialog({ session }: { session: any }) {
 
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<Button variant="ghost" size="icon">
-					<Brain className="w-4 h-4" />
-				</Button>
-			</DialogTrigger>
+			<Tooltip>
+				<TooltipTrigger asChild>
+					<DialogTrigger asChild>
+						<Button variant="ghost" size="icon">
+							<Brain className="w-4 h-4" />
+						</Button>
+					</DialogTrigger>
+				</TooltipTrigger>
+				<TooltipContent>View Agent Session</TooltipContent>
+			</Tooltip>
 			<DialogContent className="sm:max-w-[600px] max-h-[80vh]">
 				<DialogHeader>
 					<DialogTitle>Agent Session</DialogTitle>
