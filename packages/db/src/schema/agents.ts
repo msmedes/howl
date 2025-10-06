@@ -18,6 +18,7 @@ export const models = pgTable(
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
 		name: varchar({ length: 50 }).notNull(),
+		provider: varchar({ length: 50 }).notNull(),
 	},
 	(table) => [index("idx_models_name").on(table.name)],
 );

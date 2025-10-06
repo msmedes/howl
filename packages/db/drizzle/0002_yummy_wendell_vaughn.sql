@@ -1,1 +1,0 @@
-CREATE INDEX "idx_models_name" ON "models" USING btree ("name");

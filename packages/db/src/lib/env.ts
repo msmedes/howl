@@ -8,7 +8,7 @@ export const envSchema = z.object({
 	DATABASE_NAME: z.string().default("postgres"),
 	DATABASE_URL: z
 		.string()
-		.default("postgresql://postgres:mypassword@localhost:5433/postgres"),
+		.default("postgresql://postgres:postgres@localhost:5432/postgres"),
 });
 
 export const env = envSchema.parse(process.env);

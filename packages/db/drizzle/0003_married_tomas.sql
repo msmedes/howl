@@ -1,2 +1,0 @@
-ALTER TABLE "agents" ADD COLUMN "model_id" varchar(10);--> statement-breakpoint
-ALTER TABLE "agents" ADD CONSTRAINT "agents_model_id_models_id_fk" FOREIGN KEY ("model_id") REFERENCES "public"."models"("id") ON DELETE no action ON UPDATE no action;

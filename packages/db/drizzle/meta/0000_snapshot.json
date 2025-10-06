@@ -1,11 +1,11 @@
 {
-  "id": "56fe2089-7e46-4357-8970-68a5f3e6dbe9",
+  "id": "828d1984-9739-43ec-9d69-12586bbed621",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
-    "public.agent_database_changes": {
-      "name": "agent_database_changes",
+    "public.agent_sessions": {
+      "name": "agent_sessions",
       "schema": "",
       "columns": {
         "id": {
@@ -14,45 +14,21 @@
           "primaryKey": true,
           "notNull": true
         },
-        "thread_id": {
-          "name": "thread_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "step_number": {
-          "name": "step_number",
-          "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "operation_type": {
-          "name": "operation_type",
-          "type": "varchar(20)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "table_name": {
-          "name": "table_name",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "record_id": {
-          "name": "record_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "changes": {
-          "name": "changes",
-          "type": "jsonb",
-          "primaryKey": false,
-          "notNull": false
-        },
         "model_id": {
           "name": "model_id",
           "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "agent_id": {
+          "name": "agent_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "raw_session_json": {
+          "name": "raw_session_json",
+          "type": "jsonb",
           "primaryKey": false,
           "notNull": false
         },
@@ -62,83 +38,18 @@
           "primaryKey": false,
           "notNull": true,
           "default": "now()"
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {
-        "idx_agent_db_changes_thread": {
-          "name": "idx_agent_db_changes_thread",
-          "columns": [
-            {
-              "expression": "thread_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_db_changes_step": {
-          "name": "idx_agent_db_changes_step",
-          "columns": [
-            {
-              "expression": "thread_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "step_number",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_db_changes_table": {
-          "name": "idx_agent_db_changes_table",
-          "columns": [
-            {
-              "expression": "table_name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_db_changes_record": {
-          "name": "idx_agent_db_changes_record",
-          "columns": [
-            {
-              "expression": "table_name",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            },
-            {
-              "expression": "record_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_db_changes_created_at": {
-          "name": "idx_agent_db_changes_created_at",
+        "idx_agent_sessions_created_at": {
+          "name": "idx_agent_sessions_created_at",
           "columns": [
             {
               "expression": "created_at",
@@ -154,12 +65,12 @@
         }
       },
       "foreignKeys": {
-        "agent_database_changes_thread_id_agent_threads_id_fk": {
-          "name": "agent_database_changes_thread_id_agent_threads_id_fk",
-          "tableFrom": "agent_database_changes",
-          "tableTo": "agent_threads",
+        "agent_sessions_model_id_models_id_fk": {
+          "name": "agent_sessions_model_id_models_id_fk",
+          "tableFrom": "agent_sessions",
+          "tableTo": "models",
           "columnsFrom": [
-            "thread_id"
+            "model_id"
           ],
           "columnsTo": [
             "id"
@@ -167,12 +78,12 @@
           "onDelete": "no action",
           "onUpdate": "no action"
         },
-        "agent_database_changes_model_id_models_id_fk": {
-          "name": "agent_database_changes_model_id_models_id_fk",
-          "tableFrom": "agent_database_changes",
-          "tableTo": "models",
+        "agent_sessions_agent_id_agents_id_fk": {
+          "name": "agent_sessions_agent_id_agents_id_fk",
+          "tableFrom": "agent_sessions",
+          "tableTo": "agents",
           "columnsFrom": [
-            "model_id"
+            "agent_id"
           ],
           "columnsTo": [
             "id"
@@ -197,8 +108,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "thread_id": {
-          "name": "thread_id",
+        "session_id": {
+          "name": "session_id",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": true
@@ -206,12 +117,6 @@
         "step_number": {
           "name": "step_number",
           "type": "integer",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "thought_type": {
-          "name": "thought_type",
-          "type": "varchar(50)",
           "primaryKey": false,
           "notNull": true
         },
@@ -236,11 +141,11 @@
         }
       },
       "indexes": {
-        "idx_agent_thoughts_thread": {
-          "name": "idx_agent_thoughts_thread",
+        "idx_agent_thoughts_session": {
+          "name": "idx_agent_thoughts_session",
           "columns": [
             {
-              "expression": "thread_id",
+              "expression": "session_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -255,28 +160,13 @@
           "name": "idx_agent_thoughts_step",
           "columns": [
             {
-              "expression": "thread_id",
+              "expression": "session_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
             },
             {
               "expression": "step_number",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_thoughts_type": {
-          "name": "idx_agent_thoughts_type",
-          "columns": [
-            {
-              "expression": "thought_type",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -304,12 +194,12 @@
         }
       },
       "foreignKeys": {
-        "agent_thoughts_thread_id_agent_threads_id_fk": {
-          "name": "agent_thoughts_thread_id_agent_threads_id_fk",
+        "agent_thoughts_session_id_agent_sessions_id_fk": {
+          "name": "agent_thoughts_session_id_agent_sessions_id_fk",
           "tableFrom": "agent_thoughts",
-          "tableTo": "agent_threads",
+          "tableTo": "agent_sessions",
           "columnsFrom": [
-            "thread_id"
+            "session_id"
           ],
           "columnsTo": [
             "id"
@@ -337,137 +227,6 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.agent_threads": {
-      "name": "agent_threads",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "varchar(10)",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "session_id": {
-          "name": "session_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "status": {
-          "name": "status",
-          "type": "varchar(50)",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'active'"
-        },
-        "model_id": {
-          "name": "model_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "agent_id": {
-          "name": "agent_id",
-          "type": "varchar(10)",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "created_at": {
-          "name": "created_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        },
-        "updated_at": {
-          "name": "updated_at",
-          "type": "timestamp",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "now()"
-        }
-      },
-      "indexes": {
-        "idx_agent_threads_session": {
-          "name": "idx_agent_threads_session",
-          "columns": [
-            {
-              "expression": "session_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_threads_status": {
-          "name": "idx_agent_threads_status",
-          "columns": [
-            {
-              "expression": "status",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        },
-        "idx_agent_threads_created_at": {
-          "name": "idx_agent_threads_created_at",
-          "columns": [
-            {
-              "expression": "created_at",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": false,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
-      "foreignKeys": {
-        "agent_threads_model_id_models_id_fk": {
-          "name": "agent_threads_model_id_models_id_fk",
-          "tableFrom": "agent_threads",
-          "tableTo": "models",
-          "columnsFrom": [
-            "model_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        },
-        "agent_threads_agent_id_agents_id_fk": {
-          "name": "agent_threads_agent_id_agents_id_fk",
-          "tableFrom": "agent_threads",
-          "tableTo": "agents",
-          "columnsFrom": [
-            "agent_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
-      "policies": {},
-      "checkConstraints": {},
-      "isRLSEnabled": false
-    },
     "public.agent_tool_calls": {
       "name": "agent_tool_calls",
       "schema": "",
@@ -478,8 +237,8 @@
           "primaryKey": true,
           "notNull": true
         },
-        "thread_id": {
-          "name": "thread_id",
+        "session_id": {
+          "name": "session_id",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": true
@@ -517,11 +276,11 @@
         }
       },
       "indexes": {
-        "idx_agent_tool_calls_thread": {
-          "name": "idx_agent_tool_calls_thread",
+        "idx_agent_tool_calls_session": {
+          "name": "idx_agent_tool_calls_session",
           "columns": [
             {
-              "expression": "thread_id",
+              "expression": "session_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -536,7 +295,7 @@
           "name": "idx_agent_tool_calls_step",
           "columns": [
             {
-              "expression": "thread_id",
+              "expression": "session_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -585,12 +344,12 @@
         }
       },
       "foreignKeys": {
-        "agent_tool_calls_thread_id_agent_threads_id_fk": {
-          "name": "agent_tool_calls_thread_id_agent_threads_id_fk",
+        "agent_tool_calls_session_id_agent_sessions_id_fk": {
+          "name": "agent_tool_calls_session_id_agent_sessions_id_fk",
           "tableFrom": "agent_tool_calls",
-          "tableTo": "agent_threads",
+          "tableTo": "agent_sessions",
           "columnsFrom": [
-            "thread_id"
+            "session_id"
           ],
           "columnsTo": [
             "id"
@@ -644,6 +403,12 @@
         },
         "user_id": {
           "name": "user_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "model_id": {
+          "name": "model_id",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
@@ -706,6 +471,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "agents_model_id_models_id_fk": {
+          "name": "agents_model_id_models_id_fk",
+          "tableFrom": "agents",
+          "tableTo": "models",
+          "columnsFrom": [
+            "model_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -731,7 +509,23 @@
           "notNull": true
         }
       },
-      "indexes": {},
+      "indexes": {
+        "idx_models_name": {
+          "name": "idx_models_name",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
@@ -908,6 +702,12 @@
           "primaryKey": false,
           "notNull": false
         },
+        "session_id": {
+          "name": "session_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
         "created_at": {
           "name": "created_at",
           "type": "timestamp",
@@ -944,6 +744,21 @@
           "columns": [
             {
               "expression": "howl_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_howl_likes_session": {
+          "name": "idx_howl_likes_session",
+          "columns": [
+            {
+              "expression": "session_id",
               "isExpression": false,
               "asc": true,
               "nulls": "last"
@@ -996,6 +811,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "howl_likes_session_id_agent_sessions_id_fk": {
+          "name": "howl_likes_session_id_agent_sessions_id_fk",
+          "tableFrom": "howl_likes",
+          "tableTo": "agent_sessions",
+          "columnsFrom": [
+            "session_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {
@@ -1030,7 +858,7 @@
         },
         "content": {
           "name": "content",
-          "type": "varchar(140)",
+          "type": "varchar(280)",
           "primaryKey": false,
           "notNull": true
         },
@@ -1042,6 +870,12 @@
         },
         "parent_id": {
           "name": "parent_id",
+          "type": "varchar(10)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "session_id": {
+          "name": "session_id",
           "type": "varchar(10)",
           "primaryKey": false,
           "notNull": false
@@ -1112,6 +946,21 @@
           "method": "btree",
           "with": {}
         },
+        "idx_howls_session": {
+          "name": "idx_howls_session",
+          "columns": [
+            {
+              "expression": "session_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
         "idx_howls_user_created": {
           "name": "idx_howls_user_created",
           "columns": [
@@ -1156,6 +1005,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "howls_session_id_agent_sessions_id_fk": {
+          "name": "howls_session_id_agent_sessions_id_fk",
+          "tableFrom": "howls",
+          "tableTo": "agent_sessions",
+          "columnsFrom": [
+            "session_id"
           ],
           "columnsTo": [
             "id"
@@ -1440,7 +1302,7 @@
           "name": "email",
           "type": "varchar(255)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "bio": {
           "name": "bio",
@@ -1469,6 +1331,21 @@
           "columns": [
             {
               "expression": "created_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "idx_users_username": {
+          "name": "idx_users_username",
+          "columns": [
+            {
+              "expression": "username",
               "isExpression": false,
               "asc": true,
               "nulls": "last"

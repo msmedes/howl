@@ -1,1 +1,0 @@
-ALTER TABLE "howls" ALTER COLUMN "content" SET DATA TYPE varchar(280);

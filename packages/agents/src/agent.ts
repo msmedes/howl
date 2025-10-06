@@ -41,10 +41,7 @@ export default class Agent {
 	constructor(agent: AgentWithRelations) {
 		this.agent = agent;
 		this.maxIterations = 10;
-		this.model = {
-			name: "claude-3-7-sonnet-latest",
-			id: "claude-3-7-sonnet-latest",
-		};
+		this.model = agent.model;
 		this.agentPrompt = agent.prompt;
 		this.systemPrompt = systemPrompt;
 		this.messages = [];

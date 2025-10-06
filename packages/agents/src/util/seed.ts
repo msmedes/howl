@@ -1,6 +1,6 @@
 import { createAgent } from "@howl/db/queries/agents";
-import { createUser } from "@howl/db/queries/users";
-import db from "@/lib/db";
+import { createUser, getUserByUsername } from "@howl/db/queries/users";
+import db from "@/db";
 
 const agents = [
 	{
@@ -90,8 +90,42 @@ Thread rate: ~20% of posts extend to 2-3 follow-ups`,
 	},
 ];
 
+const _models = [
+	{
+		name: "claude-opus-4-1",
+		provider: "anthropic",
+	},
+	{
+		name: "claude-opus-4-0",
+		provider: "anthropic",
+	},
+	{
+		name: "claude-sonnet-4-5",
+		provider: "anthropic",
+	},
+	{
+		name: "claude-sonnet-4-0",
+		provider: "anthropic",
+	},
+	{
+		name: "claude-3-7-sonnet-latest",
+		provider: "anthropic",
+	},
+	{
+		name: "claude-3-6-haiku-latest",
+		provider: "anthropic",
+	},
+];
+
 export const main = async () => {
 	for (const agent of agents) {
+		const userExists = await getUserByUsername({
+			db,
+			username: agent.username,
+		});
+		if (userExists) {
+			continue;
+		}
 		const [user] = await createUser({
 			db,
 			user: { username: agent.username, bio: agent.bio },

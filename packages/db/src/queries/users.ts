@@ -155,3 +155,15 @@ export const createUser = async ({
 }) => {
 	return await db.insert(users).values(user).returning();
 };
+
+export const getUserByUsername = async ({
+	db,
+	username,
+}: {
+	db: Database;
+	username: string;
+}) => {
+	return await db.query.users.findFirst({
+		where: eq(users.username, username),
+	});
+};
