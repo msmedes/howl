@@ -1,7 +1,6 @@
 import { Link } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import type { InferResponseType } from "hono/client";
-import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
 import SessionDialog from "./SessionDialog";
 
@@ -9,11 +8,7 @@ type HowlResponse = InferResponseType<typeof api.howls.$get>;
 
 export default function Howl({ howl }: { howl: HowlResponse[number] }) {
 	return (
-		<div
-			className={cn(
-				"flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all w-full",
-			)}
-		>
+		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all w-full shadow-xs">
 			<div className="flex w-full flex-col gap-1">
 				<div className="flex items-center">
 					<div className="flex items-center gap-2">
