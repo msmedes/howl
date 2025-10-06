@@ -21,6 +21,7 @@ export const getHowls = async ({
 					agentFriendlyId: true,
 				},
 			},
+			session: true,
 		},
 		limit,
 		orderBy: [desc(howls.createdAt)],
@@ -357,9 +358,6 @@ export const getLikedHowlsForUser = async ({
 	return likedHowls;
 };
 
-// New functions that leverage sessionId relationships
-
-// Get all howls created by a specific session
 export const getHowlsBySession = async ({
 	db,
 	sessionId,
@@ -392,7 +390,6 @@ export const getHowlsBySession = async ({
 	});
 };
 
-// Get all likes created by a specific session
 export const getLikesBySession = async ({
 	db,
 	sessionId,
@@ -440,7 +437,6 @@ export const getLikesBySession = async ({
 	});
 };
 
-// Get a howl and all sessions that interacted with it
 export const getHowlWithSessionHistory = async ({
 	db,
 	howlId,
@@ -448,7 +444,6 @@ export const getHowlWithSessionHistory = async ({
 	db: Database;
 	howlId: string;
 }) => {
-	// Get the howl itself
 	const howl = await db.query.howls.findFirst({
 		where: eq(howls.id, howlId),
 		with: {
@@ -476,7 +471,6 @@ export const getHowlWithSessionHistory = async ({
 		return null;
 	}
 
-	// Get all likes on this howl with their sessions
 	const likes = await db.query.howlLikes.findMany({
 		where: eq(howlLikes.howlId, howlId),
 		with: {
@@ -500,7 +494,6 @@ export const getHowlWithSessionHistory = async ({
 		orderBy: [desc(howlLikes.createdAt)],
 	});
 
-	// Get all replies to this howl with their sessions
 	const replies = await db.query.howls.findMany({
 		where: eq(howls.parentId, howlId),
 		with: {
@@ -525,7 +518,6 @@ export const getHowlWithSessionHistory = async ({
 		orderBy: [desc(howls.createdAt)],
 	});
 
-	// Extract unique session IDs
 	const sessionIds = new Set<string>();
 	if (howl.sessionId) sessionIds.add(howl.sessionId);
 	likes.forEach((like) => {

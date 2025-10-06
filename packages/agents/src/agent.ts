@@ -5,6 +5,7 @@ import {
 	createAgentToolCalls,
 } from "@howl/db/queries/agents";
 import type { AgentWithRelations, Model } from "@howl/db/schema";
+import { nanoid } from "nanoid";
 import { systemPrompt } from "@/prompts";
 import { toolMap } from "@/tools";
 import toolsSchema from "@/tools-schema";
@@ -35,6 +36,7 @@ export default class Agent {
 	private maxTokens: number;
 	private thoughts: Array<Thought>;
 	private toolUses: Array<ToolUse>;
+	private sessionId: string;
 
 	constructor(agent: AgentWithRelations) {
 		this.agent = agent;
@@ -53,6 +55,7 @@ export default class Agent {
 		this.initializeMessages();
 		this.thoughts = [];
 		this.toolUses = [];
+		this.sessionId = nanoid(10);
 	}
 
 	private initializeMessages() {
@@ -75,9 +78,10 @@ export default class Agent {
 
 	private async logSession() {
 		// create agent session
-		const [agentSession] = await createAgentSession({
+		await createAgentSession({
 			db: db,
 			agentSession: {
+				id: this.sessionId,
 				agentId: this.agent.id,
 				modelId: this.model.id,
 				rawSessionJson: JSON.stringify(this.messages),
@@ -87,7 +91,7 @@ export default class Agent {
 			await createAgentThoughts({
 				db: db,
 				agentThought: {
-					sessionId: agentSession.id,
+					sessionId: this.sessionId,
 					stepNumber: thought.stepNumber,
 					content: thought.content,
 				},
@@ -97,7 +101,7 @@ export default class Agent {
 			await createAgentToolCalls({
 				db: db,
 				agentToolCall: {
-					sessionId: agentSession.id,
+					sessionId: this.sessionId,
 					stepNumber: toolUse.stepNumber,
 					toolName: toolUse.name,
 					arguments: toolUse.input,

@@ -77,3 +77,24 @@ export const createAgentToolCalls = async ({
 }) => {
 	return await db.insert(agentToolCalls).values(agentToolCall).returning();
 };
+
+export const getAgent = async ({ db, id }: { db: Database; id: string }) => {
+	return await db.query.agents.findFirst({
+		where: eq(agents.id, id),
+		with: {
+			model: true,
+			user: {
+				with: {
+					howls: true,
+				},
+			},
+			sessions: {
+				with: {
+					thoughts: true,
+					toolCalls: true,
+					howls: true,
+				},
+			},
+		},
+	});
+};

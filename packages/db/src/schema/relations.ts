@@ -98,7 +98,7 @@ export const userBlocksRelations = relations(userBlocks, ({ one }) => ({
 	}),
 }));
 
-export const agentsRelations = relations(agents, ({ one }) => ({
+export const agentsRelations = relations(agents, ({ one, many }) => ({
 	user: one(users, {
 		fields: [agents.userId],
 		references: [users.id],
@@ -107,6 +107,7 @@ export const agentsRelations = relations(agents, ({ one }) => ({
 		fields: [agents.modelId],
 		references: [models.id],
 	}),
+	sessions: many(agentSessions),
 }));
 
 // Agent Session Relations
