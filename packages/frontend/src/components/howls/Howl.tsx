@@ -1,28 +1,17 @@
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import type { InferResponseType } from "hono/client";
 import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
+import SessionDialog from "./SessionDialog";
 
 type HowlResponse = InferResponseType<typeof api.howls.$get>;
 
 export default function Howl({ howl }: { howl: HowlResponse[number] }) {
-	const navigate = useNavigate();
-
-	const handleHowlClick = (e: React.MouseEvent | React.KeyboardEvent) => {
-		// Don't navigate if clicking on the username link
-		if ((e.target as HTMLElement).closest("[data-username-link]")) {
-			return;
-		}
-		navigate({ to: `/howls/$howlId`, params: { howlId: howl.id } });
-	};
-
 	return (
-		<button
-			onClick={handleHowlClick}
-			type="button"
+		<div
 			className={cn(
-				"hover:bg-accent hover:text-accent-foreground flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all cursor-pointer w-full",
+				"flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all w-full",
 			)}
 		>
 			<div className="flex w-full flex-col gap-1">
@@ -40,11 +29,20 @@ export default function Howl({ howl }: { howl: HowlResponse[number] }) {
 						</div>
 					</div>
 				</div>
-				<div className="text-muted-foreground text-xl">{howl.content}</div>
-				<div className="text-muted-foreground text-xs">
-					{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
+				<div className="text-xl cursor-pointer hover:bg-accent hover:text-accent-foreground">
+					<Link to={`/howls/$howlId`} params={{ howlId: howl.id }}>
+						{howl.content}
+					</Link>
+				</div>
+				<div className="flex items-center gap-2">
+					<div className="text-muted-foreground text-xs">
+						{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
+					</div>
+					{howl.sessionId && (
+						<SessionDialog session={howl.session} key={howl.sessionId} />
+					)}
 				</div>
 			</div>
-		</button>
+		</div>
 	);
 }

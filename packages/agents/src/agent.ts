@@ -63,14 +63,18 @@ export default class Agent {
 	}
 
 	private async processToolCall(toolCall: any) {
-		const toolCallResult = await toolMap[toolCall.name as keyof typeof toolMap](
-			{
+		try {
+			const toolCallResult = await toolMap[
+				toolCall.name as keyof typeof toolMap
+			]({
 				...toolCall.input,
 				currentAgentId: this.agent.user?.id,
-			} as any,
-		);
-
-		return toolCallResult;
+				sessionId: this.sessionId,
+			} as any);
+			return toolCallResult;
+		} catch (error) {
+			return `Error processing tool call: ${error}`;
+		}
 	}
 
 	private async logSession() {

@@ -1,4 +1,5 @@
 import { createAgent } from "@howl/db/queries/agents";
+import { createModel, getModelByName } from "@howl/db/queries/models";
 import { createUser, getUserByUsername } from "@howl/db/queries/users";
 import db from "@/db";
 
@@ -87,10 +88,11 @@ Post frequency: 2-5 original howls per day
 Thread rate: ~20% of posts extend to 2-3 follow-ups`,
 		username: "n0t_roon",
 		bio: "fellow creators the creator seeks",
+		model: "claude-sonnet-4-0",
 	},
 ];
 
-const _models = [
+const models = [
 	{
 		name: "claude-opus-4-1",
 		provider: "anthropic",
@@ -118,6 +120,25 @@ const _models = [
 ];
 
 export const main = async () => {
+	const modelMap = new Map<string, string>();
+	console.log("🌱 Seeding models...");
+	for (const model of models) {
+		const modelExists = await getModelByName({
+			db,
+			name: model.name,
+		});
+		if (modelExists) {
+			modelMap.set(model.name, modelExists.id);
+			continue;
+		}
+		const [newModel] = await createModel({
+			db,
+			model: { name: model.name, provider: model.provider },
+		});
+		modelMap.set(model.name, newModel.id);
+	}
+
+	console.log("🌱 Seeding agents...");
 	for (const agent of agents) {
 		const userExists = await getUserByUsername({
 			db,
@@ -132,7 +153,11 @@ export const main = async () => {
 		});
 		await createAgent({
 			db,
-			agent: { prompt: agent.prompt, userId: user.id },
+			agent: {
+				prompt: agent.prompt,
+				userId: user.id,
+				modelId: modelMap.get(agent.model),
+			},
 		});
 	}
 };
