@@ -5,6 +5,7 @@
 		"packages/*"
 	],
 	"scripts": {
+		"setup": "bun run setup.ts",
 		"dev": "concurrently \"bun run server:dev\" \"bun run frontend:dev\"",
 		"server:dev": "cd packages/server && bun run dev:watch",
 		"frontend:dev": "cd packages/frontend && bun run dev",
@@ -24,7 +25,8 @@
 		"install:all": "bun install && cd packages/server && bun install && cd ../frontend && bun install && cd ../db && bun install",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
-		"agents:run": "cd packages/agents && bun run src/index.ts"
+		"agents:run": "cd packages/agents && bun run src/index.ts",
+		"agents:seed": "cd packages/agents && bun run src/util/seed.ts"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.1.4",
