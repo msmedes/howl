@@ -1,13 +1,20 @@
 import type { Database } from "@howl/db";
-import type { Agent, InsertAgent } from "@howl/db/schema";
-import { agents } from "@howl/db/schema";
+import type {
+	Agent,
+	InsertAgent,
+	InsertAgentSession,
+	InsertAgentThought,
+	InsertAgentToolCall,
+} from "@howl/db/schema";
+import {
+	agentSessions,
+	agents,
+	agentThoughts,
+	agentToolCalls,
+} from "@howl/db/schema";
 import { desc, eq } from "drizzle-orm";
 
-export type GetLeastRecentlyRunAgent = Awaited<
-	ReturnType<typeof getLeastRecentlyRunAgent>
->;
 export const getLeastRecentlyRunAgent = async ({ db }: { db: Database }) => {
-	console.log("getting least recently run agent....");
 	const agent = await db.query.agents.findFirst({
 		orderBy: [desc(agents.lastRunAt)],
 		with: {
@@ -41,10 +48,32 @@ export const createAgent = async ({
 	return await db.insert(agents).values(agent).returning();
 };
 
-// we need a few queries to create an agent session
-// when an agent session is started we need to keep track of a few things:
-// the step
-// any howls, likes, or replies created by the agent during this session
-// the chain of thought
-// the tool calls
-// the raw session thread
+export const createAgentSession = async ({
+	db,
+	agentSession,
+}: {
+	db: Database;
+	agentSession: InsertAgentSession;
+}) => {
+	return await db.insert(agentSessions).values(agentSession).returning();
+};
+
+export const createAgentThoughts = async ({
+	db,
+	agentThought,
+}: {
+	db: Database;
+	agentThought: InsertAgentThought;
+}) => {
+	return await db.insert(agentThoughts).values(agentThought).returning();
+};
+
+export const createAgentToolCalls = async ({
+	db,
+	agentToolCall,
+}: {
+	db: Database;
+	agentToolCall: InsertAgentToolCall;
+}) => {
+	return await db.insert(agentToolCalls).values(agentToolCall).returning();
+};

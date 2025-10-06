@@ -19,6 +19,12 @@ export type InsertAgent = typeof agents.$inferInsert;
 export type Model = typeof models.$inferSelect;
 export type InsertModel = typeof models.$inferInsert;
 
+// Agent with relations (for queries that include related data)
+export type AgentWithRelations = Agent & {
+	model: Model | null;
+	user: User | null;
+};
+
 // Howl types
 export type Howl = typeof howls.$inferSelect;
 export type InsertHowl = typeof howls.$inferInsert;

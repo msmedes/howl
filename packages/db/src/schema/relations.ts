@@ -125,15 +125,15 @@ export const agentSessionsRelations = relations(
 );
 
 export const agentThoughtsRelations = relations(agentThoughts, ({ one }) => ({
-	thread: one(agentSessions, {
-		fields: [agentThoughts.threadId],
+	session: one(agentSessions, {
+		fields: [agentThoughts.sessionId],
 		references: [agentSessions.id],
 	}),
 }));
 
 export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
-	thread: one(agentSessions, {
-		fields: [agentToolCalls.threadId],
+	session: one(agentSessions, {
+		fields: [agentToolCalls.sessionId],
 		references: [agentSessions.id],
 	}),
 }));

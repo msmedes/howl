@@ -1,9 +1,29 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import {
+	createAgentSession,
+	createAgentThoughts,
+	createAgentToolCalls,
+} from "@howl/db/queries/agents";
 import type { AgentWithRelations, Model } from "@howl/db/schema";
 import { nanoid } from "nanoid";
+import db from "./db";
 import { systemPrompt } from "./prompts";
 import { toolMap } from "./tools";
 import toolsSchema from "./tools-schema";
+
+type Thought = {
+	role: "assistant";
+	content: string;
+	stepNumber: number;
+};
+
+type ToolUse = {
+	type: "tool_use";
+	id: string;
+	name: string;
+	input: Record<string, unknown>;
+	stepNumber: number;
+};
 
 export default class Agent {
 	private maxIterations: number;
@@ -15,6 +35,8 @@ export default class Agent {
 	private client: Anthropic;
 	private maxTokens: number;
 	private sessionId: string;
+	private thoughts: Array<Thought>;
+	private toolUses: Array<ToolUse>;
 
 	constructor(agent: AgentWithRelations) {
 		this.agent = agent;
@@ -32,6 +54,8 @@ export default class Agent {
 		});
 		this.sessionId = nanoid(10);
 		this.initializeMessages();
+		this.thoughts = [];
+		this.toolUses = [];
 	}
 
 	private initializeMessages() {
@@ -53,7 +77,36 @@ export default class Agent {
 		return toolCallResult;
 	}
 
-	private logSession() {
+	private async logSession() {
+		// create agent session
+		const [agentSession] = await createAgentSession({
+			db: db,
+			agentSession: {
+				agentId: this.agent.id,
+				modelId: this.model.id,
+			},
+		});
+		for (const thought of this.thoughts) {
+			await createAgentThoughts({
+				db: db,
+				agentThought: {
+					sessionId: agentSession.id,
+					stepNumber: thought.stepNumber,
+					content: thought.content,
+				},
+			});
+		}
+		for (const toolUse of this.toolUses) {
+			await createAgentToolCalls({
+				db: db,
+				agentToolCall: {
+					sessionId: agentSession.id,
+					stepNumber: toolUse.stepNumber,
+					toolName: toolUse.name,
+					arguments: toolUse.input,
+				},
+			});
+		}
 		console.log(
 			`\n--- Session completed after ${this.messages.length} exchanges ---`,
 		);
@@ -80,6 +133,11 @@ export default class Agent {
 		for (const content of response.content) {
 			if (content.type === "text") {
 				assistantContent.push({ type: "text", text: content.text });
+				this.thoughts.push({
+					role: "assistant",
+					content: content.text,
+					stepNumber: this.messages.length,
+				});
 			} else if (content.type === "tool_use") {
 				const toolResult = await this.processToolCall(content);
 				assistantContent.push({
@@ -87,6 +145,13 @@ export default class Agent {
 					id: content.id,
 					name: content.name,
 					input: content.input,
+				});
+				this.toolUses.push({
+					type: "tool_use",
+					id: content.id,
+					name: content.name,
+					input: content.input as Record<string, unknown>,
+					stepNumber: this.messages.length,
 				});
 				toolResults.push({
 					type: "tool_result",
