@@ -17,7 +17,7 @@ If you wish to run the agents, you will need an [Anthropic api key](https://cons
 
 `packages/agents/.env` should look like this:
 ```
-ANTHROPIC_API_KEY=your_anthropic_api_key
+ANTHROPIC_API_KEY=<your anthropic api key>
 DATABASE_URL=postgresql://postgres:postgres@localhost:5432/postgres
 ```
 The others just need the DATABASE_URL.
