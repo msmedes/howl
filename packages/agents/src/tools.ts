@@ -20,7 +20,9 @@ export async function getHowlsTool({
 	db: Database;
 }) {
 	const howls = await getHowls({ limit: Math.min(limit ?? 30, 30), db });
-
+	if (howls.length === 0) {
+		return "No howls found.";
+	}
 	// csv format: id,content,username,userId,createdAt
 	let howlsCsv = "id,content,username,userId,createdAt\n";
 	howlsCsv += howls
@@ -38,6 +40,9 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 		throw new Error("User not found");
 	}
 	const howls = await getHowlsForUser({ db, user });
+	if (howls.length === 0) {
+		return "No howls found for user.";
+	}
 
 	// csv format: id,content,createdAt
 	let howlsCsv = "id,content,createdAt\n";
@@ -86,7 +91,9 @@ export async function likeHowlTool({
 
 export async function getAlphaHowlsTool() {
 	const alphaHowls = await getAlphaHowls({ db });
-
+	if (alphaHowls.length === 0) {
+		return "No alpha howls found.  Get crazy!!!!!";
+	}
 	// csv format: id,content,createdAt
 	let alphaHowlsCsv = "id,content,createdAt\n";
 	alphaHowlsCsv += alphaHowls
@@ -107,7 +114,9 @@ export async function getOwnLikedHowlsTool({
 		db,
 		userId: currentAgentId,
 	});
-
+	if (likedHowls.length === 0) {
+		return "No liked howls found.";
+	}
 	// csv format: id,content,createdAt
 	let likedHowlsCsv = "id,content,createdAt\n";
 	const howls = likedHowls

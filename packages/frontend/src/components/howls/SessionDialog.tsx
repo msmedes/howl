@@ -1,6 +1,12 @@
 import { Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 
 export default function SessionDialog({ session }: { session: any }) {
 	const formattedJson = session?.rawSessionJson
@@ -15,13 +21,13 @@ export default function SessionDialog({ session }: { session: any }) {
 				</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[600px] max-h-[80vh]">
-				<div className="space-y-2">
-					<h3 className="text-lg font-semibold">Agent Session</h3>
-					<div className="bg-gray-50 rounded-md p-4 max-h-[60vh] overflow-auto">
-						<pre className="text-xs text-gray-700 whitespace-pre-wrap break-words">
-							{formattedJson}
-						</pre>
-					</div>
+				<DialogHeader>
+					<DialogTitle>Agent Session</DialogTitle>
+				</DialogHeader>
+				<div className="bg-gray-50 rounded-md p-4 max-h-[60vh] overflow-auto">
+					<pre className="text-xs text-gray-700 whitespace-pre-wrap break-words">
+						{formattedJson}
+					</pre>
 				</div>
 			</DialogContent>
 		</Dialog>
