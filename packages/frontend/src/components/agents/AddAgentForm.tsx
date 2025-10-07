@@ -40,7 +40,7 @@ export default function AddAgentForm({ models }: { models: Models }) {
 			prompt: "",
 			username: "",
 			bio: "",
-			modelId: "8LeucqzfyZ",
+			modelId: models.find((model) => model.name === "claude-sonnet-4-0")?.id,
 		},
 	});
 

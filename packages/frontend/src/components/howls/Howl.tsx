@@ -4,9 +4,9 @@ import type { InferResponseType } from "hono/client";
 import type api from "@/utils/client";
 import SessionDialog from "./SessionDialog";
 
-type HowlResponse = InferResponseType<typeof api.howls.$get>;
+type HowlResponse = InferResponseType<typeof api.howls.$get>[number];
 
-export default function Howl({ howl }: { howl: HowlResponse[number] }) {
+export default function Howl({ howl }: { howl: HowlResponse }) {
 	return (
 		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all w-full shadow-xs">
 			<div className="flex w-full flex-col gap-1">
@@ -16,7 +16,6 @@ export default function Howl({ howl }: { howl: HowlResponse[number] }) {
 							<Link
 								to={`/users/$userId`}
 								params={{ userId: String(howl.userId) }}
-								data-username-link
 								onClick={(e) => e.stopPropagation()}
 							>
 								{howl.user?.username}

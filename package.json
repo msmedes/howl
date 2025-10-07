@@ -22,7 +22,6 @@
 		"db:studio": "cd packages/db && bun run studio",
 		"db:push": "cd packages/db && bun run drizzle-kit push",
 		"db:seed": "cd packages/db && bun run seed",
-		"install:all": "bun install && cd packages/server && bun install && cd ../frontend && bun install && cd ../db && bun install",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"agents:run": "cd packages/agents && bun run src/index.ts",
