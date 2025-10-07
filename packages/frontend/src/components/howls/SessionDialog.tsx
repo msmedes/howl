@@ -1,3 +1,4 @@
+import type { InferResponseType } from "hono/client";
 import { Brain } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -12,8 +13,17 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import type client from "@/utils/client";
 
-export default function SessionDialog({ session }: { session: any }) {
+type SessionResponse = InferResponseType<
+	typeof client.howls.$get
+>[number]["session"];
+
+export default function SessionDialog({
+	session,
+}: {
+	session: SessionResponse;
+}) {
 	const formattedJson = session?.rawSessionJson
 		? JSON.stringify(session.rawSessionJson, null, 2)
 		: "No session data available";
