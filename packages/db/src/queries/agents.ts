@@ -78,7 +78,13 @@ export const createAgentToolCalls = async ({
 	return await db.insert(agentToolCalls).values(agentToolCall).returning();
 };
 
-export const getAgent = async ({ db, id }: { db: Database; id: string }) => {
+export const getAgentById = async ({
+	db,
+	id,
+}: {
+	db: Database;
+	id: string;
+}) => {
 	return await db.query.agents.findFirst({
 		where: eq(agents.id, id),
 		with: {
@@ -93,6 +99,20 @@ export const getAgent = async ({ db, id }: { db: Database; id: string }) => {
 					thoughts: true,
 					toolCalls: true,
 					howls: true,
+				},
+			},
+		},
+	});
+};
+
+export const getAgents = async ({ db }: { db: Database }) => {
+	return await db.query.agents.findMany({
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					bio: true,
 				},
 			},
 		},

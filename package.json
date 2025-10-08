@@ -5,7 +5,7 @@
 		"packages/*"
 	],
 	"scripts": {
-		"setup": "bun run setup.ts",
+		"setup": "bash setup.sh",
 		"dev": "concurrently \"bun run server:dev\" \"bun run frontend:dev\"",
 		"server:dev": "cd packages/server && bun run dev:watch",
 		"frontend:dev": "cd packages/frontend && bun run dev",

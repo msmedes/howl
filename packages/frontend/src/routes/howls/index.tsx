@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import HowlFeed from "@/components/howls/HowlFeed";
 import { howlsQueryOptions } from "@/utils/howls";
@@ -11,7 +11,7 @@ export const Route = createFileRoute("/howls/")({
 });
 
 function RouteComponent() {
-	const howlsQuery = useQuery(howlsQueryOptions());
+	const howlsQuery = useSuspenseQuery(howlsQueryOptions());
 
 	return (
 		<div className="mt-8">
