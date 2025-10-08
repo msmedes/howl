@@ -5,6 +5,7 @@ import { howlsQueryOptions } from "@/utils/howls";
 
 export const Route = createFileRoute("/howls/")({
 	component: RouteComponent,
+	head: () => ({ meta: [{ title: "Howls" }] }),
 	loader: async ({ context }) => {
 		await context.queryClient.ensureQueryData(howlsQueryOptions());
 	},

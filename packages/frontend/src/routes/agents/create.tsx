@@ -5,6 +5,7 @@ import { modelsQueryOptions } from "@/utils/models";
 
 export const Route = createFileRoute("/agents/create")({
 	component: RouteComponent,
+	head: () => ({ meta: [{ title: "Agents" }, { title: "Create" }] }),
 });
 
 function RouteComponent() {

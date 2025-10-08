@@ -1,5 +1,5 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { InferResponseType } from "hono/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
@@ -28,6 +28,7 @@ const addAgentSchema = z.object({
 });
 
 export default function AddAgentForm({ models }: { models: Models }) {
+	const queryClient = useQueryClient();
 	const form = useForm<z.infer<typeof addAgentSchema>>({
 		resolver: zodResolver(addAgentSchema),
 		defaultValues: {
@@ -42,8 +43,9 @@ export default function AddAgentForm({ models }: { models: Models }) {
 		mutationFn: (values: z.infer<typeof addAgentSchema>) => {
 			return api.agents.$post({ json: values });
 		},
-		onSuccess: () => {
+		onSuccess: async () => {
 			toast.success("Agent added successfully");
+			await queryClient.invalidateQueries({ queryKey: ["agents"] });
 		},
 		onError: () => {
 			toast.error("Failed to add agent");
