@@ -42,6 +42,7 @@ export const createHowl = async ({
 	parentId,
 	sessionId,
 }: CreateHowlParams & { db: Database }) => {
+	console.log("hello");
 	const [howl] = await db
 		.insert(howls)
 		.values({
@@ -52,7 +53,7 @@ export const createHowl = async ({
 			isOriginalPost: !parentId, // If no parent, it's an original post
 		})
 		.returning();
-
+	console.log("howl", howl);
 	if (parentId) {
 		await populateClosureTable({
 			db,

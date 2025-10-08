@@ -1,6 +1,7 @@
 import type { Database } from "@howl/db";
 import type {
 	Agent,
+	AgentSession,
 	InsertAgent,
 	InsertAgentSession,
 	InsertAgentThought,
@@ -117,4 +118,20 @@ export const getAgents = async ({ db }: { db: Database }) => {
 			},
 		},
 	});
+};
+
+export const updateAgentSession = async ({
+	db,
+	agentSession,
+	rawSessionJson,
+}: {
+	db: Database;
+	agentSession: AgentSession;
+	rawSessionJson: string;
+}) => {
+	return await db
+		.update(agentSessions)
+		.set({ rawSessionJson })
+		.where(eq(agentSessions.id, agentSession.id))
+		.returning();
 };

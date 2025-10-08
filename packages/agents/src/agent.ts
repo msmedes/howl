@@ -1,11 +1,10 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import {
-	createAgentSession,
 	createAgentThoughts,
 	createAgentToolCalls,
+	updateAgentSession,
 } from "@howl/db/queries/agents";
-import type { AgentWithRelations, Model } from "@howl/db/schema";
-import { nanoid } from "nanoid";
+import type { AgentSession, AgentWithRelations, Model } from "@howl/db/schema";
 import { systemPrompt } from "@/prompts";
 import { toolMap } from "@/tools";
 import toolsSchema from "@/tools-schema";
@@ -36,9 +35,9 @@ export default class Agent {
 	private maxTokens: number;
 	private thoughts: Array<Thought>;
 	private toolUses: Array<ToolUse>;
-	private sessionId: string;
+	private session: AgentSession;
 
-	constructor(agent: AgentWithRelations) {
+	constructor(agent: AgentWithRelations, session: AgentSession) {
 		this.agent = agent;
 		this.maxIterations = 10;
 		this.model = agent.model;
@@ -52,7 +51,7 @@ export default class Agent {
 		this.initializeMessages();
 		this.thoughts = [];
 		this.toolUses = [];
-		this.sessionId = nanoid(10);
+		this.session = session;
 	}
 
 	private initializeMessages() {
@@ -69,7 +68,7 @@ export default class Agent {
 			]({
 				...toolCall.input,
 				currentAgentId: this.agent.user?.id,
-				sessionId: this.sessionId,
+				sessionId: this.session.id,
 			} as any);
 			return toolCallResult;
 		} catch (error) {
@@ -79,20 +78,13 @@ export default class Agent {
 
 	private async logSession() {
 		// create agent session
-		await createAgentSession({
-			db: db,
-			agentSession: {
-				id: this.sessionId,
-				agentId: this.agent.id,
-				modelId: this.model.id,
-				rawSessionJson: JSON.stringify(this.messages),
-			},
-		});
 		for (const thought of this.thoughts) {
+			console.log("logging thought", thought);
+			console.log("session", this.session);
 			await createAgentThoughts({
 				db: db,
 				agentThought: {
-					sessionId: this.sessionId,
+					sessionId: this.session.id,
 					stepNumber: thought.stepNumber,
 					content: thought.content,
 				},
@@ -102,13 +94,18 @@ export default class Agent {
 			await createAgentToolCalls({
 				db: db,
 				agentToolCall: {
-					sessionId: this.sessionId,
+					sessionId: this.session.id,
 					stepNumber: toolUse.stepNumber,
 					toolName: toolUse.name,
 					arguments: toolUse.input,
 				},
 			});
 		}
+		await updateAgentSession({
+			db: db,
+			agentSession: this.session,
+			rawSessionJson: JSON.stringify(this.messages),
+		});
 		console.log(
 			`\n--- Session completed after ${this.messages.length} exchanges ---`,
 		);
