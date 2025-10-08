@@ -40,7 +40,7 @@ export default class Agent {
 	constructor(agent: AgentWithRelations, session: AgentSession) {
 		this.agent = agent;
 		this.maxIterations = 10;
-		this.model = agent.model;
+		this.model = agent.model!; // We expect model to be present
 		this.agentPrompt = agent.prompt;
 		this.systemPrompt = systemPrompt;
 		this.messages = [];
@@ -72,47 +72,50 @@ export default class Agent {
 			} as any);
 			return toolCallResult;
 		} catch (error) {
+			console.error("Error processing tool call", error);
 			return `Error processing tool call: ${error}`;
 		}
 	}
 
 	private async logSession() {
-		// create agent session
-		for (const thought of this.thoughts) {
-			console.log("logging thought", thought);
-			console.log("session", this.session);
-			await createAgentThoughts({
+		try {
+			for (const toolUse of this.toolUses) {
+				console.log("logging tool use", toolUse);
+				await createAgentToolCalls({
+					db: db,
+					agentToolCall: {
+						sessionId: this.session.id,
+						stepNumber: toolUse.stepNumber,
+						toolName: toolUse.name,
+						arguments: toolUse.input,
+					},
+				});
+			}
+
+			for (const thought of this.thoughts) {
+				console.log("logging thought", thought);
+				await createAgentThoughts({
+					db: db,
+					agentThought: {
+						sessionId: this.session.id,
+						stepNumber: thought.stepNumber,
+						content: thought.content,
+					},
+				});
+			}
+
+			await updateAgentSession({
 				db: db,
-				agentThought: {
-					sessionId: this.session.id,
-					stepNumber: thought.stepNumber,
-					content: thought.content,
-				},
+				agentSession: this.session,
+				rawSessionJson: JSON.stringify(this.messages),
 			});
+			console.log(
+				`\n--- Session completed after ${this.messages.length} exchanges ---`,
+			);
+		} catch (error: unknown) {
+			console.error("Session failed:", error);
+			throw error;
 		}
-		for (const toolUse of this.toolUses) {
-			await createAgentToolCalls({
-				db: db,
-				agentToolCall: {
-					sessionId: this.session.id,
-					stepNumber: toolUse.stepNumber,
-					toolName: toolUse.name,
-					arguments: toolUse.input,
-				},
-			});
-		}
-		await updateAgentSession({
-			db: db,
-			agentSession: this.session,
-			rawSessionJson: JSON.stringify(this.messages),
-		});
-		console.log(
-			`\n--- Session completed after ${this.messages.length} exchanges ---`,
-		);
-	}
-	catch(error: unknown) {
-		console.error("Session failed:", error);
-		throw error;
 	}
 
 	async runConversationTurn() {

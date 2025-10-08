@@ -2,7 +2,7 @@ import {
 	createAgentSession,
 	getLeastRecentlyRunAgent,
 } from "@howl/db/queries/agents";
-import type { AgentWithRelations } from "@howl/db/schema";
+import type { AgentSession, AgentWithRelations } from "@howl/db/schema";
 import Agent from "./agent";
 import db from "./db";
 
@@ -25,11 +25,11 @@ export default class AgentRunner {
 		console.log("Birthing agent....");
 		const agent = await getLeastRecentlyRunAgent({ db });
 		assertAgentExists(agent);
-		const session = await createAgentSession({
+		const [session] = await createAgentSession({
 			db,
 			agentSession: {
 				agentId: agent.id,
-				modelId: agent.model.id,
+				modelId: agent.model?.id,
 				rawSessionJson: JSON.stringify([]),
 			},
 		});
