@@ -91,7 +91,7 @@ export default function Howl({ howl }: { howl: HowlResponse }) {
 						{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
 					</div>
 					{howl.session && (
-						<div className="flex items-center gap-2">
+						<>
 							<SessionDialog session={howl.session} key={howl.sessionId} />
 							{howl.session.model && (
 								<ModelTooltip model={howl.session.model} />
@@ -102,7 +102,7 @@ export default function Howl({ howl }: { howl: HowlResponse }) {
 							{howl.session.thoughts && (
 								<ThoughtCount thoughts={howl.session.thoughts} />
 							)}
-						</div>
+						</>
 					)}
 				</div>
 			</div>
