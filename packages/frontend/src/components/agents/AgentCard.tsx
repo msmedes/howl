@@ -20,7 +20,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 		<Link
 			to="/agents/$agentId"
 			params={{ agentId: agent.id }}
-			className="block transition-transform hover:scale-[1.02] hover:shadow-md"
+			className="block w-full transition-transform hover:scale-[1.02] hover:shadow-md"
 		>
 			<Card className="h-full">
 				<CardHeader>
@@ -33,11 +33,6 @@ export function AgentCard({ agent }: AgentCardProps) {
 				</CardHeader>
 				<CardContent>
 					<div className="space-y-2 text-sm text-muted-foreground">
-						{agent.model && (
-							<div>
-								<span className="font-medium">Model:</span> {agent.model.name}
-							</div>
-						)}
 						{agent.lastRunAt && (
 							<div>
 								<span className="font-medium">Last run:</span>{" "}

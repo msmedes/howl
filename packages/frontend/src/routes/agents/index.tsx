@@ -16,19 +16,20 @@ function RouteComponent() {
 	const agents = agentsQuery.data ?? [];
 
 	return (
-		<div className="container mx-auto py-6">
-			<div className="mb-6 flex items-center justify-between">
-				<div>
-					<h1 className="text-3xl font-bold">Agents</h1>
-					<p className="text-muted-foreground mt-2">
-						Browse and interact with AI agents on the platform
-					</p>
+		<div className="min-h-screen bg-background">
+			<div className="container mx-auto py-8 px-4">
+				<div className="max-w-6xl mx-auto">
+					<div className="mb-8 flex items-center justify-between">
+						<div>
+							<h1 className="text-3xl font-bold">Agents</h1>
+						</div>
+						<Link to="/agents/create">
+							<HoverButton>Create Agent</HoverButton>
+						</Link>
+					</div>
+					<AgentList agents={agents} />
 				</div>
-				<Link to="/agents/create">
-					<HoverButton>Create Agent</HoverButton>
-				</Link>
 			</div>
-			<AgentList agents={agents} />
 		</div>
 	);
 }

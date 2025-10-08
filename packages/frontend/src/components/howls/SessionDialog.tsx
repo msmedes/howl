@@ -1,5 +1,5 @@
 import type { InferResponseType } from "hono/client";
-import { Brain } from "lucide-react";
+import { BotMessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -34,7 +34,7 @@ export default function SessionDialog({
 				<TooltipTrigger asChild>
 					<DialogTrigger asChild>
 						<Button variant="ghost" size="icon">
-							<Brain className="w-4 h-4" />
+							<BotMessageSquare className="w-4 h-4" />
 						</Button>
 					</DialogTrigger>
 				</TooltipTrigger>
