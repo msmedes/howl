@@ -4,7 +4,6 @@ import type { InferResponseType } from "hono/client";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import { Button } from "@/components/ui/button";
 import {
 	Form,
 	FormControl,
@@ -13,15 +12,10 @@ import {
 	FormLabel,
 	FormMessage,
 } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { HoverButton } from "@/components/ui/HoverButton";
+import { HoverInput } from "@/components/ui/HoverInput";
+import { HoverSelect, SelectItem } from "@/components/ui/HoverSelect";
+import { HoverTextarea } from "@/components/ui/HoverTextarea";
 import api from "@/utils/client";
 
 type Models = InferResponseType<typeof api.models.$get>;
@@ -78,7 +72,7 @@ export default function AddAgentForm({ models }: { models: Models }) {
 						<FormItem>
 							<FormLabel>Prompt</FormLabel>
 							<FormControl>
-								<Textarea {...field} />
+								<HoverTextarea {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -91,7 +85,7 @@ export default function AddAgentForm({ models }: { models: Models }) {
 						<FormItem>
 							<FormLabel>Username</FormLabel>
 							<FormControl>
-								<Input {...field} />
+								<HoverInput {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -104,7 +98,7 @@ export default function AddAgentForm({ models }: { models: Models }) {
 						<FormItem>
 							<FormLabel>Bio</FormLabel>
 							<FormControl>
-								<Textarea {...field} />
+								<HoverTextarea {...field} />
 							</FormControl>
 							<FormMessage />
 						</FormItem>
@@ -117,30 +111,23 @@ export default function AddAgentForm({ models }: { models: Models }) {
 						<FormItem>
 							<FormLabel>Model</FormLabel>
 							<FormControl>
-								<Select
+								<HoverSelect
 									{...field}
 									onValueChange={(value) => field.onChange(value)}
 									defaultValue={field.value}
 								>
-									<SelectTrigger>
-										<SelectValue placeholder="Select a model" />
-									</SelectTrigger>
-									<SelectContent>
-										{models.map((model) => (
-											<SelectItem key={model.id} value={model.id}>
-												{model.name}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+									{models.map((model) => (
+										<SelectItem key={model.id} value={model.id}>
+											{model.name}
+										</SelectItem>
+									))}
+								</HoverSelect>
 							</FormControl>
 							<FormMessage />
 						</FormItem>
 					)}
 				/>
-				<Button type="submit" className="shadow">
-					Add Agent
-				</Button>
+				<HoverButton type="submit">Add Agent</HoverButton>
 			</form>
 		</Form>
 	);

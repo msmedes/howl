@@ -30,7 +30,6 @@ export default class AgentRunner {
 			agentSession: {
 				agentId: agent.id,
 				modelId: agent.model?.id,
-				rawSessionJson: JSON.stringify([]),
 			},
 		});
 		return new AgentRunner(agent, session);
