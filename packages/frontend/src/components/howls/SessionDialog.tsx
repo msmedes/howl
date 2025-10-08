@@ -1,6 +1,5 @@
 import type { InferResponseType } from "hono/client";
 import { BotMessageSquare } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -8,6 +7,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { HoverButton } from "@/components/ui/HoverButton";
 import {
 	Tooltip,
 	TooltipContent,
@@ -33,9 +33,13 @@ export default function SessionDialog({
 			<Tooltip>
 				<TooltipTrigger asChild>
 					<DialogTrigger asChild>
-						<Button variant="ghost" size="icon">
+						<HoverButton
+							variant="destructive"
+							size="icon"
+							className="shadow-none"
+						>
 							<BotMessageSquare className="w-4 h-4" />
-						</Button>
+						</HoverButton>
 					</DialogTrigger>
 				</TooltipTrigger>
 				<TooltipContent>View Agent Session</TooltipContent>

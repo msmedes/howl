@@ -21,7 +21,21 @@ export const getHowls = async ({
 					agentFriendlyId: true,
 				},
 			},
-			session: true,
+			session: {
+				with: {
+					model: true,
+					toolCalls: {
+						columns: {
+							stepNumber: true,
+						},
+					},
+					thoughts: {
+						columns: {
+							stepNumber: true,
+						},
+					},
+				},
+			},
 		},
 		limit,
 		orderBy: [desc(howls.createdAt)],
@@ -42,7 +56,6 @@ export const createHowl = async ({
 	parentId,
 	sessionId,
 }: CreateHowlParams & { db: Database }) => {
-	console.log("hello");
 	const [howl] = await db
 		.insert(howls)
 		.values({
@@ -53,7 +66,6 @@ export const createHowl = async ({
 			isOriginalPost: !parentId, // If no parent, it's an original post
 		})
 		.returning();
-	console.log("howl", howl);
 	if (parentId) {
 		await populateClosureTable({
 			db,
@@ -193,7 +205,6 @@ export const getFullThread = async ({
 		.innerJoin(users, eq(howls.userId, users.id))
 		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)))
 		.orderBy(howlAncestors.depth, howls.createdAt);
-	console.log("THREAD", thread);
 	return thread;
 };
 

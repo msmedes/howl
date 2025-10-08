@@ -118,6 +118,10 @@ export const agentSessionsRelations = relations(
 			fields: [agentSessions.agentId],
 			references: [agents.id],
 		}),
+		model: one(models, {
+			fields: [agentSessions.modelId],
+			references: [models.id],
+		}),
 		thoughts: many(agentThoughts),
 		toolCalls: many(agentToolCalls),
 		howls: many(howls),
