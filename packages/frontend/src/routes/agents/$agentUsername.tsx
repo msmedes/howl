@@ -2,12 +2,18 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import { Brain, Calendar, MessageSquare, Sparkles, User } from "lucide-react";
-import { agentByUsernameQueryOptions } from "@/utils/agents";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import HowlFeed from "@/components/howls/HowlFeed";
 import SessionDialog from "@/components/howls/SessionDialog";
+import {
+	Card,
+	CardContent,
+	CardDescription,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { agentByUsernameQueryOptions } from "@/utils/agents";
 
 export const Route = createFileRoute("/agents/$agentUsername")({
 	component: RouteComponent,
@@ -23,7 +29,7 @@ function RouteComponent() {
 	const agentQuery = useSuspenseQuery(
 		agentByUsernameQueryOptions(agentUsername),
 	);
-	
+
 	const agent = agentQuery.data;
 	if (!agent) {
 		return <div>Agent not found</div>;
@@ -80,10 +86,11 @@ function RouteComponent() {
 							<Calendar className="w-4 h-4 text-muted-foreground" />
 							<div>
 								<div className="font-medium">
-									{agent.lastRunAt 
-										? formatDistanceToNow(new Date(agent.lastRunAt), { addSuffix: true })
-										: "Never"
-									}
+									{agent.lastRunAt
+										? formatDistanceToNow(new Date(agent.lastRunAt), {
+												addSuffix: true,
+											})
+										: "Never"}
 								</div>
 								<div className="text-muted-foreground">Last Active</div>
 							</div>
@@ -92,7 +99,9 @@ function RouteComponent() {
 							<Calendar className="w-4 h-4 text-muted-foreground" />
 							<div>
 								<div className="font-medium">
-									{formatDistanceToNow(new Date(agent.createdAt), { addSuffix: true })}
+									{formatDistanceToNow(new Date(agent.createdAt), {
+										addSuffix: true,
+									})}
 								</div>
 								<div className="text-muted-foreground">Created</div>
 							</div>
@@ -138,7 +147,10 @@ function RouteComponent() {
 					) : (
 						<div className="space-y-4">
 							{sessions.map((session: any) => (
-								<Card key={session.id} className="hover:shadow-md transition-shadow">
+								<Card
+									key={session.id}
+									className="hover:shadow-md transition-shadow"
+								>
 									<CardHeader className="pb-3">
 										<div className="flex items-center justify-between">
 											<CardTitle className="text-lg">
@@ -147,7 +159,9 @@ function RouteComponent() {
 											<div className="flex items-center space-x-2 text-sm text-muted-foreground">
 												<Calendar className="w-4 h-4" />
 												<span>
-													{formatDistanceToNow(new Date(session.createdAt), { addSuffix: true })}
+													{formatDistanceToNow(new Date(session.createdAt), {
+														addSuffix: true,
+													})}
 												</span>
 											</div>
 										</div>
@@ -157,22 +171,30 @@ function RouteComponent() {
 											<div className="flex items-center space-x-2">
 												<Brain className="w-4 h-4 text-muted-foreground" />
 												<div>
-													<div className="font-medium">{session.thoughts?.length || 0}</div>
+													<div className="font-medium">
+														{session.thoughts?.length || 0}
+													</div>
 													<div className="text-muted-foreground">Thoughts</div>
 												</div>
 											</div>
 											<div className="flex items-center space-x-2">
 												<MessageSquare className="w-4 h-4 text-muted-foreground" />
 												<div>
-													<div className="font-medium">{session.howls?.length || 0}</div>
+													<div className="font-medium">
+														{session.howls?.length || 0}
+													</div>
 													<div className="text-muted-foreground">Howls</div>
 												</div>
 											</div>
 											<div className="flex items-center space-x-2">
 												<Sparkles className="w-4 h-4 text-muted-foreground" />
 												<div>
-													<div className="font-medium">{session.toolCalls?.length || 0}</div>
-													<div className="text-muted-foreground">Tool Calls</div>
+													<div className="font-medium">
+														{session.toolCalls?.length || 0}
+													</div>
+													<div className="text-muted-foreground">
+														Tool Calls
+													</div>
 												</div>
 											</div>
 										</div>

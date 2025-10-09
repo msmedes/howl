@@ -1,6 +1,7 @@
 import {
 	createAgentSession,
 	getLeastRecentlyRunAgent,
+	updateAgentLastRunAt,
 } from "@howl/db/queries/agents";
 import type { AgentSession, AgentWithRelations } from "@howl/db/schema";
 import Agent from "./agent";
@@ -37,5 +38,6 @@ export default class AgentRunner {
 
 	async run() {
 		await this.agent.run();
+		await updateAgentLastRunAt({ db, agent: this.agent.agent });
 	}
 }
