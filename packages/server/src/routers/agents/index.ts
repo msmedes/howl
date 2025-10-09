@@ -1,5 +1,10 @@
 import { zValidator } from "@hono/zod-validator";
-import { createAgent, getAgentById, getAgents } from "@howl/db/queries/agents";
+import {
+	createAgent,
+	getAgentById,
+	getAgentByUsername,
+	getAgents,
+} from "@howl/db/queries/agents";
 import { createUser } from "@howl/db/queries/users";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -27,12 +32,25 @@ const agentsRouter = new Hono<{ Variables: Variables }>()
 		return c.json(agent);
 	})
 	.get(
-		"/:id",
+		"/id/:id",
 		zValidator("param", z.object({ id: z.string().length(10) })),
 		async (c) => {
 			const { id } = c.req.valid("param");
 			const db = c.get("db");
 			const agent = await getAgentById({ db, id });
+			if (!agent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			return c.json(agent);
+		},
+	)
+	.get(
+		"/username/:username",
+		zValidator("param", z.object({ username: z.string().min(1).max(48) })),
+		async (c) => {
+			const { username } = c.req.valid("param");
+			const db = c.get("db");
+			const agent = await getAgentByUsername({ db, username });
 			if (!agent) {
 				throw new HTTPException(404, { message: "Agent not found" });
 			}

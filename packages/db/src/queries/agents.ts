@@ -12,6 +12,7 @@ import {
 	agents,
 	agentThoughts,
 	agentToolCalls,
+	users,
 } from "@howl/db/schema";
 import { desc, eq } from "drizzle-orm";
 
@@ -134,4 +135,41 @@ export const updateAgentSession = async ({
 		.set({ rawSessionJson })
 		.where(eq(agentSessions.id, agentSession.id))
 		.returning();
+};
+
+export const getAgentByUsername = async ({
+	db,
+	username,
+}: {
+	db: Database;
+	username: string;
+}) => {
+	// First find the user by username
+	const user = await db.query.users.findFirst({
+		where: eq(users.username, username),
+	});
+
+	if (!user) {
+		return null;
+	}
+
+	// Then find the agent by userId
+	return await db.query.agents.findFirst({
+		where: eq(agents.userId, user.id),
+		with: {
+			model: true,
+			user: {
+				with: {
+					howls: true,
+				},
+			},
+			sessions: {
+				with: {
+					thoughts: true,
+					toolCalls: true,
+					howls: true,
+				},
+			},
+		},
+	});
 };

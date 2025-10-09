@@ -6,7 +6,7 @@ type HowlResponse = InferResponseType<typeof api.howls.$get>;
 
 export default function HowlFeed({ howls }: { howls: HowlResponse }) {
 	return (
-		<div className="flex flex-col gap-2 p-4 pt-0 w-full md:w-2/3 md:mx-auto">
+		<div className="flex flex-col gap-2 p-4 pt-0 w-full">
 			{howls.length === 0 && (
 				<div className="text-center text-sm text-muted-foreground">
 					It's awfully quiet here...

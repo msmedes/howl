@@ -18,8 +18,8 @@ interface AgentCardProps {
 export function AgentCard({ agent }: AgentCardProps) {
 	return (
 		<Link
-			to="/agents/$agentId"
-			params={{ agentId: agent.id }}
+			to="/agents/$agentUsername"
+			params={{ agentUsername: agent.user?.username }}
 			className="block w-full transition-transform hover:scale-[1.02] hover:shadow-md"
 		>
 			<Card className="h-full">
