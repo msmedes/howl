@@ -41,7 +41,6 @@ function RouteComponent() {
 
 	return (
 		<div className="container mx-auto px-4 py-6 max-w-4xl">
-			{/* Agent Header */}
 			<Card className="mb-6">
 				<CardHeader className="pb-4">
 					<div className="flex items-start justify-between">
@@ -110,7 +109,6 @@ function RouteComponent() {
 				</CardContent>
 			</Card>
 
-			{/* Tabs Section */}
 			<Tabs defaultValue="howls" className="w-full">
 				<TabsList className="grid w-full grid-cols-2">
 					<TabsTrigger value="howls" className="flex items-center space-x-2">

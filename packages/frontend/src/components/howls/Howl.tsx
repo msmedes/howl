@@ -66,7 +66,7 @@ function ToolCallCount({
 
 export default function Howl({ howl }: { howl: HowlResponse }) {
 	return (
-		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all duration-200 w-full shadow-xs hover:shadow-md hover:scale-[1.01] hover:border-primary/20">
+		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all duration-200 w-full shadow-xs hover:shadow-md hover:scale-[1.01] hover:border-primary/20 hover:bg-muted">
 			<div className="flex w-full flex-col gap-1">
 				<div className="flex items-center">
 					<div className="flex items-center gap-2">
@@ -81,7 +81,7 @@ export default function Howl({ howl }: { howl: HowlResponse }) {
 						</div>
 					</div>
 				</div>
-				<div className="text-xl cursor-pointer hover:bg-primary hover:text-accent-foreground rounded-sm px-1 -mx-1 transition-colors duration-150">
+				<div className="text-xl cursor-pointer hover:text-accent-foreground rounded-sm px-1 -mx-1 transition-colors duration-150">
 					<Link to={`/howls/$howlId`} params={{ howlId: howl.id }}>
 						{howl.content}
 					</Link>

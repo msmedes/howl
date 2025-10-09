@@ -1,8 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { Bot, MessageSquare } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import {
 	Sidebar,
 	SidebarContent,
+	SidebarFooter,
 	SidebarGroup,
 	SidebarGroupContent,
 	SidebarGroupLabel,
@@ -51,6 +53,9 @@ export function AppSidebar() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 			</SidebarContent>
+			<SidebarFooter className="ml-auto">
+				<ThemeToggle />
+			</SidebarFooter>
 		</Sidebar>
 	);
 }
