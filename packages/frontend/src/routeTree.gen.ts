@@ -11,12 +11,14 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as UsersRouteRouteImport } from './routes/users/route'
+import { Route as SessionsRouteRouteImport } from './routes/sessions/route'
 import { Route as HowlsRouteRouteImport } from './routes/howls/route'
 import { Route as AgentsRouteRouteImport } from './routes/agents/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as HowlsIndexRouteImport } from './routes/howls/index'
 import { Route as AgentsIndexRouteImport } from './routes/agents/index'
 import { Route as UsersUserIdRouteImport } from './routes/users/$userId'
+import { Route as SessionsSessionIdRouteImport } from './routes/sessions/$sessionId'
 import { Route as HowlsHowlIdRouteImport } from './routes/howls/$howlId'
 import { Route as AgentsCreateRouteImport } from './routes/agents/create'
 import { Route as AgentsAgentUsernameRouteImport } from './routes/agents/$agentUsername'
@@ -29,6 +31,11 @@ const RedirectRoute = RedirectRouteImport.update({
 const UsersRouteRoute = UsersRouteRouteImport.update({
   id: '/users',
   path: '/users',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SessionsRouteRoute = SessionsRouteRouteImport.update({
+  id: '/sessions',
+  path: '/sessions',
   getParentRoute: () => rootRouteImport,
 } as any)
 const HowlsRouteRoute = HowlsRouteRouteImport.update({
@@ -61,6 +68,11 @@ const UsersUserIdRoute = UsersUserIdRouteImport.update({
   path: '/$userId',
   getParentRoute: () => UsersRouteRoute,
 } as any)
+const SessionsSessionIdRoute = SessionsSessionIdRouteImport.update({
+  id: '/$sessionId',
+  path: '/$sessionId',
+  getParentRoute: () => SessionsRouteRoute,
+} as any)
 const HowlsHowlIdRoute = HowlsHowlIdRouteImport.update({
   id: '/$howlId',
   path: '/$howlId',
@@ -81,22 +93,26 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteRouteWithChildren
   '/howls': typeof HowlsRouteRouteWithChildren
+  '/sessions': typeof SessionsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/agents/$agentUsername': typeof AgentsAgentUsernameRoute
   '/agents/create': typeof AgentsCreateRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/agents/': typeof AgentsIndexRoute
   '/howls/': typeof HowlsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/sessions': typeof SessionsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/agents/$agentUsername': typeof AgentsAgentUsernameRoute
   '/agents/create': typeof AgentsCreateRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/agents': typeof AgentsIndexRoute
   '/howls': typeof HowlsIndexRoute
@@ -106,11 +122,13 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/agents': typeof AgentsRouteRouteWithChildren
   '/howls': typeof HowlsRouteRouteWithChildren
+  '/sessions': typeof SessionsRouteRouteWithChildren
   '/users': typeof UsersRouteRouteWithChildren
   '/redirect': typeof RedirectRoute
   '/agents/$agentUsername': typeof AgentsAgentUsernameRoute
   '/agents/create': typeof AgentsCreateRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
+  '/sessions/$sessionId': typeof SessionsSessionIdRoute
   '/users/$userId': typeof UsersUserIdRoute
   '/agents/': typeof AgentsIndexRoute
   '/howls/': typeof HowlsIndexRoute
@@ -121,22 +139,26 @@ export interface FileRouteTypes {
     | '/'
     | '/agents'
     | '/howls'
+    | '/sessions'
     | '/users'
     | '/redirect'
     | '/agents/$agentUsername'
     | '/agents/create'
     | '/howls/$howlId'
+    | '/sessions/$sessionId'
     | '/users/$userId'
     | '/agents/'
     | '/howls/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/sessions'
     | '/users'
     | '/redirect'
     | '/agents/$agentUsername'
     | '/agents/create'
     | '/howls/$howlId'
+    | '/sessions/$sessionId'
     | '/users/$userId'
     | '/agents'
     | '/howls'
@@ -145,11 +167,13 @@ export interface FileRouteTypes {
     | '/'
     | '/agents'
     | '/howls'
+    | '/sessions'
     | '/users'
     | '/redirect'
     | '/agents/$agentUsername'
     | '/agents/create'
     | '/howls/$howlId'
+    | '/sessions/$sessionId'
     | '/users/$userId'
     | '/agents/'
     | '/howls/'
@@ -159,6 +183,7 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AgentsRouteRoute: typeof AgentsRouteRouteWithChildren
   HowlsRouteRoute: typeof HowlsRouteRouteWithChildren
+  SessionsRouteRoute: typeof SessionsRouteRouteWithChildren
   UsersRouteRoute: typeof UsersRouteRouteWithChildren
   RedirectRoute: typeof RedirectRoute
 }
@@ -177,6 +202,13 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/sessions': {
+      id: '/sessions'
+      path: '/sessions'
+      fullPath: '/sessions'
+      preLoaderRoute: typeof SessionsRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/howls': {
@@ -220,6 +252,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/users/$userId'
       preLoaderRoute: typeof UsersUserIdRouteImport
       parentRoute: typeof UsersRouteRoute
+    }
+    '/sessions/$sessionId': {
+      id: '/sessions/$sessionId'
+      path: '/$sessionId'
+      fullPath: '/sessions/$sessionId'
+      preLoaderRoute: typeof SessionsSessionIdRouteImport
+      parentRoute: typeof SessionsRouteRoute
     }
     '/howls/$howlId': {
       id: '/howls/$howlId'
@@ -275,6 +314,18 @@ const HowlsRouteRouteWithChildren = HowlsRouteRoute._addFileChildren(
   HowlsRouteRouteChildren,
 )
 
+interface SessionsRouteRouteChildren {
+  SessionsSessionIdRoute: typeof SessionsSessionIdRoute
+}
+
+const SessionsRouteRouteChildren: SessionsRouteRouteChildren = {
+  SessionsSessionIdRoute: SessionsSessionIdRoute,
+}
+
+const SessionsRouteRouteWithChildren = SessionsRouteRoute._addFileChildren(
+  SessionsRouteRouteChildren,
+)
+
 interface UsersRouteRouteChildren {
   UsersUserIdRoute: typeof UsersUserIdRoute
 }
@@ -291,6 +342,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AgentsRouteRoute: AgentsRouteRouteWithChildren,
   HowlsRouteRoute: HowlsRouteRouteWithChildren,
+  SessionsRouteRoute: SessionsRouteRouteWithChildren,
   UsersRouteRoute: UsersRouteRouteWithChildren,
   RedirectRoute: RedirectRoute,
 }

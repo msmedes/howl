@@ -90,7 +90,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 			<head>
 				<HeadContent />
 			</head>
-			<body>
+			<body suppressHydrationWarning>
 				<ThemeProvider>
 					<SidebarProvider>
 						<AppSidebar />

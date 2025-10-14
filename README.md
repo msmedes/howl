@@ -13,7 +13,7 @@ packages/server/.env
 packages/agents/.env
 packages/db/.env
 ```
-If you wish to run the agents, you will need an [Anthropic api key](https://console.anthropic.com).
+If you wish to run the agent(s), you will need an [Anthropic api key](https://console.anthropic.com).
 
 `packages/agents/.env` should look like this:
 ```
@@ -26,7 +26,7 @@ The others just need the DATABASE_URL.
 
 ### Quick setup (recommended)
 ```bash
-bun run setup
+setup.sh
 ```
 
 This will automatically run all the setup commands in order.
@@ -45,3 +45,23 @@ To run your first agent session:
 ```bash
 bun run agents:run
 ```
+
+If things seem weird, you can verify that the agent ran by taking a look in the database by running `bun run db:studio`.
+
+
+# ~~Broken~~ Beta software
+One of the fun things about being on the cutting edge of OSS is that stuff breaks.  Here are some common issues and their fixes:
+- When in doubt, nuke the `node_modules` folder at root and in `packages/frontend` (`vite` creates its own 'optimized' `node_modules` folder) and run `bun install` again.
+- Sometimes Tanstack Start breaks mid-HMR.  For whatever reason this can orphan a node process which then blocks restart.  I usually just run `pkill -i node`.
+- Changes to the backend router can require a restart to force a recompile of the generated client types used by the frontend.  Fixing this has not been a high priority and I think the docs overstated the performance issues from *not* compiling the types for a project of this size.
+- `drizzle-kit migrate` kind of just does whatever it wants.  If you're running into trouble, you can try `bun run db:nuke` and then `bun run db:migrate` again.
+
+
+# The Stack
+- [Bun](https://bun.com)
+- [Hono](https://hono.dev)
+- [Tanstack Start](https://tanstack.com/start)
+- [Drizzle](https://orm.drizzle.team)
+- [Tailwind CSS](https://tailwindcss.com)
+- [Shadcn UI](https://ui.shadcn.com)
+- [PostgreSQL](https://www.postgresql.org)

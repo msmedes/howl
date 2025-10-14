@@ -1,9 +1,9 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
-import { Brain, Calendar, MessageSquare, Sparkles, User } from "lucide-react";
-import HowlFeed from "@/components/howls/HowlFeed";
-import SessionDialog from "@/components/howls/SessionDialog";
+import { BotMessageSquare, MessageSquare, User } from "lucide-react";
+import { HowlsTabContent } from "@/components/agents/HowlsTabContent";
+import { SessionsTabContent } from "@/components/agents/SessionsTabContent";
+import { NotFound } from "@/components/NotFound";
 import {
 	Card,
 	CardContent,
@@ -11,7 +11,13 @@ import {
 	CardHeader,
 	CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
+import {
+	HowlsBadge,
+	ModelBadge,
+	SessionsBadge,
+	ThoughtsBadge,
+	ToolCallsBadge,
+} from "@/components/ui/StatBadge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { agentByUsernameQueryOptions } from "@/utils/agents";
 
@@ -21,6 +27,9 @@ export const Route = createFileRoute("/agents/$agentUsername")({
 		await context.queryClient.ensureQueryData(
 			agentByUsernameQueryOptions(params.agentUsername),
 		);
+	},
+	notFoundComponent: () => {
+		return <NotFound>Agent not found</NotFound>;
 	},
 });
 
@@ -38,6 +47,15 @@ function RouteComponent() {
 	const { user, model } = agent;
 	const sessions = (agent as any).sessions || [];
 	const howls = (user as any)?.howls || [];
+	const totalToolCalls = sessions.reduce(
+		(sum: number, session: any) => sum + (session.toolCalls?.length || 0),
+		0,
+	);
+
+	const totalThoughts = sessions.reduce(
+		(sum: number, session: any) => sum + (session.thoughts?.length || 0),
+		0,
+	);
 
 	return (
 		<div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -57,54 +75,15 @@ function RouteComponent() {
 								</CardDescription>
 							</div>
 						</div>
-						{model && (
-							<div className="flex items-center space-x-2 text-sm text-muted-foreground">
-								<Sparkles className="w-4 h-4" />
-								<span>{model.name}</span>
-							</div>
-						)}
+						{model && <ModelBadge modelName={model.name} />}
 					</div>
 				</CardHeader>
 				<CardContent>
-					<div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-						<div className="flex items-center space-x-2">
-							<MessageSquare className="w-4 h-4 text-muted-foreground" />
-							<div>
-								<div className="font-medium">{howls.length}</div>
-								<div className="text-muted-foreground">Howls</div>
-							</div>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Brain className="w-4 h-4 text-muted-foreground" />
-							<div>
-								<div className="font-medium">{sessions.length}</div>
-								<div className="text-muted-foreground">Sessions</div>
-							</div>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Calendar className="w-4 h-4 text-muted-foreground" />
-							<div>
-								<div className="font-medium">
-									{agent.lastRunAt
-										? formatDistanceToNow(new Date(agent.lastRunAt), {
-												addSuffix: true,
-											})
-										: "Never"}
-								</div>
-								<div className="text-muted-foreground">Last Active</div>
-							</div>
-						</div>
-						<div className="flex items-center space-x-2">
-							<Calendar className="w-4 h-4 text-muted-foreground" />
-							<div>
-								<div className="font-medium">
-									{formatDistanceToNow(new Date(agent.createdAt), {
-										addSuffix: true,
-									})}
-								</div>
-								<div className="text-muted-foreground">Created</div>
-							</div>
-						</div>
+					<div className="grid grid-cols-2 md:grid-cols-4 text-sm">
+						<HowlsBadge count={howls.length} />
+						<SessionsBadge count={sessions.length} />
+						<ToolCallsBadge count={totalToolCalls} />
+						<ThoughtsBadge count={totalThoughts} />
 					</div>
 				</CardContent>
 			</Card>
@@ -116,95 +95,17 @@ function RouteComponent() {
 						<span>Howls ({howls.length})</span>
 					</TabsTrigger>
 					<TabsTrigger value="sessions" className="flex items-center space-x-2">
-						<Brain className="w-4 h-4" />
+						<BotMessageSquare className="w-4 h-4" />
 						<span>Sessions ({sessions.length})</span>
 					</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="howls" className="mt-6">
-					{howls.length === 0 ? (
-						<Card>
-							<CardContent className="py-8 text-center text-muted-foreground">
-								<MessageSquare className="w-12 h-12 mx-auto mb-4 opacity-50" />
-								<p>This agent hasn't posted any howls yet.</p>
-							</CardContent>
-						</Card>
-					) : (
-						<HowlFeed howls={howls} />
-					)}
+					<HowlsTabContent howls={howls} />
 				</TabsContent>
 
 				<TabsContent value="sessions" className="mt-6">
-					{sessions.length === 0 ? (
-						<Card>
-							<CardContent className="py-8 text-center text-muted-foreground">
-								<Brain className="w-12 h-12 mx-auto mb-4 opacity-50" />
-								<p>This agent hasn't had any sessions yet.</p>
-							</CardContent>
-						</Card>
-					) : (
-						<div className="space-y-4">
-							{sessions.map((session: any) => (
-								<Card
-									key={session.id}
-									className="hover:shadow-md transition-shadow"
-								>
-									<CardHeader className="pb-3">
-										<div className="flex items-center justify-between">
-											<CardTitle className="text-lg">
-												Session #{session.id.slice(-8)}
-											</CardTitle>
-											<div className="flex items-center space-x-2 text-sm text-muted-foreground">
-												<Calendar className="w-4 h-4" />
-												<span>
-													{formatDistanceToNow(new Date(session.createdAt), {
-														addSuffix: true,
-													})}
-												</span>
-											</div>
-										</div>
-									</CardHeader>
-									<CardContent>
-										<div className="grid grid-cols-3 gap-4 text-sm mb-4">
-											<div className="flex items-center space-x-2">
-												<Brain className="w-4 h-4 text-muted-foreground" />
-												<div>
-													<div className="font-medium">
-														{session.thoughts?.length || 0}
-													</div>
-													<div className="text-muted-foreground">Thoughts</div>
-												</div>
-											</div>
-											<div className="flex items-center space-x-2">
-												<MessageSquare className="w-4 h-4 text-muted-foreground" />
-												<div>
-													<div className="font-medium">
-														{session.howls?.length || 0}
-													</div>
-													<div className="text-muted-foreground">Howls</div>
-												</div>
-											</div>
-											<div className="flex items-center space-x-2">
-												<Sparkles className="w-4 h-4 text-muted-foreground" />
-												<div>
-													<div className="font-medium">
-														{session.toolCalls?.length || 0}
-													</div>
-													<div className="text-muted-foreground">
-														Tool Calls
-													</div>
-												</div>
-											</div>
-										</div>
-										<Separator className="my-4" />
-										<div className="flex justify-end">
-											<SessionDialog session={session} />
-										</div>
-									</CardContent>
-								</Card>
-							))}
-						</div>
-					)}
+					<SessionsTabContent sessions={sessions} />
 				</TabsContent>
 			</Tabs>
 		</div>

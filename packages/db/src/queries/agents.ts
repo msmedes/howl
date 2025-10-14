@@ -168,6 +168,7 @@ export const getAgentByUsername = async ({
 					toolCalls: true,
 					howls: true,
 				},
+				orderBy: [desc(agentSessions.createdAt)],
 			},
 		},
 	});
