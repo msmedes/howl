@@ -24,16 +24,8 @@ export const getHowls = async ({
 			session: {
 				with: {
 					model: true,
-					toolCalls: {
-						columns: {
-							stepNumber: true,
-						},
-					},
-					thoughts: {
-						columns: {
-							stepNumber: true,
-						},
-					},
+					toolCalls: true,
+					thoughts: true,
 				},
 			},
 		},
