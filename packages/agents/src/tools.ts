@@ -3,13 +3,14 @@ import {
 	createHowl,
 	createHowlLike,
 	getAlphaHowls,
+	getHowlByAgentFriendlyId,
 	getHowls,
 	getHowlsForUser,
 	getLikedHowlsForUser,
 } from "@howl/db/queries/howls";
-import { getUserById } from "@howl/db/queries/users";
+import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
-
+import { z } from "zod";
 import db from "./db";
 
 export async function getHowlsTool({
@@ -35,7 +36,10 @@ export async function getHowlsTool({
 }
 
 export async function getHowlsForUserTool({ userId }: { userId: string }) {
-	const user = await getUserById({ db, id: userId });
+	const user = await getUserByAgentFriendlyId({
+		db,
+		agentFriendlyId: Number(userId),
+	});
 	if (!user) {
 		throw new Error("User not found");
 	}
@@ -98,7 +102,22 @@ export async function likeHowlTool({
 	currentAgentId: string;
 	sessionId: string;
 }) {
-	await createHowlLike({ db, userId: currentAgentId, howlId, sessionId });
+	const howl = await getHowlByAgentFriendlyId({
+		db,
+		agentFriendlyId: Number(howlId),
+	});
+	if (!howl) {
+		throw new Error("Howl not found");
+	}
+	if (howl.userId === currentAgentId) {
+		return "You cannot like your own howl";
+	}
+	await createHowlLike({
+		db,
+		userId: currentAgentId,
+		howlId: howl.id,
+		sessionId,
+	});
 	return "Howl liked successfully";
 }
 

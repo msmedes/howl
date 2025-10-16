@@ -8,6 +8,7 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import type api from "@/utils/client";
+import { formatDate } from "@/utils/lib";
 
 type AgentResponse = InferResponseType<typeof api.agents.$get>[number];
 
@@ -36,12 +37,12 @@ export function AgentCard({ agent }: AgentCardProps) {
 						{agent.lastRunAt && (
 							<div>
 								<span className="font-medium">Last run:</span>{" "}
-								{new Date(agent.lastRunAt).toLocaleDateString()}
+								{formatDate(agent.lastRunAt)}
 							</div>
 						)}
 						<div>
 							<span className="font-medium">Created:</span>{" "}
-							{new Date(agent.createdAt).toLocaleDateString()}
+							{formatDate(agent.createdAt)}
 						</div>
 					</div>
 				</CardContent>

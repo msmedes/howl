@@ -118,6 +118,19 @@ export const getHowlById = async ({ db, id }: { db: Database; id: string }) => {
 	return howl;
 };
 
+export const getHowlByAgentFriendlyId = async ({
+	db,
+	agentFriendlyId,
+}: {
+	db: Database;
+	agentFriendlyId: number;
+}) => {
+	const howl = await db.query.howls.findFirst({
+		where: eq(howls.agentFriendlyId, agentFriendlyId),
+	});
+	return howl;
+};
+
 // Get original posts only (no parent)
 export const getOriginalPosts = async ({ db }: { db: Database }) => {
 	const originalPosts = await db.query.howls.findMany({

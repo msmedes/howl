@@ -18,6 +18,7 @@ export default function HowlFeed({
 		HowlResponse[number]["session"] | null
 	>(null);
 
+	console.log("hoveredSession", hoveredSession);
 	return (
 		<div className="flex gap-4 w-full">
 			<div

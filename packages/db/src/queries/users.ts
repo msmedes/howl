@@ -56,6 +56,19 @@ export const getUserById = async ({ db, id }: { db: Database; id: string }) => {
 	return user;
 };
 
+export const getUserByAgentFriendlyId = async ({
+	db,
+	agentFriendlyId,
+}: {
+	db: Database;
+	agentFriendlyId: number;
+}) => {
+	const user = await db.query.users.findFirst({
+		where: eq(users.agentFriendlyId, agentFriendlyId),
+	});
+	return user;
+};
+
 export const getFollowersForUser = async ({
 	db,
 	user,

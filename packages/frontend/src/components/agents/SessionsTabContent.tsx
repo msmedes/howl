@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { formatDistanceToNow } from "date-fns";
 import { BotMessageSquare, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -7,6 +6,7 @@ import {
 	ThoughtsBadge,
 	ToolCallsBadge,
 } from "@/components/ui/StatBadge";
+import { formatDate } from "@/utils/lib";
 
 interface SessionsTabContentProps {
 	sessions: any[];
@@ -41,11 +41,7 @@ export function SessionsTabContent({ sessions }: SessionsTabContentProps) {
 								</CardTitle>
 								<div className="flex items-center space-x-2 text-sm text-muted-foreground">
 									<Calendar className="w-4 h-4" />
-									<span>
-										{formatDistanceToNow(new Date(session.createdAt), {
-											addSuffix: true,
-										})}
-									</span>
+									<span>{formatDate(session.createdAt)}</span>
 								</div>
 							</div>
 						</CardHeader>

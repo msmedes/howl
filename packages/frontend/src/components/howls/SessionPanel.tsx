@@ -12,11 +12,11 @@ import {
 	ToolCallsBadge,
 } from "@/components/ui/StatBadge";
 import type api from "@/utils/client";
+import { generateRandomString } from "@/utils/lib";
 
 type SessionResponse = InferResponseType<
 	typeof api.howls.$get
 >[number]["session"];
-
 export default function SessionPanel({
 	session,
 }: {
@@ -47,9 +47,18 @@ export default function SessionPanel({
 		type: "Thought" as const,
 	}));
 
-	const sessionSteps = [...toolCalls, ...thoughts].sort(
-		(a, b) => a.stepNumber - b.stepNumber,
-	);
+	const sessionSteps = [...toolCalls, ...thoughts].sort((a, b) => {
+		if (a.stepNumber !== b.stepNumber) {
+			return a.stepNumber - b.stepNumber;
+		}
+		if (a.type === "Thought" && b.type === "Tool Call") {
+			return -1;
+		}
+		if (a.type === "Tool Call" && b.type === "Thought") {
+			return 1;
+		}
+		return 0;
+	});
 
 	return (
 		<Card className="sticky top-4 h-fit hidden lg:block">
@@ -70,9 +79,12 @@ export default function SessionPanel({
 			</CardHeader>
 			<CardContent className="max-h-[calc(100vh-12rem)] overflow-y-auto">
 				{sessionSteps.length > 0 ? (
-					<Accordion type="single" collapsible defaultValue="0">
+					<Accordion type="single" collapsible>
 						{sessionSteps.map((step, index) => (
-							<AccordionItem key={step.stepNumber} value={index.toString()}>
+							<AccordionItem
+								key={generateRandomString(6)}
+								value={index.toString()}
+							>
 								<AccordionTrigger className="text-sm">
 									{step.type === "Tool Call" ? `${step.toolName}` : "Thought"}
 								</AccordionTrigger>
