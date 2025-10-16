@@ -1,7 +1,7 @@
 import type { Database } from "@howl/db";
 import type { Howl, User } from "@howl/db/schema";
 import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
-import { and, desc, eq, isNull, lte, not } from "drizzle-orm";
+import { and, desc, eq, isNull, lte, not, sql } from "drizzle-orm";
 
 export const getHowls = async ({
 	db,
@@ -28,6 +28,12 @@ export const getHowls = async ({
 					thoughts: true,
 				},
 			},
+		},
+		extras: {
+			likesCount:
+				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = howls.id)`.as(
+					"likesCount",
+				),
 		},
 		limit,
 		orderBy: [desc(howls.createdAt)],
