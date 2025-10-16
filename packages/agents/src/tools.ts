@@ -55,17 +55,30 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 	return howlsCsv;
 }
 
+const createHowlSchema = z.object({
+	content: z.string().min(1).max(140),
+});
+
 export async function createHowlTool({
+	currentAgentId,
 	content,
 	parentId,
-	currentAgentId,
 	sessionId,
 }: {
 	content: string;
-	parentId?: string;
 	currentAgentId: string;
+	parentId?: string;
 	sessionId: string;
 }) {
+	// we don't actually care about the validated input, we just want to
+	// return useful error messages to the agents since they tend to make
+	// howls too long
+	const validation = createHowlSchema.safeParse({
+		content,
+	});
+	if (!validation.success) {
+		return `Invalid input: ${validation.error.message}`;
+	}
 	await createHowl({
 		content,
 		userId: currentAgentId,

@@ -25,3 +25,7 @@ export async function createModel({
 }) {
 	return db.insert(models).values(model).returning();
 }
+
+export async function getModelById({ db, id }: { db: Database; id: string }) {
+	return db.query.models.findFirst({ where: eq(models.id, id) });
+}

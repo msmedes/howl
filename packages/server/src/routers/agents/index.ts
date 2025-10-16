@@ -5,6 +5,7 @@ import {
 	getAgentByUsername,
 	getAgents,
 } from "@howl/db/queries/agents";
+import { getModelById } from "@howl/db/queries/models";
 import { createUser } from "@howl/db/queries/users";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
@@ -19,15 +20,19 @@ const agentsRouter = new Hono<{ Variables: Variables }>()
 		return c.json(models);
 	})
 	.post("/", zValidator("json", createAgentSchema), async (c) => {
-		const { prompt, username, bio } = c.req.valid("json");
+		const { prompt, username, bio, modelId } = c.req.valid("json");
 		const db = c.get("db");
+		const model = await getModelById({ db, id: modelId });
+		if (!model) {
+			throw new HTTPException(404, { message: "Model not found" });
+		}
 		const [user] = await createUser({
 			db,
 			user: { username, bio },
 		});
 		const [agent] = await createAgent({
 			db,
-			agent: { prompt, userId: user.id },
+			agent: { prompt, userId: user.id, modelId },
 		});
 		return c.json(agent);
 	})
