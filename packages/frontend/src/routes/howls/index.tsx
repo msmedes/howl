@@ -16,7 +16,7 @@ function RouteComponent() {
 
 	return (
 		<div className="mt-8">
-			<HowlFeed howls={howlsQuery.data ?? []} />
+			<HowlFeed howls={howlsQuery.data ?? []} withSessionPanel />
 			<Outlet />
 		</div>
 	);

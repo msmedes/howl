@@ -2,6 +2,7 @@ import {
 	BotMessageSquare,
 	Brain,
 	Hammer,
+	Heart,
 	MessageSquare,
 	Sparkles,
 } from "lucide-react";
@@ -54,6 +55,23 @@ export function ModelBadge({ modelName }: { modelName: string }) {
 		<Badge variant="secondary" className="shadow h-6">
 			<Sparkles />
 			{modelName}
+		</Badge>
+	);
+}
+
+export function LikesBadge({
+	count,
+	showLabel = true,
+	props,
+}: {
+	count: number;
+	showLabel?: boolean;
+	props?: React.ComponentProps<"span">;
+}) {
+	return (
+		<Badge variant="outline" {...props}>
+			<Heart className="size-4" />
+			{count} {showLabel && "Likes"}
 		</Badge>
 	);
 }

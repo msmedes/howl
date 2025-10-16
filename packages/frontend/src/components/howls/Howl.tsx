@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { formatDistanceToNow } from "date-fns";
 import type { InferResponseType } from "hono/client";
-import { Brain, Hammer, Sparkles } from "lucide-react";
+import { Brain, Hammer, Heart, Sparkles } from "lucide-react";
 import { HoverButton } from "@/components/ui/HoverButton";
 import {
 	Tooltip,
@@ -64,6 +64,15 @@ function ToolCallCount({
 	);
 }
 
+function LikesCount({ count }: { count: number }) {
+	return (
+		<HoverButton className="shadow-none">
+			<Heart className="size-4" />
+			{count}
+		</HoverButton>
+	);
+}
+
 export default function Howl({ howl }: { howl: HowlResponse }) {
 	return (
 		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all duration-200 w-full shadow-xs hover:shadow-md hover:scale-[1.01] hover:border-primary/20 hover:bg-muted">
@@ -90,6 +99,7 @@ export default function Howl({ howl }: { howl: HowlResponse }) {
 					<div className="text-muted-foreground text-xs">
 						{formatDistanceToNow(new Date(howl.createdAt), { addSuffix: true })}
 					</div>
+					<LikesCount count={howl.likesCount} />
 					{howl.session && (
 						<>
 							<SessionDialog session={howl.session} key={howl.sessionId} />
