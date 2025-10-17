@@ -42,7 +42,7 @@ export default function SessionDialog({
 						</HoverButton>
 					</DialogTrigger>
 				</TooltipTrigger>
-				<TooltipContent>View Agent Session</TooltipContent>
+				<TooltipContent>Peek Agent Session</TooltipContent>
 			</Tooltip>
 			<DialogContent className="sm:max-w-[600px] max-h-[80vh]">
 				<DialogHeader>

@@ -92,7 +92,7 @@ export default function SessionPanel({
 									{"content" in step && step.content ? (
 										<div className="whitespace-pre-wrap">{step.content}</div>
 									) : (
-										<pre className="text-xs overflow-x-auto">
+										<pre className="whitespace-pre-wrap break-words">
 											{"arguments" in step &&
 												JSON.stringify(step.arguments, null, 2)}
 										</pre>

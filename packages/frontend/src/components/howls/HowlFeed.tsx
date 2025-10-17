@@ -18,12 +18,11 @@ export default function HowlFeed({
 		HowlResponse[number]["session"] | null
 	>(null);
 
-	console.log("hoveredSession", hoveredSession);
 	return (
 		<div className="flex gap-4 w-full">
 			<div
 				className={cn(
-					"flex flex-col gap-2 p-4 pt-0 w-full",
+					"flex flex-col gap-2 pt-0 w-full",
 					withSessionPanel ? "lg:w-2/3" : "lg:w-full",
 				)}
 			>

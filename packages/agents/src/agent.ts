@@ -118,7 +118,7 @@ export default class Agent {
 		}
 	}
 
-	async runConversationTurn() {
+	async runConversationTurn(iterationNumber: number) {
 		const assistantContent = [];
 		const toolResults = [];
 
@@ -137,7 +137,7 @@ export default class Agent {
 				this.thoughts.push({
 					role: "assistant",
 					content: content.text,
-					stepNumber: this.messages.length,
+					stepNumber: iterationNumber,
 				});
 			} else if (content.type === "tool_use") {
 				const toolResult = await this.processToolCall(content);
@@ -152,7 +152,7 @@ export default class Agent {
 					id: content.id,
 					name: content.name,
 					input: content.input as Record<string, unknown>,
-					stepNumber: this.messages.length,
+					stepNumber: iterationNumber,
 				});
 				toolResults.push({
 					type: "tool_result",
@@ -170,7 +170,7 @@ export default class Agent {
 			try {
 				console.log(`\n--- Iteration ${turn + 1}/${this.maxIterations} ---`);
 				const { assistantContent, toolResults } =
-					await this.runConversationTurn();
+					await this.runConversationTurn(turn);
 
 				this.messages.push({ role: "assistant", content: assistantContent });
 				if (toolResults.length > 0) {
