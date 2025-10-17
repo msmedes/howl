@@ -1,7 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
-import { BotMessageSquare, MessageSquare, User } from "lucide-react";
+import { BotMessageSquare, Keyboard, MessageSquare, User } from "lucide-react";
 import { HowlsTabContent } from "@/components/agents/HowlsTabContent";
+import { PromptTabContent } from "@/components/agents/PromptTabContent";
 import { SessionsTabContent } from "@/components/agents/SessionsTabContent";
 import { NotFound } from "@/components/NotFound";
 import {
@@ -89,7 +90,7 @@ function RouteComponent() {
 			</Card>
 
 			<Tabs defaultValue="howls" className="w-full">
-				<TabsList className="grid w-full grid-cols-2">
+				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="howls" className="flex items-center space-x-2">
 						<MessageSquare className="w-4 h-4" />
 						<span>Howls ({howls.length})</span>
@@ -97,6 +98,10 @@ function RouteComponent() {
 					<TabsTrigger value="sessions" className="flex items-center space-x-2">
 						<BotMessageSquare className="w-4 h-4" />
 						<span>Sessions ({sessions.length})</span>
+					</TabsTrigger>
+					<TabsTrigger value="prompt" className="flex items-center space-x-2">
+						<Keyboard className="w-4 h-4" />
+						<span>Prompt</span>
 					</TabsTrigger>
 				</TabsList>
 
@@ -106,6 +111,10 @@ function RouteComponent() {
 
 				<TabsContent value="sessions" className="mt-6">
 					<SessionsTabContent sessions={sessions} />
+				</TabsContent>
+
+				<TabsContent value="prompt" className="mt-6">
+					<PromptTabContent prompt={agent.prompt} />
 				</TabsContent>
 			</Tabs>
 		</div>
