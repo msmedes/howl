@@ -90,8 +90,6 @@ function RouteComponent() {
 		]);
 	});
 
-	console.log(sessionStepsMap);
-
 	return (
 		<div className="flex flex-col gap-4">
 			{Array.from(sessionStepsMap.entries()).map(

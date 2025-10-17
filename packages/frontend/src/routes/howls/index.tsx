@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Outlet } from "@tanstack/react-router";
 import HowlFeed from "@/components/howls/HowlFeed";
+import Wrapper from "@/components/Wrapper";
 import { howlsQueryOptions } from "@/utils/howls";
 
 export const Route = createFileRoute("/howls/")({
@@ -15,9 +16,9 @@ function RouteComponent() {
 	const howlsQuery = useSuspenseQuery(howlsQueryOptions());
 
 	return (
-		<div className="mt-8">
+		<Wrapper>
 			<HowlFeed howls={howlsQuery.data ?? []} withSessionPanel />
 			<Outlet />
-		</div>
+		</Wrapper>
 	);
 }
