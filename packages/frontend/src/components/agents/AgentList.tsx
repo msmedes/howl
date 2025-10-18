@@ -19,7 +19,7 @@ export function AgentList({ agents }: AgentListProps) {
 	}
 
 	return (
-		<div className="flex flex-col items-center gap-6 w-full md:w-2/3 mx-auto">
+		<div className="flex flex-col items-center gap-6">
 			{agents.map((agent) => (
 				<AgentCard key={agent.id} agent={agent} />
 			))}
