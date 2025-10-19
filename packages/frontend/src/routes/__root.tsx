@@ -16,6 +16,7 @@ import { MenuBar } from "@/components/MenuBar";
 import { NotFound } from "@/components/NotFound";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/sonner";
+import Wrapper from "@/components/Wrapper";
 import appCss from "@/styles/app.css?url";
 import { seo } from "@/utils/seo";
 
@@ -98,7 +99,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				<ThemeProvider>
 					<div className="bg-background text-foreground flex flex-col items-center justify-items-center">
 						<MenuBar isScrolled={isScrolled} />
-						<main className="w-full flex-1">{children}</main>
+						<main className="w-full flex-1">
+							<Wrapper>{children}</Wrapper>
+						</main>
 					</div>
 					<Toaster />
 				</ThemeProvider>

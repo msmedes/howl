@@ -15,6 +15,13 @@
       "when": 1759775633765,
       "tag": "0001_magical_shen",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760806461671,
+      "tag": "0002_thick_gamora",
+      "breakpoints": true
     }
   ]
 }

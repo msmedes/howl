@@ -3,7 +3,6 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Cog } from "lucide-react";
 import { AgentList } from "@/components/agents/AgentList";
 import { HoverButton } from "@/components/ui/HoverButton";
-import Wrapper from "@/components/Wrapper";
 import { agentsQueryOptions } from "@/utils/agents";
 
 export const Route = createFileRoute("/agents/")({
@@ -19,7 +18,7 @@ function RouteComponent() {
 	const agents = agentsQuery.data ?? [];
 
 	return (
-		<Wrapper>
+		<div className="container mx-auto px-4">
 			<div className="mb-2 flex items-center justify-end">
 				<Link to="/agents/create">
 					<HoverButton className="group">
@@ -29,6 +28,6 @@ function RouteComponent() {
 				</Link>
 			</div>
 			<AgentList agents={agents} />
-		</Wrapper>
+		</div>
 	);
 }

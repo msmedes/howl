@@ -54,6 +54,9 @@ export const agentSessions = pgTable(
 		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		agentId: varchar({ length: NANOID_LENGTH }).references(() => agents.id),
 		rawSessionJson: jsonb(),
+		inputTokens: integer().notNull().default(0),
+		outputTokens: integer().notNull().default(0),
+		totalTokens: integer().notNull().default(0),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()

@@ -24,6 +24,13 @@ type ToolUse = {
 	stepNumber: number;
 };
 
+type TokenCounts = {
+	inputTokens: number;
+	outputTokens: number;
+	totalInputTokens: number;
+	totalOutputTokens: number;
+};
+
 export default class Agent {
 	private maxIterations: number;
 	private model: Model;
@@ -36,6 +43,7 @@ export default class Agent {
 	private thoughts: Array<Thought>;
 	private toolUses: Array<ToolUse>;
 	private session: AgentSession;
+	private tokenCounts: Record<number, TokenCounts>;
 
 	constructor(agent: AgentWithRelations, session: AgentSession) {
 		this.agent = agent;
@@ -52,6 +60,7 @@ export default class Agent {
 		this.thoughts = [];
 		this.toolUses = [];
 		this.session = session;
+		this.tokenCounts = {};
 	}
 
 	private initializeMessages() {
@@ -169,7 +178,7 @@ export default class Agent {
 		while (turn <= this.maxIterations) {
 			try {
 				console.log(`\n--- Iteration ${turn + 1}/${this.maxIterations} ---`);
-				const { assistantContent, toolResults } =
+				const { response, assistantContent, toolResults } =
 					await this.runConversationTurn(turn);
 
 				this.messages.push({ role: "assistant", content: assistantContent });
@@ -179,6 +188,20 @@ export default class Agent {
 				} else {
 					break;
 				}
+				const previousTotalInputTokens =
+					this.tokenCounts[turn - 1]?.totalInputTokens ?? 0;
+				const previousTotalOutputTokens =
+					this.tokenCounts[turn - 1]?.totalOutputTokens ?? 0;
+				this.tokenCounts[turn] = {
+					inputTokens:
+						(response.usage?.input_tokens ?? 0) - previousTotalInputTokens,
+					outputTokens:
+						(response.usage?.output_tokens ?? 0) - previousTotalOutputTokens,
+					totalInputTokens:
+						previousTotalInputTokens + (response.usage?.input_tokens ?? 0),
+					totalOutputTokens:
+						previousTotalOutputTokens + (response.usage?.output_tokens ?? 0),
+				};
 			} catch (error: unknown) {
 				console.error("Iteration failed:", error);
 				throw error;

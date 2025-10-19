@@ -10,6 +10,7 @@ import {
 import type api from "@/utils/client";
 import { formatDate } from "@/utils/lib";
 import SessionDialog from "./SessionDialog";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type HowlResponse = InferResponseType<typeof api.howls.$get>[number];
 
