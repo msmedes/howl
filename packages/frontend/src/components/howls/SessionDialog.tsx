@@ -1,5 +1,4 @@
 import type { InferResponseType } from "hono/client";
-import { BotMessageSquare } from "lucide-react";
 import {
 	Dialog,
 	DialogContent,
@@ -7,7 +6,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { HoverButton } from "@/components/ui/HoverButton";
+import { SessionPeekBadge } from "@/components/ui/StatBadge";
 import {
 	Tooltip,
 	TooltipContent,
@@ -33,13 +32,9 @@ export default function SessionDialog({
 			<Tooltip>
 				<TooltipTrigger asChild>
 					<DialogTrigger asChild>
-						<HoverButton
-							variant="destructive"
-							size="icon"
-							className="shadow-none"
-						>
-							<BotMessageSquare className="w-4 h-4" />
-						</HoverButton>
+						<div className="cursor-pointer transition-transform hover:scale-105">
+							<SessionPeekBadge showLabel={false} />
+						</div>
 					</DialogTrigger>
 				</TooltipTrigger>
 				<TooltipContent>Peek Agent Session</TooltipContent>

@@ -75,3 +75,16 @@ export function LikesBadge({
 		</Badge>
 	);
 }
+
+export function SessionPeekBadge({
+	showLabel = false,
+}: {
+	showLabel?: boolean;
+}) {
+	return (
+		<Badge variant="destructive" className="shadow h-6">
+			<BotMessageSquare className="size-4" />
+			{showLabel && "Peek Session"}
+		</Badge>
+	);
+}

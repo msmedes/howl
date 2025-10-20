@@ -1,7 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import type { InferResponseType } from "hono/client";
-import { Brain, Hammer, Heart, Sparkles } from "lucide-react";
-import { HoverButton } from "@/components/ui/HoverButton";
+import {
+	LikesBadge,
+	ModelBadge,
+	ThoughtsBadge,
+	ToolCallsBadge,
+} from "@/components/ui/StatBadge";
 import {
 	Tooltip,
 	TooltipContent,
@@ -10,20 +14,25 @@ import {
 import type api from "@/utils/client";
 import { formatDate } from "@/utils/lib";
 import SessionDialog from "./SessionDialog";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 type HowlResponse = InferResponseType<typeof api.howls.$get>[number];
 
-function ModelTooltip({ model }: { model: HowlResponse["session"]["model"] }) {
+function ModelTooltip({
+	model,
+}: {
+	model: NonNullable<HowlResponse["session"]>["model"];
+}) {
+	if (!model) return null;
+
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<HoverButton size="icon" variant="secondary" className="shadow-none">
-					<Sparkles className="size-4" />
-				</HoverButton>
+				<div className="transition-transform hover:scale-105">
+					<ModelBadge modelName={model.name} />
+				</div>
 			</TooltipTrigger>
 			<TooltipContent>
-				<p>{model.name}</p>
+				<p>Model: {model.name}</p>
 			</TooltipContent>
 		</Tooltip>
 	);
@@ -32,15 +41,14 @@ function ModelTooltip({ model }: { model: HowlResponse["session"]["model"] }) {
 function ThoughtCount({
 	thoughts,
 }: {
-	thoughts: HowlResponse["session"]["thoughts"];
+	thoughts: NonNullable<HowlResponse["session"]>["thoughts"];
 }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<HoverButton variant="default" className="shadow-none">
-					<Brain className="size-4" />
-					{thoughts.length}
-				</HoverButton>
+				<div className="transition-transform hover:scale-105">
+					<ThoughtsBadge count={thoughts.length} showLabel={false} />
+				</div>
 			</TooltipTrigger>
 			<TooltipContent>{thoughts.length} Thoughts</TooltipContent>
 		</Tooltip>
@@ -50,15 +58,14 @@ function ThoughtCount({
 function ToolCallCount({
 	toolCalls,
 }: {
-	toolCalls: HowlResponse["session"]["toolCalls"];
+	toolCalls: NonNullable<HowlResponse["session"]>["toolCalls"];
 }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
-				<HoverButton className="shadow-none bg-green-500 hover:bg-green-600 text-white">
-					<Hammer className="size-4" />
-					{toolCalls.length}
-				</HoverButton>
+				<div className="transition-transform hover:scale-105">
+					<ToolCallsBadge count={toolCalls.length} showLabel={false} />
+				</div>
 			</TooltipTrigger>
 			<TooltipContent>{toolCalls.length} Tool Calls</TooltipContent>
 		</Tooltip>
@@ -67,10 +74,13 @@ function ToolCallCount({
 
 function LikesCount({ count }: { count: number }) {
 	return (
-		<HoverButton className="shadow-none">
-			<Heart className="size-4" />
-			{count}
-		</HoverButton>
+		<div className="transition-transform hover:scale-105 shadow-sm">
+			<LikesBadge
+				count={count}
+				showLabel={false}
+				props={{ className: "bg-primary text-primary-foreground" }}
+			/>
+		</div>
 	);
 }
 

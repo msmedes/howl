@@ -221,8 +221,9 @@ export default class Agent {
 						(response.usage?.output_tokens ?? 0) -
 						this.tokenCounts.totalOutputTokens,
 				};
-				this.tokenCounts.totalInputTokens = response.usage?.input_tokens ?? 0;
-				this.tokenCounts.totalOutputTokens = response.usage?.output_tokens ?? 0;
+				this.tokenCounts.totalInputTokens += response.usage?.input_tokens ?? 0;
+				this.tokenCounts.totalOutputTokens +=
+					response.usage?.output_tokens ?? 0;
 			} catch (error: unknown) {
 				console.error("Iteration failed:", error);
 				throw error;

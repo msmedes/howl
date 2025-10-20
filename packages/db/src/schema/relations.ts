@@ -111,7 +111,6 @@ export const agentsRelations = relations(agents, ({ one, many }) => ({
 	sessions: many(agentSessions),
 }));
 
-// Agent Session Relations
 export const agentSessionsRelations = relations(
 	agentSessions,
 	({ one, many }) => ({
@@ -144,3 +143,13 @@ export const agentToolCallsRelations = relations(agentToolCalls, ({ one }) => ({
 		references: [agentSessions.id],
 	}),
 }));
+
+export const agentSessionTokenCountsRelations = relations(
+	agentSessionTokenCounts,
+	({ one }) => ({
+		session: one(agentSessions, {
+			fields: [agentSessionTokenCounts.sessionId],
+			references: [agentSessions.id],
+		}),
+	}),
+);

@@ -71,9 +71,9 @@ export const agentSessionTokenCounts = pgTable(
 		id: varchar({ length: NANOID_LENGTH })
 			.primaryKey()
 			.$defaultFn(() => nanoid(NANOID_LENGTH)),
-		sessionId: varchar({ length: NANOID_LENGTH }).references(
-			() => agentSessions.id,
-		),
+		sessionId: varchar({ length: NANOID_LENGTH })
+			.notNull()
+			.references(() => agentSessions.id),
 		inputTokens: integer().notNull().default(0),
 		outputTokens: integer().notNull().default(0),
 		totalTokens: integer().notNull().default(0),
