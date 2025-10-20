@@ -1,5 +1,6 @@
 import type {
 	agentSessions,
+	agentSessionTokenCounts,
 	agents,
 	agentThoughts,
 	agentToolCalls,
@@ -46,3 +47,7 @@ export type AgentThought = typeof agentThoughts.$inferSelect;
 export type InsertAgentThought = typeof agentThoughts.$inferInsert;
 export type AgentToolCall = typeof agentToolCalls.$inferSelect;
 export type InsertAgentToolCall = typeof agentToolCalls.$inferInsert;
+export type AgentSessionTokenCount =
+	typeof agentSessionTokenCounts.$inferSelect;
+export type InsertAgentSessionTokenCount =
+	typeof agentSessionTokenCounts.$inferInsert;

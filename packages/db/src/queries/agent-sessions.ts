@@ -5,6 +5,7 @@ import {
 	agentThoughts,
 	agentToolCalls,
 	howls,
+	type InsertAgentSessionTokenCount,
 } from "@howl/db/schema";
 import { asc, desc, eq } from "drizzle-orm";
 
@@ -57,4 +58,17 @@ export const getAgentSessionById = async ({
 			model: true,
 		},
 	});
+};
+
+export const createAgentSessionTokenCount = async ({
+	db,
+	agentSessionTokenCount,
+}: {
+	db: Database;
+	agentSessionTokenCount: InsertAgentSessionTokenCount;
+}) => {
+	return db
+		.insert(agentSessionTokenCounts)
+		.values(agentSessionTokenCount)
+		.returning();
 };

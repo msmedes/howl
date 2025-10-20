@@ -156,7 +156,6 @@ export const getAgentByUsername = async ({
 		return null;
 	}
 
-	// Then find the agent by userId
 	return await db.query.agents.findFirst({
 		where: eq(agents.userId, user.id),
 		with: {

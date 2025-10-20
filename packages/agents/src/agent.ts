@@ -1,4 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import { createAgentSessionTokenCount } from "@howl/db/queries/agent-sessions";
 import {
 	createAgentThoughts,
 	createAgentToolCalls,
@@ -118,6 +119,19 @@ export default class Agent {
 						sessionId: this.session.id,
 						stepNumber: thought.stepNumber,
 						content: thought.content,
+					},
+				});
+			}
+			for (const [stepNumber, tokenCounts] of Object.entries(
+				this.tokenCounts.stepCounts,
+			)) {
+				await createAgentSessionTokenCount({
+					db: db,
+					agentSessionTokenCount: {
+						sessionId: this.session.id,
+						stepNumber: parseInt(stepNumber, 10),
+						inputTokens: tokenCounts.inputTokens,
+						outputTokens: tokenCounts.outputTokens,
 					},
 				});
 			}
