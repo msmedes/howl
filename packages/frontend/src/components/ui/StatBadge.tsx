@@ -4,9 +4,12 @@ import {
 	Hammer,
 	Heart,
 	MessageSquare,
+	MoveDownRight,
+	MoveUpRight,
 	Sparkles,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 interface StatBadgeProps {
 	count: number;
@@ -85,6 +88,32 @@ export function SessionPeekBadge({
 		<Badge variant="destructive" className="shadow h-6">
 			<BotMessageSquare className="size-4" />
 			{showLabel && "Peek Session"}
+		</Badge>
+	);
+}
+
+export function InputTokensBadge({
+	count,
+	showLabel = true,
+	className,
+}: {
+	count: number;
+	showLabel?: boolean;
+	className?: string;
+}) {
+	return (
+		<Badge variant="outline" className={cn("shadow h-6", className)}>
+			<MoveUpRight />
+			{count} {showLabel && "Input Tokens"}
+		</Badge>
+	);
+}
+
+export function OutputTokensBadge({ count, showLabel = true }: StatBadgeProps) {
+	return (
+		<Badge variant="outline" className="shadow h-6">
+			<MoveDownRight />
+			{count} {showLabel && "Output Tokens"}
 		</Badge>
 	);
 }
