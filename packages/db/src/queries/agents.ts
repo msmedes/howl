@@ -125,14 +125,18 @@ export const updateAgentSession = async ({
 	db,
 	agentSession,
 	rawSessionJson,
+	inputTokens,
+	outputTokens,
 }: {
 	db: Database;
 	agentSession: AgentSession;
-	rawSessionJson: string;
+	rawSessionJson?: string;
+	inputTokens?: number;
+	outputTokens?: number;
 }) => {
 	return await db
 		.update(agentSessions)
-		.set({ rawSessionJson })
+		.set({ rawSessionJson, inputTokens, outputTokens })
 		.where(eq(agentSessions.id, agentSession.id))
 		.returning();
 };

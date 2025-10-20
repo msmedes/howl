@@ -1,6 +1,7 @@
 import type { Database } from "@howl/db";
 import {
 	agentSessions,
+	agentSessionTokenCounts,
 	agentThoughts,
 	agentToolCalls,
 	howls,
@@ -44,6 +45,14 @@ export const getAgentSessionById = async ({
 					content: true,
 				},
 				orderBy: [desc(howls.createdAt)],
+			},
+			tokenCounts: {
+				columns: {
+					stepNumber: true,
+					inputTokens: true,
+					outputTokens: true,
+				},
+				orderBy: [asc(agentSessionTokenCounts.stepNumber)],
 			},
 			model: true,
 		},

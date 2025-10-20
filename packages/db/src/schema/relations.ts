@@ -1,6 +1,7 @@
 import { relations } from "drizzle-orm";
 import {
 	agentSessions,
+	agentSessionTokenCounts,
 	agents,
 	agentThoughts,
 	agentToolCalls,
@@ -126,6 +127,7 @@ export const agentSessionsRelations = relations(
 		toolCalls: many(agentToolCalls),
 		howls: many(howls),
 		howlLikes: many(howlLikes),
+		tokenCounts: many(agentSessionTokenCounts),
 	}),
 );
 

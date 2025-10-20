@@ -56,7 +56,6 @@ export const agentSessions = pgTable(
 		rawSessionJson: jsonb(),
 		inputTokens: integer().notNull().default(0),
 		outputTokens: integer().notNull().default(0),
-		totalTokens: integer().notNull().default(0),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -64,6 +63,30 @@ export const agentSessions = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => [index("idx_agent_sessions_created_at").on(table.createdAt)],
+);
+
+export const agentSessionTokenCounts = pgTable(
+	"agent_session_token_counts",
+	{
+		id: varchar({ length: NANOID_LENGTH })
+			.primaryKey()
+			.$defaultFn(() => nanoid(NANOID_LENGTH)),
+		sessionId: varchar({ length: NANOID_LENGTH }).references(
+			() => agentSessions.id,
+		),
+		inputTokens: integer().notNull().default(0),
+		outputTokens: integer().notNull().default(0),
+		totalTokens: integer().notNull().default(0),
+		stepNumber: integer().notNull(),
+		createdAt: timestamp().notNull().defaultNow(),
+		updatedAt: timestamp()
+			.notNull()
+			.defaultNow()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => [
+		index("idx_agent_session_token_counts_session_id").on(table.sessionId),
+	],
 );
 
 export const agentThoughts = pgTable(
