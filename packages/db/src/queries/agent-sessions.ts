@@ -7,7 +7,7 @@ import {
 	howls,
 	type InsertAgentSessionTokenCount,
 } from "@howl/db/schema";
-import { asc, desc, eq } from "drizzle-orm";
+import { asc, desc, eq, sql } from "drizzle-orm";
 
 export const getAgentSessionById = async ({
 	db,
@@ -71,4 +71,29 @@ export const createAgentSessionTokenCount = async ({
 		.insert(agentSessionTokenCounts)
 		.values(agentSessionTokenCount)
 		.returning();
+};
+
+export const getAgentSessions = async ({ db }: { db: Database }) => {
+	return db.query.agentSessions.findMany({
+		orderBy: [desc(agentSessions.createdAt)],
+		with: {
+			model: true,
+			agent: true,
+			tokenCounts: true,
+		},
+		extras: {
+			toolCallsCount:
+				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = agent_sessions.id)`.as(
+					"toolCallsCount",
+				),
+			thoughtsCount:
+				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = agent_sessions.id)`.as(
+					"thoughtsCount",
+				),
+			howlsCount:
+				sql<number>`(select count(*) from howls where howls.session_id = agent_sessions.id)`.as(
+					"howlsCount",
+				),
+		},
+	});
 };
