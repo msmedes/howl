@@ -9,3 +9,11 @@ export const agentSessionQueryOptions = (id: string) =>
 			return res.json();
 		},
 	});
+
+export const agentSessionsQueryOptions = queryOptions({
+	queryKey: ["agent-sessions"],
+	queryFn: async () => {
+		const res = await api.sessions.$get();
+		return res.json();
+	},
+});

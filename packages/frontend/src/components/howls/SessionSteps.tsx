@@ -120,7 +120,7 @@ export default function SessionSteps({
 											session.tokenCounts?.find(
 												(tokenCount) =>
 													tokenCount.stepNumber === parseInt(stepNumber, 10),
-											)?.inputTokens
+											)?.inputTokens || 0
 										}
 										showLabel={false}
 									/>

@@ -77,21 +77,37 @@ export const getAgentSessions = async ({ db }: { db: Database }) => {
 	return db.query.agentSessions.findMany({
 		orderBy: [desc(agentSessions.createdAt)],
 		with: {
-			model: true,
-			agent: true,
-			tokenCounts: true,
+			model: {
+				columns: {
+					id: true,
+					name: true,
+				},
+			},
+			agent: {
+				columns: {
+					id: true,
+				},
+				with: {
+					user: {
+						columns: {
+							id: true,
+							username: true,
+						},
+					},
+				},
+			},
 		},
 		extras: {
 			toolCallsCount:
-				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = agent_sessions.id)`.as(
+				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = ${agentSessions.id})`.as(
 					"toolCallsCount",
 				),
 			thoughtsCount:
-				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = agent_sessions.id)`.as(
+				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${agentSessions.id})`.as(
 					"thoughtsCount",
 				),
 			howlsCount:
-				sql<number>`(select count(*) from howls where howls.session_id = agent_sessions.id)`.as(
+				sql<number>`(select count(*) from howls where howls.session_id = ${agentSessions.id})`.as(
 					"howlsCount",
 				),
 		},

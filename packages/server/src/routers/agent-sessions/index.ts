@@ -1,5 +1,8 @@
 import { zValidator } from "@hono/zod-validator";
-import { getAgentSessionById } from "@howl/db/queries/agent-sessions";
+import {
+	getAgentSessionById,
+	getAgentSessions,
+} from "@howl/db/queries/agent-sessions";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
