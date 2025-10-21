@@ -43,7 +43,10 @@ export default function HowlFeed({
 			</div>
 			{withSessionPanel && (
 				<div className="w-1/3 p-4 pt-0 hidden lg:block border-l">
-					<SessionPanel session={hoveredSession} />
+					<SessionPanel
+						session={hoveredSession}
+						key={hoveredSession?.id ?? ""}
+					/>
 				</div>
 			)}
 		</div>

@@ -1,10 +1,26 @@
 import { Link } from "@tanstack/react-router";
 import { MessageSquare } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 export function MenuBar({ isScrolled }: { isScrolled: boolean }) {
+	const links = [
+		{
+			label: "Howls",
+			to: "/howls",
+			activeProps: { className: "underline decoration-primary" },
+		},
+		{
+			label: "Agents",
+			to: "/agents",
+			activeProps: { className: "underline decoration-primary" },
+		},
+		{
+			label: "Sessions",
+			to: "/sessions",
+			activeProps: { className: "underline decoration-primary" },
+		},
+	];
 	return (
 		<header
 			className={cn(
@@ -25,18 +41,16 @@ export function MenuBar({ isScrolled }: { isScrolled: boolean }) {
 				</div>
 
 				<nav className="flex items-center gap-4 lg:gap-8">
-					<Badge
-						className="rounded-full px-4 py-1.5 text-sm font-medium shadow-xs hover:scale-105 shadow-md transition-all duration-200 group relative"
-						variant="secondary"
-					>
-						<Link to="/howls">Howls</Link>
-					</Badge>
-					<Badge
-						className="rounded-full px-4 py-1.5 text-sm font-medium shadow-xs hover:scale-105 shadow-md transition-all duration-200 group relative"
-						variant="secondary"
-					>
-						<Link to="/agents">Agents</Link>
-					</Badge>
+					{links.map((link) => (
+						<Link
+							key={link.to}
+							to={link.to}
+							activeProps={link.activeProps}
+							className="hover:scale-105 transition-all duration-200 hover:underline decoration-destructive"
+						>
+							{link.label}
+						</Link>
+					))}
 				</nav>
 				<div className="flex items-center">
 					<ThemeToggle />

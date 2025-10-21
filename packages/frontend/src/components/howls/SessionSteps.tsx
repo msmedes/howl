@@ -11,6 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
 import { camelCaseToTitleCase } from "@/utils/lib";
+import { InputTokensBadge } from "../ui/StatBadge";
 
 type SessionResponse = InferResponseType<(typeof api.sessions)[":id"]["$get"]>;
 type HowlSessionResponse = InferResponseType<
@@ -111,7 +112,20 @@ export default function SessionSteps({
 						)}
 					>
 						<CardHeader>
-							<CardTitle>Step {stepNumber}</CardTitle>
+							<CardTitle>
+								Step {stepNumber}{" "}
+								{"tokenCounts" in session && session.tokenCounts && (
+									<InputTokensBadge
+										count={
+											session.tokenCounts?.find(
+												(tokenCount) =>
+													tokenCount.stepNumber === parseInt(stepNumber, 10),
+											)?.inputTokens
+										}
+										showLabel={false}
+									/>
+								)}
+							</CardTitle>
 						</CardHeader>
 						<CardContent>
 							<Accordion type="multiple">

@@ -1,4 +1,6 @@
+import { Link } from "@tanstack/react-router";
 import type { InferResponseType } from "hono/client";
+import { SquareArrowOutUpRight } from "lucide-react";
 import SessionSteps from "@/components/howls/SessionSteps";
 import {
 	Card,
@@ -19,14 +21,25 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
 
 type SessionResponse = InferResponseType<
 	typeof api.howls.$get
 >[number]["session"];
 
-function HoverDiv({ children }: { children: React.ReactNode }) {
-	return <div className="transition-transform hover:scale-105">{children}</div>;
+function HoverDiv({
+	children,
+	className,
+}: {
+	children: React.ReactNode;
+	className?: string;
+}) {
+	return (
+		<div className={cn("transition-transform hover:scale-105", className)}>
+			{children}
+		</div>
+	);
 }
 export default function SessionPanel({
 	session,
@@ -52,8 +65,19 @@ export default function SessionPanel({
 		<Card className="sticky top-4 h-fit hidden lg:block">
 			<CardHeader className="pb-2">
 				<CardTitle className="text-sm">
-					<div className="flex items-center gap-2">
-						<span>Session Details</span>
+					<div className="flex items-center gap-2 group">
+						<HoverDiv>
+							<Link
+								className="hover:underline"
+								to={`/sessions/$sessionId`}
+								params={{ sessionId: session.id }}
+							>
+								<div className="flex items-center gap-1">
+									<p>Session Details</p>
+									<SquareArrowOutUpRight className="size-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+								</div>
+							</Link>
+						</HoverDiv>
 						<div className="flex items-center gap-2 ml-auto">
 							{session.model && (
 								<HoverDiv>
@@ -65,7 +89,7 @@ export default function SessionPanel({
 				</CardTitle>
 				<CardDescription>
 					<div className="flex gap-2 mt-2 justify-between">
-						{session.inputTokens && (
+						{session.inputTokens > 0 && (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<HoverDiv>
@@ -81,11 +105,12 @@ export default function SessionPanel({
 								</TooltipContent>
 							</Tooltip>
 						)}
-						{session.outputTokens && (
+						{session.outputTokens > 0 && (
 							<Tooltip>
 								<TooltipTrigger asChild>
 									<HoverDiv>
 										<OutputTokensBadge
+											className="bg-destructive text-white"
 											count={session.outputTokens}
 											showLabel={false}
 										/>
