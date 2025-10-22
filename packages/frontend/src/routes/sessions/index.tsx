@@ -2,7 +2,6 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import type { InferResponseType } from "hono/client";
 import { Calendar } from "lucide-react";
-import { Suspense } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
 	HowlsBadge,
@@ -31,38 +30,36 @@ function RouteComponent() {
 	}
 
 	return (
-		<Suspense fallback={<div>Loading sessions...</div>}>
-			<div className="space-y-4">
-				{agentSessions.map((session: SessionResponse) => (
-					<Link
-						key={session.id}
-						to="/sessions/$sessionId"
-						params={{ sessionId: session.id }}
-						className="block transition-transform hover:scale-[1.02] hover:shadow-md"
-					>
-						<Card className="h-full">
-							<CardHeader className="pb-3">
-								<div className="flex items-center justify-between">
-									<CardTitle className="text-lg">
-										Session #{session.id.slice(-8)}
-									</CardTitle>
-									<div className="flex items-center space-x-2 text-sm text-muted-foreground">
-										<Calendar className="w-4 h-4" />
-										<span>{formatDate(session.createdAt)}</span>
-									</div>
+		<div className="space-y-4">
+			{agentSessions.map((session: SessionResponse) => (
+				<Link
+					key={session.id}
+					to="/sessions/$sessionId"
+					params={{ sessionId: session.id }}
+					className="block transition-transform hover:scale-[1.02] hover:shadow-md"
+				>
+					<Card className="h-full">
+						<CardHeader className="pb-3">
+							<div className="flex items-center justify-between">
+								<CardTitle className="text-lg">
+									Session #{session.id.slice(-8)}
+								</CardTitle>
+								<div className="flex items-center space-x-2 text-sm text-muted-foreground">
+									<Calendar className="w-4 h-4" />
+									<span>{formatDate(session.createdAt)}</span>
 								</div>
-							</CardHeader>
-							<CardContent>
-								<div className="grid grid-cols-3 gap-4 text-sm mb-4">
-									<ThoughtsBadge count={session.thoughtsCount} />
-									<HowlsBadge count={session.howlsCount} />
-									<ToolCallsBadge count={session.toolCallsCount} />
-								</div>
-							</CardContent>
-						</Card>
-					</Link>
-				))}
-			</div>
-		</Suspense>
+							</div>
+						</CardHeader>
+						<CardContent>
+							<div className="grid grid-cols-3 gap-4 text-sm mb-4">
+								<ThoughtsBadge count={session.thoughtsCount} />
+								<HowlsBadge count={session.howlsCount} />
+								<ToolCallsBadge count={session.toolCallsCount} />
+							</div>
+						</CardContent>
+					</Card>
+				</Link>
+			))}
+		</div>
 	);
 }
