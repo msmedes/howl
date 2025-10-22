@@ -82,6 +82,23 @@ export default class Agent {
 		});
 	}
 
+	private tallyTokenCounts(response: any, turn: number) {
+		console.log("response usage", response.usage);
+		console.log("******************");
+		console.log("this.tokenCounts", this.tokenCounts);
+		console.log("******************");
+		this.tokenCounts.stepCounts[turn] = {
+			inputTokens:
+				(response.usage?.input_tokens ?? 0) - this.tokenCounts.totalInputTokens,
+			outputTokens:
+				(response.usage?.output_tokens ?? 0) -
+				this.tokenCounts.totalOutputTokens,
+		};
+		this.tokenCounts.totalInputTokens += response.usage?.input_tokens ?? 0;
+		this.tokenCounts.totalOutputTokens += response.usage?.output_tokens ?? 0;
+		console.log("POST this.tokenCounts", this.tokenCounts);
+	}
+
 	private async processToolCall(toolCall: any) {
 		try {
 			const toolCallResult = await toolMap[
@@ -101,7 +118,6 @@ export default class Agent {
 	private async logSession() {
 		try {
 			for (const toolUse of this.toolUses) {
-				console.log("logging tool use", toolUse);
 				await createAgentToolCalls({
 					db: db,
 					agentToolCall: {
@@ -114,7 +130,6 @@ export default class Agent {
 			}
 
 			for (const thought of this.thoughts) {
-				console.log("logging thought", thought);
 				await createAgentThoughts({
 					db: db,
 					agentThought: {
@@ -204,32 +219,20 @@ export default class Agent {
 		let turn = 1;
 		while (turn <= this.maxIterations) {
 			try {
-				console.log(`\n--- Iteration ${turn + 1}/${this.maxIterations} ---`);
+				console.log(`\n--- Iteration ${turn}/${this.maxIterations} ---`);
 				const { response, assistantContent, toolResults } =
 					await this.runConversationTurn(turn);
+
+				this.tallyTokenCounts(response, turn);
 
 				this.messages.push({ role: "assistant", content: assistantContent });
 				if (toolResults.length > 0) {
 					this.messages.push({ role: "user", content: toolResults });
 					turn++;
 				} else {
+					console.log("break?");
 					break;
 				}
-				this.tokenCounts.stepCounts[turn] = {
-					inputTokens:
-						(response.usage?.input_tokens ?? 0) -
-						this.tokenCounts.totalInputTokens,
-					outputTokens:
-						(response.usage?.output_tokens ?? 0) -
-						this.tokenCounts.totalOutputTokens,
-				};
-				this.tokenCounts.totalInputTokens += response.usage?.input_tokens ?? 0;
-				this.tokenCounts.totalOutputTokens +=
-					response.usage?.output_tokens ?? 0;
-				this.tokenCounts.cumulativeInputTokens +=
-					response.usage?.input_tokens ?? 0;
-				this.tokenCounts.cumulativeOutputTokens +=
-					response.usage?.output_tokens ?? 0;
 			} catch (error: unknown) {
 				console.error("Iteration failed:", error);
 				throw error;

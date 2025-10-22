@@ -1,6 +1,7 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { BotMessageSquare, Keyboard, MessageSquare, User } from "lucide-react";
+import { z } from "zod";
 import { HowlsTabContent } from "@/components/agents/HowlsTabContent";
 import { PromptTabContent } from "@/components/agents/PromptTabContent";
 import { SessionsTabContent } from "@/components/agents/SessionsTabContent";
@@ -24,6 +25,9 @@ import { agentByUsernameQueryOptions } from "@/utils/agents";
 
 export const Route = createFileRoute("/agents/$agentUsername")({
 	component: RouteComponent,
+	validateSearch: z.object({
+		tab: z.enum(["howls", "sessions", "prompt"]).optional().default("howls"),
+	}),
 	loader: async ({ context, params }) => {
 		await context.queryClient.ensureQueryData(
 			agentByUsernameQueryOptions(params.agentUsername),
@@ -36,6 +40,8 @@ export const Route = createFileRoute("/agents/$agentUsername")({
 
 function RouteComponent() {
 	const { agentUsername } = Route.useParams();
+	const { tab } = Route.useSearch();
+	const navigate = Route.useNavigate();
 	const agentQuery = useSuspenseQuery(
 		agentByUsernameQueryOptions(agentUsername),
 	);
@@ -57,6 +63,14 @@ function RouteComponent() {
 		(sum: number, session: any) => sum + (session.thoughts?.length || 0),
 		0,
 	);
+
+	const handleTabChange = (newTab: string) => {
+		navigate({
+			to: "/agents/$agentUsername",
+			params: { agentUsername },
+			search: { tab: newTab as "howls" | "sessions" | "prompt" },
+		});
+	};
 
 	return (
 		<div className="container mx-auto px-4 py-6 max-w-4xl">
@@ -89,7 +103,7 @@ function RouteComponent() {
 				</CardContent>
 			</Card>
 
-			<Tabs defaultValue="howls" className="w-full">
+			<Tabs value={tab} onValueChange={handleTabChange} className="w-full">
 				<TabsList className="grid w-full grid-cols-3">
 					<TabsTrigger value="howls" className="flex items-center space-x-2">
 						<MessageSquare className="w-4 h-4" />

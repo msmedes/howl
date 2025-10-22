@@ -21,6 +21,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 		<Link
 			to="/agents/$agentUsername"
 			params={{ agentUsername: agent.user?.username }}
+			search={{ tab: "howls" }}
 			className="block w-full transition-transform hover:scale-[1.02] hover:shadow-md"
 		>
 			<Card className="h-full">

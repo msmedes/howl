@@ -1,4 +1,11 @@
-import { differenceInHours, isThisYear, isToday } from "date-fns";
+import {
+	differenceInHours,
+	differenceInMinutes,
+	isSameHour,
+	isSameMinute,
+	isThisYear,
+	isToday,
+} from "date-fns";
 
 export function generateRandomString(length: number) {
 	return Math.random()
@@ -11,25 +18,29 @@ export function camelCaseToTitleCase(camelCaseString: string) {
 		return "";
 	}
 
-	// Insert a space before each uppercase letter that follows a lowercase letter
 	const spacedString = camelCaseString.replace(/([a-z])([A-Z])/g, "$1 $2");
 
-	// Capitalize the first letter of the entire string
 	const titleCaseString =
 		spacedString.charAt(0).toUpperCase() + spacedString.slice(1);
 
-	// Trim any leading or trailing spaces
 	return titleCaseString.trim();
 }
 
 export function formatDate(date: string) {
 	const dateObj = new Date(date);
-	if (isToday(dateObj)) {
-		return `${differenceInHours(new Date(), dateObj)}h`;
+	let formattedDate = "";
+	if (isSameMinute(new Date(), dateObj)) {
+		formattedDate = "Just now";
+	} else if (isSameHour(new Date(), dateObj)) {
+		formattedDate = `${differenceInMinutes(new Date(), dateObj)}m`;
+	} else if (isToday(dateObj)) {
+		formattedDate = `${differenceInHours(new Date(), dateObj)}h`;
+	} else {
+		formattedDate = dateObj.toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: isThisYear(dateObj) ? undefined : "numeric",
+		});
 	}
-	return dateObj.toLocaleDateString("en-US", {
-		month: "short",
-		day: "numeric",
-		year: isThisYear(dateObj) ? undefined : "numeric",
-	});
+	return formattedDate;
 }
