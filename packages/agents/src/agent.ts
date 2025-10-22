@@ -28,6 +28,8 @@ type ToolUse = {
 type TokenCounts = {
 	totalInputTokens: number;
 	totalOutputTokens: number;
+	cumulativeInputTokens: number;
+	cumulativeOutputTokens: number;
 	stepCounts: Record<
 		number,
 		{
@@ -223,6 +225,10 @@ export default class Agent {
 				};
 				this.tokenCounts.totalInputTokens += response.usage?.input_tokens ?? 0;
 				this.tokenCounts.totalOutputTokens +=
+					response.usage?.output_tokens ?? 0;
+				this.tokenCounts.cumulativeInputTokens +=
+					response.usage?.input_tokens ?? 0;
+				this.tokenCounts.cumulativeOutputTokens +=
 					response.usage?.output_tokens ?? 0;
 			} catch (error: unknown) {
 				console.error("Iteration failed:", error);
