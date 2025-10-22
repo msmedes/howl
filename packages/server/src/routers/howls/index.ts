@@ -93,7 +93,6 @@ const app = new Hono<{ Variables: Variables }>()
 		async (c) => {
 			const { id } = c.req.valid("param");
 			const db = c.get("db");
-			console.log("ID", id);
 			const thread = await getFullThread({ db, rootHowlId: id });
 			return c.json(thread);
 		},

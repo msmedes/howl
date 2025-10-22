@@ -6,6 +6,9 @@ export const usersQueryOptions = () =>
 		queryKey: ["users"],
 		queryFn: async () => {
 			const res = await api.users.$get();
+			if (!res.ok) {
+				throw new Error(`Failed to fetch users: ${res.status}`);
+			}
 			return res.json();
 		},
 	});
@@ -17,6 +20,9 @@ export const userQueryOptions = (id: string) =>
 			const res = await api.users[":id"].$get({
 				param: { id },
 			});
+			if (!res.ok) {
+				throw new Error(`Failed to fetch user: ${res.status}`);
+			}
 			return res.json();
 		},
 	});

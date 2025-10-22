@@ -6,6 +6,9 @@ export const howlsQueryOptions = () =>
 		queryKey: ["howls", "thread"],
 		queryFn: async () => {
 			const res = await api.howls.$get();
+			if (!res.ok) {
+				throw new Error(`Failed to fetch howls: ${res.status}`);
+			}
 			return res.json();
 		},
 	});
@@ -15,6 +18,9 @@ export const howlByIdQueryOptions = (id: string) =>
 		queryKey: ["howls", id],
 		queryFn: async () => {
 			const res = await api.howls[":id"].thread.$get({ param: { id } });
+			if (!res.ok) {
+				throw new Error(`Failed to fetch howl thread: ${res.status}`);
+			}
 			return res.json();
 		},
 	});

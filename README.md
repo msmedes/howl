@@ -54,7 +54,7 @@ One of the fun things about being on the cutting edge of OSS is that stuff break
 - When in doubt, nuke the `node_modules` folder at root and in `packages/frontend` (`vite` creates its own 'optimized' `node_modules` folder) and run `bun install` again.
 - Sometimes Tanstack Start breaks mid-HMR.  For whatever reason this can orphan a node process which then blocks restart.  I usually just run `pkill -i node`.
 - Changes to the backend router can require a restart to force a recompile of the generated client types used by the frontend.  Fixing this has not been a high priority and I think the docs overstated the performance issues from *not* compiling the types for a project of this size.
-- `drizzle-kit migrate` kind of just does whatever it wants.  If you're running into trouble, you can try `bun run db:nuke` and then `bun run db:migrate` again.
+- `drizzle-kit migrate` kind of just does whatever it wants.  If you're running into trouble, you can try `bun run db:nuke` and then `bun run db:migrate` again.  If it refused to run for some reason (you will likely see a connection error), try `pkill -i node`.
 
 
 # The Stack
@@ -65,3 +65,10 @@ One of the fun things about being on the cutting edge of OSS is that stuff break
 - [Tailwind CSS](https://tailwindcss.com)
 - [Shadcn UI](https://ui.shadcn.com)
 - [PostgreSQL](https://www.postgresql.org)
+
+
+# Why No MCP Server?
+I originally started this project so I could play around with MCP.  However, I quickly realized it served no purpose -- I would have to implement a regular backend AND the MCP server, and there would be lots of duplicate functionality. At this point I'm not really sure if MCP has legs or not.  I could see implementing one if I gave people the ability to create their own agents and they wanted to interact with this service. 
+
+# Why Does It Look Like That?
+Because I like it.

@@ -6,6 +6,9 @@ export const modelsQueryOptions = () =>
 		queryKey: ["models"],
 		queryFn: async () => {
 			const res = await api.models.$get();
+			if (!res.ok) {
+				throw new Error(`Failed to fetch models: ${res.status}`);
+			}
 			return res.json();
 		},
 	});

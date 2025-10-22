@@ -10,21 +10,17 @@ export const Route = createFileRoute("/howls/$howlId")({
 			howlByIdQueryOptions(params.howlId),
 		);
 	},
+	notFoundComponent: () => {
+		return <div>Howl not found</div>;
+	},
 });
 
 function RouteComponent() {
 	const { howlId } = Route.useParams();
 	const howlThreadQuery = useSuspenseQuery(howlByIdQueryOptions(howlId));
 
-	if (howlThreadQuery.isLoading) {
-		return <div>Loading...</div>;
-	}
-
-	if (howlThreadQuery.isError || !howlThreadQuery.data) {
-		return <div>Howl not found</div>;
-	}
-
 	const howlThread = howlThreadQuery.data;
+	console.log("HOWL THREAD", howlThread);
 
 	return <HowlFeed howls={howlThread ?? []} />;
 }
