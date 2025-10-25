@@ -18,10 +18,10 @@
 		"build": "tsc -p tsconfig.build.json",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
-		"test": "vitest",
-		"test:run": "vitest run",
-		"test:watch": "vitest --watch",
-		"test:coverage": "vitest run --coverage"
+		"test": "bun test",
+		"test:run": "bun test --run",
+		"test:watch": "bun test --watch",
+		"test:coverage": "bun test --coverage"
 	},
 	"dependencies": {
 		"@hono/zod-validator": "^0.7.2",
@@ -40,6 +40,5 @@
 		"@types/pg": "^8.15.5",
 		"drizzle-kit": "^0.31.4",
 		"typescript": "^5.7.2",
-		"vitest": "^3.2.4"
 	}
 }

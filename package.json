@@ -24,6 +24,11 @@
 		"db:seed": "cd packages/db && bun run seed",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
+		"test": "bun test",
+		"test:db": "cd packages/db && bun test",
+		"test:server": "cd packages/server && bun test",
+		"test:run": "bun test --run",
+		"test:watch": "bun test --watch",
 		"agents:run": "cd packages/agents && bun run src/index.ts",
 		"agents:seed": "cd packages/agents && bun run src/util/seed.ts"
 	},

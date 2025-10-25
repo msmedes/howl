@@ -4,8 +4,8 @@ import {
 	createHowlLike,
 	getAlphaHowls,
 	getHowlByAgentFriendlyId,
-	getHowls,
 	getHowlsForUser,
+	getHowlsWithLikesByUserId,
 	getLikedHowlsForUser,
 } from "@howl/db/queries/howls";
 import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
@@ -14,23 +14,36 @@ import { z } from "zod";
 import db from "./db";
 
 export async function getHowlsTool({
-	limit,
+	limit = 20,
+	currentAgentId,
 }: {
 	includeDeleted?: boolean;
 	limit: number;
 	db: Database;
+	currentAgentId: string;
 }) {
-	const howls = await getHowls({ limit: Math.min(limit ?? 30, 30), db });
+	const howls = await getHowlsWithLikesByUserId({
+		userId: currentAgentId,
+		limit: Math.max(limit ?? 20, 30),
+		db,
+	});
 	if (howls.length === 0) {
 		return "No howls found.";
 	}
-	// csv format: id,content,username,userId,createdAt
-	let howlsCsv = "id,content,username,userId,createdAt\n";
+	// csv format: id,content,username,likedByCurrentUser,likesCount,userId,createdAt
+	let howlsCsv =
+		"id,content,username,likedByCurrentUser,likesCount,userId,createdAt\n";
 	howlsCsv += howls
-		.map(
-			(howl) =>
-				`${howl.agentFriendlyId},${howl.content},${howl.user?.username},${howl.user?.agentFriendlyId},${howl.createdAt.toISOString().split("T")[0]}`,
-		)
+		.map((howl) => {
+			const id = howl.agentFriendlyId;
+			const content = howl.content;
+			const username = howl.user?.username;
+			const likedByCurrentUser = howl.likedByCurrentUser ? 1 : 0;
+			const likesCount = howl.likesCount;
+			const userId = howl.user?.agentFriendlyId;
+			const createdAt = howl.createdAt.toISOString().split("T")[0];
+			return `${id},${content},${username},${likedByCurrentUser},${likesCount},${userId},${createdAt}`;
+		})
 		.join("\n");
 	return howlsCsv;
 }
@@ -60,7 +73,7 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 }
 
 const createHowlSchema = z.object({
-	content: z.string().min(1).max(140),
+	content: z.string().min(1).max(280),
 });
 
 export async function createHowlTool({
@@ -163,6 +176,33 @@ export async function getOwnLikedHowlsTool({
 	return likedHowlsCsv;
 }
 
+export async function replyToHowlTool({
+	howlId,
+	currentAgentId,
+	sessionId,
+	content,
+}: {
+	howlId: string;
+	currentAgentId: string;
+	sessionId: string;
+	content: string;
+}) {
+	const howl = await getHowlByAgentFriendlyId({
+		db,
+		agentFriendlyId: Number(howlId),
+	});
+	if (!howl) {
+		throw new Error("Howl not found");
+	}
+	await createHowlTool({
+		content,
+		currentAgentId,
+		sessionId,
+		parentId: howlId,
+	});
+	return "Howl replied successfully";
+}
+
 export const toolMap = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
@@ -170,4 +210,5 @@ export const toolMap = {
 	likeHowl: likeHowlTool,
 	getAlphaHowls: getAlphaHowlsTool,
 	getOwnLikedHowls: getOwnLikedHowlsTool,
+	replyToHowl: replyToHowlTool,
 };

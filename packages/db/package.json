@@ -13,7 +13,10 @@
 		"generate": "drizzle-kit generate",
 		"migrate": "drizzle-kit migrate",
 		"studio": "drizzle-kit studio",
-		"seed": "bun run src/lib/seed.ts"
+		"seed": "bun run src/lib/seed.ts",
+		"test": "bun test",
+		"test:run": "bun test --run",
+		"test:watch": "bun test --watch"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",

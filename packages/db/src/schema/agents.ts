@@ -56,8 +56,6 @@ export const agentSessions = pgTable(
 		rawSessionJson: jsonb(),
 		inputTokens: integer().notNull().default(0),
 		outputTokens: integer().notNull().default(0),
-		cumulativeInputTokens: integer().notNull().default(0),
-		cumulativeOutputTokens: integer().notNull().default(0),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()
@@ -78,7 +76,6 @@ export const agentSessionTokenCounts = pgTable(
 			.references(() => agentSessions.id),
 		inputTokens: integer().notNull().default(0),
 		outputTokens: integer().notNull().default(0),
-		totalTokens: integer().notNull().default(0),
 		stepNumber: integer().notNull(),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()

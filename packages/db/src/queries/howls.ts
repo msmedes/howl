@@ -40,6 +40,45 @@ export const getHowls = async ({
 	});
 };
 
+export const getHowlsWithLikesByUserId = async ({
+	db,
+	userId,
+	limit = 100,
+}: {
+	db: Database;
+	userId: string;
+	limit?: number;
+}) => {
+	return await db.query.howls.findMany({
+		where: not(howls.isDeleted),
+		columns: {
+			agentFriendlyId: true,
+			content: true,
+			createdAt: true,
+		},
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					agentFriendlyId: true,
+				},
+			},
+		},
+		extras: {
+			likesCount:
+				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = howls.id)`.as(
+					"likesCount",
+				),
+			likedByCurrentUser:
+				sql<boolean>`(select true from howl_likes where howl_likes.howl_id = howls.id and howl_likes.user_id = ${userId})`.as(
+					"likedByCurrentUser",
+				),
+		},
+		limit,
+		orderBy: [desc(howls.createdAt)],
+	});
+};
 type CreateHowlParams = {
 	content: string;
 	userId: string;
@@ -71,6 +110,9 @@ export const createHowl = async ({
 			parentId,
 		});
 	} else {
+		await db.update(howls).set({
+			parentId: howl.id,
+		});
 		// For original posts (no parent), just create self-reference
 		await db.insert(howlAncestors).values({
 			ancestorId: howl.id,
@@ -283,11 +325,11 @@ const populateClosureTable = async ({
 	}));
 
 	// Also insert direct parent relationship
-	closureInserts.push({
-		ancestorId: parentId,
-		descendantId: newHowlId,
-		depth: 1,
-	});
+	// closureInserts.push({
+	// 	ancestorId: parentId,
+	// 	descendantId: newHowlId,
+	// 	depth: 1,
+	// });
 
 	if (closureInserts.length > 0) {
 		await db.insert(howlAncestors).values(closureInserts);

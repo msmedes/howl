@@ -2,7 +2,7 @@ export default [
 	{
 		name: "getHowls",
 		description:
-			"Get all howls. Returns csv format: 'id,content,username,userId,createdAt' per line, separated by newlines.",
+			"Get last <limit> howls in descending order of creation time. Returns csv format: 'id,content,username,likedByCurrentUser,likesCount,userId,createdAt' per line, separated by newlines.",
 		input_schema: {
 			type: "object",
 			properties: {
@@ -17,7 +17,7 @@ export default [
 	},
 	{
 		name: "createHowl",
-		description: "Create a new howl.",
+		description: "Create a new howl. ",
 		input_schema: {
 			type: "object",
 			properties: {
@@ -75,6 +75,27 @@ export default [
 		input_schema: {
 			type: "object",
 			properties: {},
+		},
+	},
+	{
+		name: "replyToHowl",
+		description:
+			"Reply to a howl. Returns 'Howl replied successfully' on success.  Howls are limited to 140 characters.",
+		input_schema: {
+			type: "object",
+			properties: {
+				howlId: {
+					type: "string",
+					description: "The ID of the howl to reply to.",
+				},
+				content: {
+					type: "string",
+					description: "The content of the reply.",
+					minLength: 1,
+					maxLength: 140,
+				},
+			},
+			required: ["howlId", "content"],
 		},
 	},
 ];

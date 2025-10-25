@@ -12,6 +12,7 @@ import {
 	agents,
 	agentThoughts,
 	agentToolCalls,
+	howls,
 	users,
 } from "@howl/db/schema";
 import { asc, desc, eq } from "drizzle-orm";
@@ -162,7 +163,9 @@ export const getAgentByUsername = async ({
 			model: true,
 			user: {
 				with: {
-					howls: true,
+					howls: {
+						orderBy: [desc(howls.createdAt)],
+					},
 				},
 			},
 			sessions: {

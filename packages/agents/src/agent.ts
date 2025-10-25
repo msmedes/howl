@@ -1,4 +1,5 @@
 import { Anthropic } from "@anthropic-ai/sdk";
+import type { BetaTool } from "@anthropic-ai/sdk/resources/beta.mjs";
 import { createAgentSessionTokenCount } from "@howl/db/queries/agent-sessions";
 import {
 	createAgentThoughts,
@@ -28,8 +29,10 @@ type ToolUse = {
 type TokenCounts = {
 	totalInputTokens: number;
 	totalOutputTokens: number;
-	cumulativeInputTokens: number;
-	cumulativeOutputTokens: number;
+	accTokenCounts: {
+		inputTokens: number;
+		outputTokens: number;
+	};
 	stepCounts: Record<
 		number,
 		{
@@ -71,6 +74,10 @@ export default class Agent {
 		this.tokenCounts = {
 			totalInputTokens: 0,
 			totalOutputTokens: 0,
+			accTokenCounts: {
+				inputTokens: 0,
+				outputTokens: 0,
+			},
 			stepCounts: {},
 		};
 	}
@@ -82,21 +89,26 @@ export default class Agent {
 		});
 	}
 
-	private tallyTokenCounts(response: any, turn: number) {
-		console.log("response usage", response.usage);
-		console.log("******************");
-		console.log("this.tokenCounts", this.tokenCounts);
-		console.log("******************");
+	private tallyTokenCounts(
+		response: Anthropic.Beta.Messages.BetaMessage,
+		turn: number,
+	) {
 		this.tokenCounts.stepCounts[turn] = {
 			inputTokens:
-				(response.usage?.input_tokens ?? 0) - this.tokenCounts.totalInputTokens,
+				(response.usage.input_tokens ?? 0) -
+				this.tokenCounts.accTokenCounts.inputTokens,
 			outputTokens:
-				(response.usage?.output_tokens ?? 0) -
-				this.tokenCounts.totalOutputTokens,
+				(response.usage.output_tokens ?? 0) -
+				this.tokenCounts.accTokenCounts.outputTokens,
 		};
-		this.tokenCounts.totalInputTokens += response.usage?.input_tokens ?? 0;
-		this.tokenCounts.totalOutputTokens += response.usage?.output_tokens ?? 0;
-		console.log("POST this.tokenCounts", this.tokenCounts);
+		this.tokenCounts.totalInputTokens += response.usage.input_tokens ?? 0;
+		this.tokenCounts.totalOutputTokens += response.usage.output_tokens ?? 0;
+		this.tokenCounts.accTokenCounts.inputTokens =
+			response.usage.input_tokens ?? 0;
+		this.tokenCounts.accTokenCounts.outputTokens =
+			response.usage.output_tokens ?? 0;
+		console.log("response", response.usage);
+		console.log("tokenCounts", this.tokenCounts);
 	}
 
 	private async processToolCall(toolCall: any) {
@@ -178,7 +190,7 @@ export default class Agent {
 			max_tokens: this.maxTokens,
 			system: this.systemPrompt,
 			messages: this.messages,
-			tools: toolsSchema as any,
+			tools: toolsSchema as BetaTool[],
 			betas: ["token-efficient-tools-2025-02-19"],
 		});
 
@@ -220,6 +232,7 @@ export default class Agent {
 		while (turn <= this.maxIterations) {
 			try {
 				console.log(`\n--- Iteration ${turn}/${this.maxIterations} ---`);
+
 				const { response, assistantContent, toolResults } =
 					await this.runConversationTurn(turn);
 

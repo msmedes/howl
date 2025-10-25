@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
 import { camelCaseToTitleCase } from "@/utils/lib";
-import { InputTokensBadge } from "../ui/StatBadge";
+import { InputTokensBadge, OutputTokensBadge } from "../ui/StatBadge";
 
 type SessionResponse = InferResponseType<(typeof api.sessions)[":id"]["$get"]>;
 type HowlSessionResponse = InferResponseType<
@@ -112,18 +112,31 @@ export default function SessionSteps({
 						)}
 					>
 						<CardHeader>
-							<CardTitle>
+							<CardTitle className="flex items-center gap-2">
 								Step {stepNumber}{" "}
 								{"tokenCounts" in session && session.tokenCounts && (
-									<InputTokensBadge
-										count={
-											session.tokenCounts?.find(
-												(tokenCount) =>
-													tokenCount.stepNumber === parseInt(stepNumber, 10),
-											)?.inputTokens || 0
-										}
-										showLabel={false}
-									/>
+									<div className="flex gap-2">
+										<InputTokensBadge
+											className="bg-primary text-white"
+											count={
+												session.tokenCounts?.find(
+													(tokenCount) =>
+														tokenCount.stepNumber === parseInt(stepNumber, 10),
+												)?.inputTokens || 0
+											}
+											showLabel={false}
+										/>
+										<OutputTokensBadge
+											className="bg-destructive text-white"
+											count={
+												session.tokenCounts?.find(
+													(tokenCount) =>
+														tokenCount.stepNumber === parseInt(stepNumber, 10),
+												)?.outputTokens || 0
+											}
+											showLabel={false}
+										/>
+									</div>
 								)}
 							</CardTitle>
 						</CardHeader>
