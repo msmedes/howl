@@ -93,7 +93,7 @@ export const createHowl = async ({
 	parentId,
 	sessionId,
 }: CreateHowlParams & { db: Database }) => {
-	const [howl] = await db
+	let [howl] = await db
 		.insert(howls)
 		.values({
 			content,
@@ -103,22 +103,21 @@ export const createHowl = async ({
 			isOriginalPost: !parentId, // If no parent, it's an original post
 		})
 		.returning();
-	if (parentId) {
-		await populateClosureTable({
-			db,
-			newHowlId: howl.id,
-			parentId,
-		});
-	} else {
-		await db.update(howls).set({
-			parentId: howl.id,
-		});
-		// For original posts (no parent), just create self-reference
-		await db.insert(howlAncestors).values({
-			ancestorId: howl.id,
-			descendantId: howl.id,
-			depth: 0,
-		});
+
+	await populateClosureTable({
+		db,
+		newHowlId: howl.id,
+		parentId: parentId ?? howl.id,
+	});
+
+	if (!parentId) {
+		[howl] = await db
+			.update(howls)
+			.set({
+				parentId: howl.id,
+			})
+			.where(eq(howls.id, howl.id))
+			.returning();
 	}
 
 	return howl;
@@ -216,7 +215,11 @@ export const getImmediateReplies = async ({
 	howlId: string;
 }) => {
 	const replies = await db.query.howls.findMany({
-		where: eq(howls.parentId, howlId),
+		where: and(
+			eq(howls.parentId, howlId),
+			not(howls.isDeleted),
+			not(eq(howls.parentId, howls.id)),
+		),
 		with: {
 			user: {
 				columns: {
@@ -295,7 +298,6 @@ export const getDescendantsUpToDepth = async ({
 	return descendants;
 };
 
-// Helper function to populate closure table when adding replies
 const populateClosureTable = async ({
 	db,
 	newHowlId,
@@ -305,14 +307,48 @@ const populateClosureTable = async ({
 	newHowlId: string;
 	parentId: string;
 }) => {
-	// Insert self-reference (depth 0)
-	await db.insert(howlAncestors).values({
-		ancestorId: newHowlId,
-		descendantId: newHowlId,
-		depth: 0,
-	});
+	/*
+	closure tables:
+	ancestorId: the id of the parent howl
+	descendantId: the id of the child howl
+	depth: the depth of the child howl
 
-	// Get all ancestors of the parent
+	An example with three howls:
+	A -> B -> C
+	
+	The closure table will look like this:
+	A -> A (depth 0) <- self-reference
+	A -> B (depth 1)
+	A -> C (depth 2)
+	B -> B (depth 0) <- self-reference
+	B -> C (depth 1)
+	C -> C (depth 0) <- self-reference
+
+	If we them attempt to insert a reply to C, we need to get all the ancestors of C (all the howl ancestors with a descendant of C)
+	This would be:
+	C -> C (depth 0)
+	B -> C (depth 1)
+	A -> C (depth 2)
+
+	And then insert the new reply D with ancestor depth + 1.
+	C -> D (depth 1)
+	B -> D (depth 2)
+	A -> D (depth 3)
+
+	The resulting closure table:
+	A -> A (depth 0) <- self-reference
+	A -> B (depth 1)
+	A -> C (depth 2)
+	A -> D (depth 3)
+	B -> B (depth 0) <- self-reference
+	B -> C (depth 1)
+	B -> D (depth 2)
+	C -> C (depth 0) <- self-reference
+	C -> D (depth 1)
+	D -> D (depth 0) <- self-reference	
+	*/
+	// Get all ancestors of the parent, if no parent, the new howl *is* its own parent
+	// and the result set will be empty.
 	const parentAncestors = await db.query.howlAncestors.findMany({
 		where: eq(howlAncestors.descendantId, parentId),
 	});
@@ -323,13 +359,12 @@ const populateClosureTable = async ({
 		descendantId: newHowlId,
 		depth: ancestor.depth + 1,
 	}));
-
-	// Also insert direct parent relationship
-	// closureInserts.push({
-	// 	ancestorId: parentId,
-	// 	descendantId: newHowlId,
-	// 	depth: 1,
-	// });
+	// Include self-reference
+	closureInserts.push({
+		ancestorId: newHowlId,
+		descendantId: newHowlId,
+		depth: 0,
+	});
 
 	if (closureInserts.length > 0) {
 		await db.insert(howlAncestors).values(closureInserts);
