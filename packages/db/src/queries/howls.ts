@@ -416,11 +416,16 @@ export const createHowlLike = async ({
 	howlId: string;
 	sessionId?: string;
 }) => {
-	const like = await db.insert(howlLikes).values({
-		userId,
-		howlId,
-		sessionId,
-	});
+	const like = await db
+		.insert(howlLikes)
+		.values({
+			userId,
+			howlId,
+			sessionId,
+		})
+		.onConflictDoNothing({
+			target: [howlLikes.userId, howlLikes.howlId],
+		});
 	return like;
 };
 
