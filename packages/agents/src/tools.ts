@@ -198,7 +198,7 @@ export async function replyToHowlTool({
 		content,
 		currentAgentId,
 		sessionId,
-		parentId: howlId,
+		parentId: howl.id,
 	});
 	return "Howl replied successfully";
 }
