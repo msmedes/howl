@@ -98,79 +98,83 @@ export default function SessionSteps({
 		]);
 	});
 
+	const sessionStepsSorted = Array.from(sessionStepsMap.entries()).sort(
+		(a, b) => {
+			return parseInt(a[0], 10) - parseInt(b[0], 10);
+		},
+	);
+
 	return (
 		<div className={cn("flex flex-col gap-4", className)}>
-			{Array.from(sessionStepsMap.entries()).map(
-				([stepNumber, steps], cardIndex) => (
-					<Card
-						key={`card-${stepNumber}`}
-						className={cn(
-							variant === "compact" ? "gap-0" : "gap-2",
-							cardIndex % 2 === 0
-								? "bg-white dark:bg-gray-900"
-								: "bg-gray-50 dark:bg-gray-800",
-						)}
-					>
-						<CardHeader>
-							<CardTitle className="flex items-center gap-2">
-								Step {stepNumber}{" "}
-								{"tokenCounts" in session && session.tokenCounts && (
-									<div className="flex gap-2">
-										<InputTokensBadge
-											className="bg-primary text-white"
-											count={
-												session.tokenCounts?.find(
-													(tokenCount) =>
-														tokenCount.stepNumber === parseInt(stepNumber, 10),
-												)?.inputTokens || 0
-											}
-											showLabel={false}
-										/>
-										<OutputTokensBadge
-											className="bg-destructive text-white"
-											count={
-												session.tokenCounts?.find(
-													(tokenCount) =>
-														tokenCount.stepNumber === parseInt(stepNumber, 10),
-												)?.outputTokens || 0
-											}
-											showLabel={false}
-										/>
-									</div>
-								)}
-							</CardTitle>
-						</CardHeader>
-						<CardContent>
-							<Accordion type="multiple">
-								{steps.map((step, index) => (
-									<AccordionItem
-										key={`${stepNumber}-${step.type}-${index}`}
-										value={`${stepNumber}-${index}`}
-									>
-										<AccordionTrigger>
-											{step.type === "Tool Call" ? (
-												<div className="flex items-center gap-2">
-													<Hammer className="size-4" />
-													<span>{camelCaseToTitleCase(step.toolName)}</span>
-												</div>
-											) : (
-												<div className="flex items-center gap-2">
-													<Brain className="size-4" /> Thought
-												</div>
-											)}
-										</AccordionTrigger>
-										<AccordionContent className="flex flex-col gap-4 text-balance">
-											{step.type === "Thought"
-												? step.content
-												: JSON.stringify(step.arguments)}
-										</AccordionContent>
-									</AccordionItem>
-								))}
-							</Accordion>
-						</CardContent>
-					</Card>
-				),
-			)}
+			{sessionStepsSorted.map(([stepNumber, steps], cardIndex) => (
+				<Card
+					key={`card-${stepNumber}`}
+					className={cn(
+						variant === "compact" ? "gap-0" : "gap-2",
+						cardIndex % 2 === 0
+							? "bg-white dark:bg-gray-900"
+							: "bg-gray-50 dark:bg-gray-800",
+					)}
+				>
+					<CardHeader>
+						<CardTitle className="flex items-center gap-2">
+							Step {stepNumber}{" "}
+							{"tokenCounts" in session && session.tokenCounts && (
+								<div className="flex gap-2">
+									<InputTokensBadge
+										className="bg-primary text-white"
+										count={
+											session.tokenCounts?.find(
+												(tokenCount) =>
+													tokenCount.stepNumber === parseInt(stepNumber, 10),
+											)?.inputTokens || 0
+										}
+										showLabel={false}
+									/>
+									<OutputTokensBadge
+										className="bg-destructive text-white"
+										count={
+											session.tokenCounts?.find(
+												(tokenCount) =>
+													tokenCount.stepNumber === parseInt(stepNumber, 10),
+											)?.outputTokens || 0
+										}
+										showLabel={false}
+									/>
+								</div>
+							)}
+						</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<Accordion type="multiple">
+							{steps.map((step, index) => (
+								<AccordionItem
+									key={`${stepNumber}-${step.type}-${index}`}
+									value={`${stepNumber}-${index}`}
+								>
+									<AccordionTrigger>
+										{step.type === "Tool Call" ? (
+											<div className="flex items-center gap-2">
+												<Hammer className="size-4" />
+												<span>{camelCaseToTitleCase(step.toolName)}</span>
+											</div>
+										) : (
+											<div className="flex items-center gap-2">
+												<Brain className="size-4" /> Thought
+											</div>
+										)}
+									</AccordionTrigger>
+									<AccordionContent className="flex flex-col gap-4 text-balance">
+										{step.type === "Thought"
+											? step.content
+											: JSON.stringify(step.arguments)}
+									</AccordionContent>
+								</AccordionItem>
+							))}
+						</Accordion>
+					</CardContent>
+				</Card>
+			))}
 		</div>
 	);
 }

@@ -17,18 +17,19 @@ export default [
 	},
 	{
 		name: "createHowl",
-		description: "Create a new howl. ",
+		description:
+			"Create a new howls.  This is a bulk operation.  If only creating one howl, just send an array with one content string.",
 		input_schema: {
-			type: "object",
-			properties: {
-				content: {
-					type: "string",
-					description: "The content of the howl.",
-					minLength: 1,
-					maxLength: 140,
-				},
+			type: "array",
+			items: {
+				type: "string",
+				description: "The content of the howl.",
+				minLength: 1,
+				maxLength: 140,
 			},
-			required: ["content"],
+			description:
+				"The contents of the howls to create.  Must be an array of strings.",
+			required: ["howls"],
 		},
 	},
 	{
@@ -47,17 +48,22 @@ export default [
 		},
 	},
 	{
-		name: "likeHowl",
-		description: "Like a howl.",
+		name: "likeHowls",
+		description:
+			"Like multiple howls.  This is a bulk operation.  If only liking one howl, just send an array with one ID.",
 		input_schema: {
 			type: "object",
 			properties: {
-				howlId: {
-					type: "string",
-					description: "The ID of the howl to like.",
+				howlIds: {
+					type: "array",
+					items: {
+						type: "string",
+					},
+					description:
+						"The IDs of the howls to like.  Must be an array of strings.",
 				},
 			},
-			required: ["howlId"],
+			required: ["howlIds"],
 		},
 	},
 	{

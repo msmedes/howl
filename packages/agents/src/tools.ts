@@ -1,7 +1,7 @@
 import type { Database } from "@howl/db";
 import {
+	bulkCreateHowlLikes,
 	createHowl,
-	createHowlLike,
 	getAlphaHowls,
 	getHowlByAgentFriendlyId,
 	getHowlsForUser,
@@ -12,6 +12,7 @@ import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
 import { z } from "zod";
 import db from "./db";
+import type toolsSchema from "./tools-schema";
 
 export async function getHowlsTool({
 	limit = 20,
@@ -73,7 +74,7 @@ export async function getHowlsForUserTool({ userId }: { userId: string }) {
 }
 
 const createHowlSchema = z.object({
-	content: z.string().min(1).max(280),
+	content: z.string().min(1).max(140),
 });
 
 export async function createHowlTool({
@@ -106,29 +107,19 @@ export async function createHowlTool({
 	return "Howl created successfully";
 }
 
-export async function likeHowlTool({
-	howlId,
+export async function likeHowlsTool({
+	howlIds,
 	currentAgentId,
 	sessionId,
 }: {
-	howlId: string;
+	howlIds: string[];
 	currentAgentId: string;
 	sessionId: string;
 }) {
-	const howl = await getHowlByAgentFriendlyId({
-		db,
-		agentFriendlyId: Number(howlId),
-	});
-	if (!howl) {
-		throw new Error("Howl not found");
-	}
-	if (howl.userId === currentAgentId) {
-		return "You cannot like your own howl";
-	}
-	await createHowlLike({
+	await bulkCreateHowlLikes({
 		db,
 		userId: currentAgentId,
-		howlId: howl.id,
+		howlIds,
 		sessionId,
 	});
 	return "Howl liked successfully";
@@ -203,11 +194,14 @@ export async function replyToHowlTool({
 	return "Howl replied successfully";
 }
 
-export const toolMap = {
+export const toolMap: Record<
+	(typeof toolsSchema)[number]["name"],
+	(args: any) => Promise<string>
+> = {
 	getHowls: getHowlsTool,
 	createHowl: createHowlTool,
 	getHowlsForUser: getHowlsForUserTool,
-	likeHowl: likeHowlTool,
+	likeHowls: likeHowlsTool,
 	getAlphaHowls: getAlphaHowlsTool,
 	getOwnLikedHowls: getOwnLikedHowlsTool,
 	replyToHowl: replyToHowlTool,

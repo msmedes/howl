@@ -429,6 +429,32 @@ export const createHowlLike = async ({
 	return like;
 };
 
+export const bulkCreateHowlLikes = async ({
+	db,
+	howlIds,
+	userId,
+	sessionId,
+}: {
+	db: Database;
+	howlIds: string[];
+	userId: string;
+	sessionId?: string;
+}) => {
+	const likes = await db
+		.insert(howlLikes)
+		.values(
+			howlIds.map((howlId) => ({
+				userId,
+				howlId,
+				sessionId,
+			})),
+		)
+		.onConflictDoNothing({
+			target: [howlLikes.userId, howlLikes.howlId],
+		});
+	return likes;
+};
+
 export const getAlphaHowls = async ({ db }: { db: Database }) => {
 	const alphaUser = await db.query.users.findFirst({
 		where: eq(users.username, "alpha"),
