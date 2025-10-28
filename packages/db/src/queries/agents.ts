@@ -117,6 +117,16 @@ export const getAgents = async ({ db }: { db: Database }) => {
 					username: true,
 					bio: true,
 				},
+				with: {
+					howls: true,
+				},
+			},
+			model: true,
+			sessions: {
+				with: {
+					thoughts: true,
+					toolCalls: true,
+				},
 			},
 		},
 	});

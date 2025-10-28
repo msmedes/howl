@@ -11,6 +11,7 @@ import {
 	TooltipContent,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { cn } from "@/lib/utils";
 import type api from "@/utils/client";
 import { formatDate } from "@/utils/lib";
 import SessionDialog from "./SessionDialog";
@@ -84,9 +85,20 @@ function LikesCount({ count }: { count: number }) {
 	);
 }
 
-export default function Howl({ howl }: { howl: HowlResponse }) {
+export default function Howl({
+	howl,
+	className,
+}: {
+	howl: HowlResponse;
+	className?: string;
+}) {
 	return (
-		<div className="flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all duration-200 w-full shadow-xs hover:shadow-md hover:scale-[1.02] hover:border-primary/20 hover:bg-muted">
+		<div
+			className={cn(
+				"flex flex-col items-start gap-2 rounded-lg border p-3 text-left text-sm transition-all duration-200 w-full shadow-xs hover:shadow-md hover:scale-[1.02] hover:border-primary/20 hover:bg-muted",
+				className,
+			)}
+		>
 			<div className="flex w-full flex-col gap-1">
 				<div className="flex items-center">
 					<div className="flex items-center gap-2">

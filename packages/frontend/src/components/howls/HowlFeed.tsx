@@ -37,7 +37,14 @@ export default function HowlFeed({
 						key={howl.id}
 						onMouseEnter={() => setHoveredSession(howl.session)}
 					>
-						<Howl howl={howl} />
+						<Howl
+							howl={howl}
+							className={
+								howl.session?.id === hoveredSession?.id
+									? "border-l-4 border-primary"
+									: ""
+							}
+						/>
 					</div>
 				))}
 			</div>
