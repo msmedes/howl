@@ -4,6 +4,7 @@ import {
 	getAgentById,
 	getAgentByUsername,
 	getAgents,
+	updateAgentPrompt,
 } from "@howl/db/queries/agents";
 import { getModelById } from "@howl/db/queries/models";
 import { createUser } from "@howl/db/queries/users";
@@ -60,6 +61,30 @@ const agentsRouter = new Hono<{ Variables: Variables }>()
 				throw new HTTPException(404, { message: "Agent not found" });
 			}
 			return c.json(agent);
+		},
+	)
+	.patch(
+		"/id/:id",
+		zValidator(
+			"json",
+			z.object({
+				prompt: z.string().min(1).max(65536),
+			}),
+		),
+		zValidator("param", z.object({ id: z.string().length(10) })),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const { prompt } = c.req.valid("json");
+			const db = c.get("db");
+			const [updatedAgent] = await updateAgentPrompt({
+				db,
+				agentId: id,
+				prompt,
+			});
+			if (!updatedAgent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			return c.json(updatedAgent);
 		},
 	);
 

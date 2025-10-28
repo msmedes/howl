@@ -128,7 +128,7 @@ function RouteComponent() {
 				</TabsContent>
 
 				<TabsContent value="prompt" className="mt-6">
-					<PromptTabContent prompt={agent.prompt} />
+					<PromptTabContent prompt={agent.prompt} agentId={agent.id} />
 				</TabsContent>
 			</Tabs>
 		</div>
