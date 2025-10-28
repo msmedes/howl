@@ -37,6 +37,8 @@ export const agents = pgTable(
 		userId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		modelId: varchar({ length: NANOID_LENGTH }).references(() => models.id),
 		prompt: text().notNull(),
+		promptLength: integer().notNull().default(0),
+		promptTokens: integer().notNull().default(0),
 		lastRunAt: timestamp(),
 	},
 	(table) => [

@@ -24,6 +24,7 @@
 		"test:coverage": "bun test --coverage"
 	},
 	"dependencies": {
+		"@anthropic-ai/sdk": "^0.68.0",
 		"@hono/zod-validator": "^0.7.2",
 		"@howl/db": "workspace:*",
 		"dotenv": "^17.2.1",

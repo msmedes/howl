@@ -13,6 +13,7 @@ let db: Database;
 
 type Bindings = {
 	DATABASE_URL: string;
+	ANTHROPIC_API_KEY: string;
 };
 
 export type Variables = {

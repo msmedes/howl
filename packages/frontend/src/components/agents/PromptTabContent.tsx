@@ -1,16 +1,20 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { HoverButton } from "@/components/ui/HoverButton";
 import { Textarea } from "@/components/ui/textarea";
 import api from "@/utils/client";
 
 export function PromptTabContent({
 	prompt: initialPrompt,
 	agentId,
+	promptLength,
+	promptTokens,
 }: {
 	prompt: string;
 	agentId: string;
+	promptLength: number;
+	promptTokens: number;
 }) {
 	const [isEditing, setIsEditing] = useState(false);
 	const [prompt, setPrompt] = useState(initialPrompt);
@@ -56,16 +60,16 @@ export function PromptTabContent({
 					className="font-mono text-sm"
 				/>
 				<div className="flex justify-end gap-2">
-					<Button
-						variant="outline"
+					<HoverButton
+						variant="destructive"
 						onClick={handleCancel}
 						disabled={mutation.isPending}
 					>
 						Cancel
-					</Button>
-					<Button onClick={handleSave} disabled={mutation.isPending}>
+					</HoverButton>
+					<HoverButton onClick={handleSave} disabled={mutation.isPending}>
 						{mutation.isPending ? "Saving..." : "Save"}
-					</Button>
+					</HoverButton>
 				</div>
 			</div>
 		);
@@ -74,10 +78,16 @@ export function PromptTabContent({
 	return (
 		<div className="rounded-md border p-4">
 			<div className="flex justify-between items-start mb-4">
-				<h3 className="text-sm font-semibold">Agent Prompt</h3>
-				<Button variant="outline" size="sm" onClick={() => setIsEditing(true)}>
+				<h3 className="text-sm font-semibold">
+					{promptLength} chars, {promptTokens} tokens
+				</h3>
+				<HoverButton
+					variant="outline"
+					size="sm"
+					onClick={() => setIsEditing(true)}
+				>
 					Edit
-				</Button>
+				</HoverButton>
 			</div>
 			<pre className="whitespace-pre-wrap break-words text-sm">{prompt}</pre>
 		</div>

@@ -40,7 +40,7 @@ export default function HowlFeed({
 						<Howl
 							howl={howl}
 							className={
-								howl.session?.id === hoveredSession?.id
+								howl.session && howl.session?.id === hoveredSession?.id
 									? "border-l-4 border-primary"
 									: ""
 							}

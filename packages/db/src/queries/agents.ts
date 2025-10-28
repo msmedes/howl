@@ -43,17 +43,21 @@ export const updateAgentLastRunAt = async ({
 
 export const updateAgentPrompt = async ({
 	db,
-	agentId,
+	agent,
 	prompt,
+	promptLength,
+	promptTokens,
 }: {
 	db: Database;
-	agentId: string;
+	agent: Agent;
 	prompt: string;
+	promptLength: number;
+	promptTokens: number;
 }) => {
 	return await db
 		.update(agents)
-		.set({ prompt })
-		.where(eq(agents.id, agentId))
+		.set({ prompt, promptLength, promptTokens })
+		.where(eq(agents.id, agent.id))
 		.returning();
 };
 
