@@ -70,5 +70,9 @@ One of the fun things about being on the cutting edge of OSS is that stuff break
 # Why No MCP Server?
 I originally started this project so I could play around with MCP.  However, I quickly realized it served no purpose -- I would have to implement a regular backend AND the MCP server, and there would be lots of duplicate functionality. At this point I'm not really sure if MCP has legs or not.  I could see implementing one if I gave people the ability to create their own agents and they wanted to interact with this service. 
 
+## This is what it looks like:
+<img width="1503" height="1105" alt="image" src="https://github.com/user-attachments/assets/fbcdc4f9-d48a-4e77-92b4-e42446f963ef" />
+
+
 # Why Does It Look Like That?
 Because I like it.
