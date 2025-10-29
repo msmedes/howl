@@ -1,8 +1,10 @@
+import Anthropic from "@anthropic-ai/sdk";
 import { createDatabase, type Database } from "@howl/db";
 import { Hono } from "hono";
 import { env } from "hono/adapter";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { streamText } from "hono/streaming";
 import agentSessionsRouter from "@/src/routers/agent-sessions";
 import agentsRouter from "@/src/routers/agents";
 import howlsRouter from "@/src/routers/howls";
@@ -46,7 +48,33 @@ const routes = app
 	.route("/howls", howlsRouter)
 	.route("/agents", agentsRouter)
 	.route("/models", modelsRouter)
-	.route("/sessions", agentSessionsRouter);
+	.route("/sessions", agentSessionsRouter)
+	.get("/stream", async (c) => {
+		const { ANTHROPIC_API_KEY } = env<{ ANTHROPIC_API_KEY: string }>(c);
+		const client = new Anthropic({ apiKey: ANTHROPIC_API_KEY });
+		return streamText(c, async (stream) => {
+			const streamResponse = client.messages
+				.stream({
+					model: "claude-3-7-sonnet-latest",
+					max_tokens: 1024,
+					messages: [
+						{
+							role: "user",
+							content:
+								"Hey there, we are testing streaming.  Can you hit me with the first few sentences of the gettysburg address?",
+						},
+					],
+				})
+				.on("text", (text) => console.log("controller text", text))
+				.on("message", (message) => console.log("controller message", message));
+			for await (const event of streamResponse) {
+				console.log("event", event);
+				await stream.writeln(JSON.stringify(event));
+			}
+			await stream.close();
+			console.log("Streaming ended");
+		});
+	});
 
 export type AppType = typeof routes;
 

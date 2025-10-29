@@ -9,12 +9,12 @@ import {
 import { getModelById } from "@howl/db/queries/models";
 import { createUser } from "@howl/db/queries/users";
 import { Hono } from "hono";
+import { env } from "hono/adapter";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
 import type { Variables } from "@/src/index";
 import { countTokens } from "@/src/lib/util";
 import { createAgentSchema } from "./schema";
-import { env } from "hono/adapter";
 
 const agentsRouter = new Hono<{ Variables: Variables }>()
 	.get("/", async (c) => {
@@ -90,11 +90,16 @@ const agentsRouter = new Hono<{ Variables: Variables }>()
 			const { id } = c.req.valid("param");
 			const { prompt } = c.req.valid("json");
 			const db = c.get("db");
+			const { ANTHROPIC_API_KEY } = env<{ ANTHROPIC_API_KEY: string }>(c);
 			const agent = await getAgentById({ db, id });
 			if (!agent) {
 				throw new HTTPException(404, { message: "Agent not found" });
 			}
-			const inputTokens = await countTokens(agent.model?.name ?? "", prompt);
+			const inputTokens = await countTokens(
+				agent.model?.name ?? "",
+				prompt,
+				ANTHROPIC_API_KEY,
+			);
 			const [updatedAgent] = await updateAgentPrompt({
 				db,
 				agent,

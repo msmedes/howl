@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as StreamIndexRouteImport } from './routes/stream/index'
 import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
 import { Route as HowlsIndexRouteImport } from './routes/howls/index'
 import { Route as AgentsIndexRouteImport } from './routes/agents/index'
@@ -28,6 +29,11 @@ const RedirectRoute = RedirectRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StreamIndexRoute = StreamIndexRouteImport.update({
+  id: '/stream/',
+  path: '/stream/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SessionsIndexRoute = SessionsIndexRouteImport.update({
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/agents': typeof AgentsIndexRoute
   '/howls': typeof HowlsIndexRoute
   '/sessions': typeof SessionsIndexRoute
+  '/stream': typeof StreamIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/agents': typeof AgentsIndexRoute
   '/howls': typeof HowlsIndexRoute
   '/sessions': typeof SessionsIndexRoute
+  '/stream': typeof StreamIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/agents/': typeof AgentsIndexRoute
   '/howls/': typeof HowlsIndexRoute
   '/sessions/': typeof SessionsIndexRoute
+  '/stream/': typeof StreamIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/howls'
     | '/sessions'
+    | '/stream'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/agents'
     | '/howls'
     | '/sessions'
+    | '/stream'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/agents/'
     | '/howls/'
     | '/sessions/'
+    | '/stream/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -158,6 +170,7 @@ export interface RootRouteChildren {
   AgentsIndexRoute: typeof AgentsIndexRoute
   HowlsIndexRoute: typeof HowlsIndexRoute
   SessionsIndexRoute: typeof SessionsIndexRoute
+  StreamIndexRoute: typeof StreamIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -174,6 +187,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stream/': {
+      id: '/stream/'
+      path: '/stream'
+      fullPath: '/stream'
+      preLoaderRoute: typeof StreamIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/sessions/': {
@@ -246,6 +266,7 @@ const rootRouteChildren: RootRouteChildren = {
   AgentsIndexRoute: AgentsIndexRoute,
   HowlsIndexRoute: HowlsIndexRoute,
   SessionsIndexRoute: SessionsIndexRoute,
+  StreamIndexRoute: StreamIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
