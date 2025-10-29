@@ -2,9 +2,9 @@
 
 set -e
 
-echo "🚀 Setting up Howl project..."
+echo "Setting up Howl project..."
 
-echo "📦 Installing dependencies..."
+echo "Installing dependencies..."
 bun install
 
 echo
