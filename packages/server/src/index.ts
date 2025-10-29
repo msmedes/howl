@@ -65,11 +65,15 @@ const routes = app
 						},
 					],
 				})
-				.on("text", (text) => console.log("controller text", text))
 				.on("message", (message) => console.log("controller message", message));
 			for await (const event of streamResponse) {
-				console.log("event", event);
-				await stream.writeln(JSON.stringify(event));
+				switch (event.type) {
+					case "content_block_delta":
+						stream.write(event.delta.text);
+						break;
+					default:
+						console.log("controller event", event);
+				}
 			}
 			await stream.close();
 			console.log("Streaming ended");
