@@ -352,7 +352,6 @@ const populateClosureTable = async ({
 	const parentAncestors = await db.query.howlAncestors.findMany({
 		where: eq(howlAncestors.descendantId, parentId),
 	});
-	console.log("parent ancestors", parentAncestors);
 
 	// Insert relationships to all ancestors
 	const closureInserts = parentAncestors.map((ancestor) => ({
@@ -366,7 +365,6 @@ const populateClosureTable = async ({
 		descendantId: newHowlId,
 		depth: 0,
 	});
-	console.log("closure inserts", closureInserts);
 
 	if (closureInserts.length > 0) {
 		await db.insert(howlAncestors).values(closureInserts);
@@ -451,7 +449,8 @@ export const bulkCreateHowlLikes = async ({
 		)
 		.onConflictDoNothing({
 			target: [howlLikes.userId, howlLikes.howlId],
-		});
+		})
+		.returning();
 	return likes;
 };
 

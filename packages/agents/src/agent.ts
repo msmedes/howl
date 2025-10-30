@@ -7,10 +7,27 @@ import {
 	updateAgentSession,
 } from "@howl/db/queries/agents";
 import type { AgentSession, AgentWithRelations, Model } from "@howl/db/schema";
-import { systemPrompt } from "@/prompts";
-import { toolMap } from "@/tools";
-import toolsSchema from "@/tools-schema";
 import db from "./db";
+import { systemPrompt } from "./prompts";
+import { toolMap } from "./tools";
+import { toolsSchema } from "./tools-schema";
+
+type AgentEvent =
+	| { type: "session-started"; sessionId: string; agentId?: string }
+	| { type: "step-started"; sessionId: string; step: number }
+	| { type: "tool-call"; sessionId: string; tool: string; input: unknown }
+	| { type: "tool-result"; sessionId: string; tool: string; output: unknown }
+	| { type: "session-completed"; sessionId: string }
+	| { type: "session-error"; sessionId: string; error: string }
+	| {
+			type: "thinking";
+			sessionId: string;
+	  };
+
+type RunOptions = {
+	onEvent?: (e: AgentEvent) => void;
+	signal?: AbortSignal;
+};
 
 type Thought = {
 	role: "assistant";
@@ -45,16 +62,17 @@ type TokenCounts = {
 export default class Agent {
 	private maxIterations: number;
 	private model: Model;
-	private agent: AgentWithRelations;
+	public readonly agent: AgentWithRelations;
 	private agentPrompt: string;
 	private systemPrompt: string;
-	private messages: Array<{ role: "user" | "assistant"; content: string }>;
+	private messages: Anthropic.MessageParam[];
 	private client: Anthropic;
 	private maxTokens: number;
 	private thoughts: Array<Thought>;
 	private toolUses: Array<ToolUse>;
 	private session: AgentSession;
 	private tokenCounts: TokenCounts;
+	private onEvent?: (e: AgentEvent) => void;
 
 	constructor(agent: AgentWithRelations, session: AgentSession) {
 		this.agent = agent;
@@ -80,6 +98,16 @@ export default class Agent {
 			},
 			stepCounts: {},
 		};
+	}
+
+	private emit(event: AgentEvent) {
+		try {
+			console.log("emitting event", event);
+			this.onEvent?.(event);
+		} catch (_) {
+			console.error("error emitting event", _);
+			// Swallow emitter errors to avoid breaking the run loop
+		}
 	}
 
 	private initializeMessages() {
@@ -185,6 +213,10 @@ export default class Agent {
 		const assistantContent = [];
 		const toolResults = [];
 
+		this.emit({
+			type: "thinking",
+			sessionId: this.session.id,
+		});
 		const response = await this.client.beta.messages.create({
 			model: this.model.name,
 			max_tokens: this.maxTokens,
@@ -203,6 +235,12 @@ export default class Agent {
 					stepNumber: iterationNumber,
 				});
 			} else if (content.type === "tool_use") {
+				this.emit({
+					type: "tool-call",
+					sessionId: this.session.id,
+					tool: content.name,
+					input: content.input as Record<string, unknown>,
+				});
 				const toolResult = await this.processToolCall(content);
 				assistantContent.push({
 					type: "tool_use",
@@ -222,35 +260,58 @@ export default class Agent {
 					tool_use_id: content.id,
 					content: toolResult,
 				});
+				this.emit({
+					type: "tool-result",
+					sessionId: this.session.id,
+					tool: content.name,
+					output: toolResult,
+				});
 			}
 		}
 		return { response, assistantContent, toolResults };
 	}
 
-	async run() {
+	async run(options?: RunOptions) {
+		this.onEvent = options?.onEvent;
+		const signal = options?.signal;
+		this.emit({
+			type: "session-started",
+			sessionId: this.session.id,
+			agentId: this.agent.user?.id,
+		});
 		let turn = 1;
 		while (turn <= this.maxIterations) {
-			try {
-				console.log(`\n--- Iteration ${turn}/${this.maxIterations} ---`);
+			console.log(`\n--- Iteration ${turn}/${this.maxIterations} ---`);
+			if (signal?.aborted) {
+				throw new Error("aborted");
+			}
+			this.emit({
+				type: "step-started",
+				sessionId: this.session.id,
+				step: turn,
+			});
 
-				const { response, assistantContent, toolResults } =
-					await this.runConversationTurn(turn);
+			const { response, assistantContent, toolResults } =
+				await this.runConversationTurn(turn);
 
-				this.tallyTokenCounts(response, turn);
+			this.tallyTokenCounts(response, turn);
 
-				this.messages.push({ role: "assistant", content: assistantContent });
-				if (toolResults.length > 0) {
-					this.messages.push({ role: "user", content: toolResults });
-					turn++;
-				} else {
-					console.log("break?");
-					break;
-				}
-			} catch (error: unknown) {
-				console.error("Iteration failed:", error);
-				throw error;
+			this.messages.push({
+				role: "assistant",
+				content: assistantContent as Anthropic.MessageParam["content"],
+			});
+			if (toolResults.length > 0) {
+				this.messages.push({
+					role: "user",
+					content: toolResults as Anthropic.MessageParam["content"],
+				});
+				turn++;
+			} else {
+				console.log("break?");
+				break;
 			}
 		}
+		this.emit({ type: "session-completed", sessionId: this.session.id });
 		this.logSession();
 	}
 }

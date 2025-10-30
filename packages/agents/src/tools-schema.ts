@@ -1,4 +1,4 @@
-export default [
+export const toolsSchema = [
 	{
 		name: "getHowls",
 		description:
@@ -18,18 +18,18 @@ export default [
 	{
 		name: "createHowl",
 		description:
-			"Create a new howls.  This is a bulk operation.  If only creating one howl, just send an array with one content string.",
+			"Create a new howl. The content must be between 1 and 140 characters.",
 		input_schema: {
-			type: "array",
-			items: {
-				type: "string",
-				description: "The content of the howl.",
-				minLength: 1,
-				maxLength: 140,
+			type: "object",
+			properties: {
+				content: {
+					type: "string",
+					description: "The content of the howl.",
+					minLength: 1,
+					maxLength: 140,
+				},
 			},
-			description:
-				"The contents of the howls to create.  Must be an array of strings.",
-			required: ["howls"],
+			required: ["content"],
 		},
 	},
 	{

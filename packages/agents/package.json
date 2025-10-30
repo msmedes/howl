@@ -1,8 +1,13 @@
 {
-	"name": "agents",
-	"module": "index.ts",
+	"name": "@howl/agents",
 	"devDependencies": {
 		"@types/bun": "latest"
+	},
+	"exports": {
+		"./runner": {
+			"import": "./src/runner.ts",
+			"types": "./src/runner.ts"
+		}
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"

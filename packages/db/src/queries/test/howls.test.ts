@@ -7,7 +7,13 @@ import {
 	createFreshFixtures,
 	setupTestDatabase,
 } from "../../test/helpers";
-import { createHowl, getImmediateReplies } from "../howls";
+import {
+	bulkCreateHowlLikes,
+	createHowl,
+	createHowlLike,
+	getHowlsForUser,
+	getImmediateReplies,
+} from "../howls";
 
 describe("Howls Tests", () => {
 	beforeAll(async () => {
@@ -19,30 +25,30 @@ describe("Howls Tests", () => {
 		await cleanupTestDatabase();
 	});
 
-	// it("should be able to create a howl", async () => {
-	// 	const { db, testUser } = await createFreshFixtures();
-	// 	const howl = await createHowl({
-	// 		db: db as unknown as Database,
-	// 		content: "This is a new test howl!",
-	// 		userId: testUser.id,
-	// 	});
-	// 	expect(howl).toBeDefined();
-	// 	expect(howl.content).toBe("This is a new test howl!");
-	// 	expect(howl.userId).toBe(testUser.id);
-	// });
+	it("should be able to create a howl", async () => {
+		const { db, testUser } = await createFreshFixtures();
+		const howl = await createHowl({
+			db: db as unknown as Database,
+			content: "This is a new test howl!",
+			userId: testUser.id,
+		});
+		expect(howl).toBeDefined();
+		expect(howl.content).toBe("This is a new test howl!");
+		expect(howl.userId).toBe(testUser.id);
+	});
 
-	// it("should be able to reply to a howl", async () => {
-	// 	const { db, testUser, testHowl } = await createFreshFixtures();
-	// 	const reply = await createHowl({
-	// 		db: db as unknown as Database,
-	// 		content: "This is a reply to the test howl!",
-	// 		userId: testUser.id,
-	// 		parentId: testHowl.id,
-	// 	});
-	// 	expect(reply).toBeDefined();
-	// 	expect(reply.parentId).toBe(testHowl.id);
-	// 	expect(reply.isOriginalPost).toBe(false);
-	// });
+	it("should be able to reply to a howl", async () => {
+		const { db, testUser, testHowl } = await createFreshFixtures();
+		const reply = await createHowl({
+			db: db as unknown as Database,
+			content: "This is a reply to the test howl!",
+			userId: testUser.id,
+			parentId: testHowl.id,
+		});
+		expect(reply).toBeDefined();
+		expect(reply.parentId).toBe(testHowl.id);
+		expect(reply.isOriginalPost).toBe(false);
+	});
 
 	it("should be able to reply to a howl and correctly populate the closure table", async () => {
 		const { db, testUser, testHowl } = await createFreshFixtures();
@@ -140,44 +146,84 @@ describe("Howls Tests", () => {
 		expect(secondReplyAncestors[1].depth).toBe(1);
 	});
 
-	// it("should be able to like a howl", async () => {
-	// 	const { db, testUser, testHowl } = await createFreshFixtures();
-	// 	const like = await createHowlLike({
-	// 		db: db as unknown as Database,
-	// 		userId: testUser.id,
-	// 		howlId: testHowl.id,
-	// 	});
-	// 	expect(like).toBeDefined();
-	// });
+	it("should be able to like a howl", async () => {
+		const { db, testUser, testHowl } = await createFreshFixtures();
+		const like = await createHowlLike({
+			db: db as unknown as Database,
+			userId: testUser.id,
+			howlId: testHowl.id,
+		});
+		expect(like).toBeDefined();
+	});
 
-	// it("should be able to query howls by user", async () => {
-	// 	const { db, testUser } = await createFreshFixtures();
-	// 	const howls = await getHowlsForUser({
-	// 		db: db as unknown as Database,
-	// 		user: testUser,
-	// 	});
+	it("should be able to upsert a howl like", async () => {
+		const { db, testUser, testHowl } = await createFreshFixtures();
+		const _like = await createHowlLike({
+			db: db as unknown as Database,
+			userId: testUser.id,
+			howlId: testHowl.id,
+		});
 
-	// 	expect(howls.length).toBeGreaterThan(0);
-	// 	expect(howls[0].userId).toBe(testUser.id);
-	// });
+		expect(
+			async () =>
+				await createHowlLike({
+					db: db as unknown as Database,
+					userId: testUser.id,
+					howlId: testHowl.id,
+				}),
+		).not.toThrow();
+	});
 
-	// it("should be able to query howls with replies", async () => {
-	// 	const { db, testUser, testHowl } = await createFreshFixtures();
-	// 	// First create a reply
-	// 	await createHowl({
-	// 		db: db as unknown as Database,
-	// 		content: "This is a reply!",
-	// 		userId: testUser.id,
-	// 		parentId: testHowl.id,
-	// 	});
+	it("should be able to bulk like howls", async () => {
+		const { db, testUser, testHowl } = await createFreshFixtures();
+		const howl2 = await createHowl({
+			db: db as unknown as Database,
+			content: "This is a second howl!",
+			userId: testUser.id,
+		});
+		await createHowlLike({
+			db: db as unknown as Database,
+			userId: testUser.id,
+			howlId: testHowl.id,
+		});
+		const likes = await bulkCreateHowlLikes({
+			db: db as unknown as Database,
+			userId: testUser.id,
+			howlIds: [testHowl.id, howl2.id],
+		});
+		expect(likes.length).toBe(1);
+		expect(likes[0].userId).toBe(testUser.id);
+		expect(likes[0].howlId).toBe(howl2.id);
+	});
 
-	// 	// Query for replies to the test howl
-	// 	const replies = await getImmediateReplies({
-	// 		db: db as unknown as Database,
-	// 		howlId: testHowl.id,
-	// 	});
+	it("should be able to query howls by user", async () => {
+		const { db, testUser } = await createFreshFixtures();
+		const howls = await getHowlsForUser({
+			db: db as unknown as Database,
+			user: testUser,
+		});
 
-	// 	expect(replies.length).toBeGreaterThan(0);
-	// 	expect(replies[0].parentId).toBe(testHowl.id);
-	// });
+		expect(howls.length).toBeGreaterThan(0);
+		expect(howls[0].userId).toBe(testUser.id);
+	});
+
+	it("should be able to query howls with replies", async () => {
+		const { db, testUser, testHowl } = await createFreshFixtures();
+		// First create a reply
+		await createHowl({
+			db: db as unknown as Database,
+			content: "This is a reply!",
+			userId: testUser.id,
+			parentId: testHowl.id,
+		});
+
+		// Query for replies to the test howl
+		const replies = await getImmediateReplies({
+			db: db as unknown as Database,
+			howlId: testHowl.id,
+		});
+
+		expect(replies.length).toBeGreaterThan(0);
+		expect(replies[0].parentId).toBe(testHowl.id);
+	});
 });

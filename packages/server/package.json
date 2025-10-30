@@ -27,6 +27,7 @@
 		"@anthropic-ai/sdk": "^0.68.0",
 		"@hono/zod-validator": "^0.7.2",
 		"@howl/db": "workspace:*",
+		"@howl/agents": "workspace:*",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
 		"hono": "^4.9.1",

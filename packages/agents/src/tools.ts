@@ -12,7 +12,7 @@ import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
 import { z } from "zod";
 import db from "./db";
-import type toolsSchema from "./tools-schema";
+import type { toolsSchema } from "./tools-schema";
 
 export async function getHowlsTool({
 	limit = 20,
@@ -116,10 +116,22 @@ export async function likeHowlsTool({
 	currentAgentId: string;
 	sessionId: string;
 }) {
+	const howlsToLikePromises = howlIds.map(async (howlId) => {
+		const howl = await getHowlByAgentFriendlyId({
+			db,
+			agentFriendlyId: Number(howlId),
+		});
+		return howl?.id ?? null;
+	});
+	const howlsToLikeResolved = await Promise.all(howlsToLikePromises);
+	const howlsToLike = howlsToLikeResolved.filter(
+		Boolean,
+	) as unknown as string[];
+	console.log("howlsToLike", howlsToLike);
 	await bulkCreateHowlLikes({
 		db,
 		userId: currentAgentId,
-		howlIds,
+		howlIds: howlsToLike,
 		sessionId,
 	});
 	return "Howl liked successfully";
