@@ -132,8 +132,6 @@ export default class Agent {
 			response.usage.input_tokens ?? 0;
 		this.tokenCounts.accTokenCounts.outputTokens =
 			response.usage.output_tokens ?? 0;
-		console.log("response", response.usage);
-		console.log("tokenCounts", this.tokenCounts);
 	}
 
 	private async processToolCall(toolCall: any) {
@@ -154,41 +152,35 @@ export default class Agent {
 
 	private async logSession() {
 		try {
-			for (const toolUse of this.toolUses) {
-				await createAgentToolCalls({
-					db: db,
-					agentToolCall: {
-						sessionId: this.session.id,
-						stepNumber: toolUse.stepNumber,
-						toolName: toolUse.name,
-						arguments: toolUse.input,
-					},
-				});
-			}
+			await createAgentToolCalls({
+				db: db,
+				agentToolCallsInserts: this.toolUses.map((toolUse) => ({
+					sessionId: this.session.id,
+					stepNumber: toolUse.stepNumber,
+					toolName: toolUse.name,
+					arguments: toolUse.input,
+				})),
+			});
+			await createAgentThoughts({
+				db: db,
+				agentThoughtsInserts: this.thoughts.map((thought) => ({
+					sessionId: this.session.id,
+					stepNumber: thought.stepNumber,
+					content: thought.content,
+				})),
+			});
 
-			for (const thought of this.thoughts) {
-				await createAgentThoughts({
-					db: db,
-					agentThought: {
-						sessionId: this.session.id,
-						stepNumber: thought.stepNumber,
-						content: thought.content,
-					},
-				});
-			}
-			for (const [stepNumber, tokenCounts] of Object.entries(
-				this.tokenCounts.stepCounts,
-			)) {
-				await createAgentSessionTokenCount({
-					db: db,
-					agentSessionTokenCount: {
-						sessionId: this.session.id,
-						stepNumber: parseInt(stepNumber, 10),
-						inputTokens: tokenCounts.inputTokens,
-						outputTokens: tokenCounts.outputTokens,
-					},
-				});
-			}
+			await createAgentSessionTokenCount({
+				db: db,
+				agentSessionTokenCountsInserts: Object.entries(
+					this.tokenCounts.stepCounts,
+				).map(([stepNumber, tokenCounts]) => ({
+					sessionId: this.session.id,
+					stepNumber: parseInt(stepNumber, 10),
+					inputTokens: tokenCounts.inputTokens,
+					outputTokens: tokenCounts.outputTokens,
+				})),
+			});
 
 			await updateAgentSession({
 				db: db,
@@ -214,6 +206,7 @@ export default class Agent {
 			type: "thinking",
 			sessionId: this.session.id,
 		});
+		console.log("post thinking emit");
 		const response = await this.client.beta.messages.create({
 			model: this.model.name,
 			max_tokens: this.maxTokens,
@@ -222,6 +215,7 @@ export default class Agent {
 			tools: toolsSchema as BetaTool[],
 			betas: ["token-efficient-tools-2025-02-19"],
 		});
+		console.log("*********** response ***********");
 
 		for (const content of response.content) {
 			if (content.type === "text") {

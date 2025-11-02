@@ -83,22 +83,28 @@ export const createAgentSession = async ({
 
 export const createAgentThoughts = async ({
 	db,
-	agentThought,
+	agentThoughtsInserts,
 }: {
 	db: Database;
-	agentThought: InsertAgentThought;
+	agentThoughtsInserts: InsertAgentThought[];
 }) => {
-	return await db.insert(agentThoughts).values(agentThought).returning();
+	return await db
+		.insert(agentThoughts)
+		.values(agentThoughtsInserts)
+		.returning();
 };
 
 export const createAgentToolCalls = async ({
 	db,
-	agentToolCall,
+	agentToolCallsInserts,
 }: {
 	db: Database;
-	agentToolCall: InsertAgentToolCall;
+	agentToolCallsInserts: InsertAgentToolCall[];
 }) => {
-	return await db.insert(agentToolCalls).values(agentToolCall).returning();
+	return await db
+		.insert(agentToolCalls)
+		.values(agentToolCallsInserts)
+		.returning();
 };
 
 export const getAgentById = async ({

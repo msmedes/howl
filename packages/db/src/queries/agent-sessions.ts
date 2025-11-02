@@ -62,14 +62,14 @@ export const getAgentSessionById = async ({
 
 export const createAgentSessionTokenCount = async ({
 	db,
-	agentSessionTokenCount,
+	agentSessionTokenCountsInserts,
 }: {
 	db: Database;
-	agentSessionTokenCount: InsertAgentSessionTokenCount;
+	agentSessionTokenCountsInserts: InsertAgentSessionTokenCount[];
 }) => {
 	return db
 		.insert(agentSessionTokenCounts)
-		.values(agentSessionTokenCount)
+		.values(agentSessionTokenCountsInserts)
 		.returning();
 };
 
