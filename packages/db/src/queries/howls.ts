@@ -31,9 +31,13 @@ export const getHowls = async ({
 			session: {
 				columns: {
 					id: true,
+					inputTokens: true,
+					outputTokens: true,
 				},
 				with: {
 					model: true,
+					thoughts: true,
+					toolCalls: true,
 				},
 			},
 		},
