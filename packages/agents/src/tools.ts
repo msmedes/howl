@@ -231,6 +231,7 @@ export async function createThreadTool({
 		});
 		currentParentId = createdHowl.id;
 	}
+	return "Thread created successfully";
 }
 
 export const toolMap: Record<
