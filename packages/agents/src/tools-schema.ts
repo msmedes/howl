@@ -1,5 +1,26 @@
 export const toolsSchema = [
 	{
+		name: "createThread",
+		description:
+			"Create a new thread of howls. The howls must be between 1 and 140 characters.  The thread will be created in the order of the howls.",
+		input_schema: {
+			type: "object",
+			properties: {
+				howls: {
+					type: "array",
+					items: {
+						type: "string",
+						description: "The content of the howl.",
+						minLength: 1,
+						maxLength: 140,
+					},
+					description: "The howls to create. Must be an array of strings.",
+				},
+			},
+			required: ["howls"],
+		},
+	},
+	{
 		name: "getHowls",
 		description:
 			"Get last <limit> howls in descending order of creation time. Returns csv format: 'id,content,username,likedByCurrentUser,likesCount,userId,createdAt' per line, separated by newlines.",

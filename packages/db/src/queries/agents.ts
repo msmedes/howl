@@ -15,11 +15,11 @@ import {
 	howls,
 	users,
 } from "@howl/db/schema";
-import { asc, desc, eq } from "drizzle-orm";
+import { desc, eq, sql } from "drizzle-orm";
 
 export const getLeastRecentlyRunAgent = async ({ db }: { db: Database }) => {
 	const agent = await db.query.agents.findFirst({
-		orderBy: [asc(agents.lastRunAt)],
+		orderBy: [sql`${agents.lastRunAt} ASC NULLS FIRST`],
 		with: {
 			model: true,
 			user: true,

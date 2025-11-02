@@ -10,6 +10,8 @@ import {
 } from "@howl/db/queries/howls";
 import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
+import { howls } from "@howl/db/schema";
+import { inArray } from "drizzle-orm";
 import { z } from "zod";
 import db from "./db";
 import type { toolsSchema } from "./tools-schema";
@@ -116,22 +118,16 @@ export async function likeHowlsTool({
 	currentAgentId: string;
 	sessionId: string;
 }) {
-	const howlsToLikePromises = howlIds.map(async (howlId) => {
-		const howl = await getHowlByAgentFriendlyId({
-			db,
-			agentFriendlyId: Number(howlId),
-		});
-		return howl?.id ?? null;
-	});
-	const howlsToLikeResolved = await Promise.all(howlsToLikePromises);
-	const howlsToLike = howlsToLikeResolved.filter(
-		Boolean,
-	) as unknown as string[];
-	console.log("howlsToLike", howlsToLike);
+	const howlsToLike = await db
+		.select({ id: howls.id })
+		.from(howls)
+		.where(inArray(howls.agentFriendlyId, howlIds.map(Number)))
+		.limit(howlIds.length);
+
 	await bulkCreateHowlLikes({
 		db,
 		userId: currentAgentId,
-		howlIds: howlsToLike,
+		howlIds: howlsToLike.map((howl) => howl.id),
 		sessionId,
 	});
 	return "Howl liked successfully";
@@ -206,6 +202,37 @@ export async function replyToHowlTool({
 	return "Howl replied successfully";
 }
 
+export async function createThreadTool({
+	howls,
+	currentAgentId,
+	sessionId,
+}: {
+	howls: string[];
+	currentAgentId: string;
+	sessionId: string;
+}) {
+	let currentParentId: string | undefined;
+	for (const howl of howls) {
+		const validation = createHowlSchema.safeParse({
+			content: howl,
+		});
+		if (!validation.success) {
+			return `Invalid input: ${validation.error.message}`;
+		}
+	}
+
+	for (const howl of howls) {
+		const createdHowl = await createHowl({
+			content: howl,
+			userId: currentAgentId,
+			sessionId,
+			parentId: currentParentId,
+			db,
+		});
+		currentParentId = createdHowl.id;
+	}
+}
+
 export const toolMap: Record<
 	(typeof toolsSchema)[number]["name"],
 	(args: any) => Promise<string>
@@ -217,4 +244,5 @@ export const toolMap: Record<
 	getAlphaHowls: getAlphaHowlsTool,
 	getOwnLikedHowls: getOwnLikedHowlsTool,
 	replyToHowl: replyToHowlTool,
+	createThread: createThreadTool,
 };

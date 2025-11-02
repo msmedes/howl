@@ -19,10 +19,7 @@ type AgentEvent =
 	| { type: "tool-result"; sessionId: string; tool: string; output: unknown }
 	| { type: "session-completed"; sessionId: string }
 	| { type: "session-error"; sessionId: string; error: string }
-	| {
-			type: "thinking";
-			sessionId: string;
-	  };
+	| { type: "thinking"; sessionId: string };
 
 type RunOptions = {
 	onEvent?: (e: AgentEvent) => void;

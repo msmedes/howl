@@ -123,7 +123,8 @@ const agentsRouter = new Hono<{ Variables: Variables }>()
 			const send = async (e: { type: string; [k: string]: unknown }) => {
 				if (aborted) return;
 				try {
-					await stream.writeSSE({ event: e.type, data: JSON.stringify(e) });
+					const { type, ...rest } = e;
+					await stream.writeSSE({ event: type, data: JSON.stringify(rest) });
 				} catch (err) {
 					console.error("Error writing SSE:", err);
 				}

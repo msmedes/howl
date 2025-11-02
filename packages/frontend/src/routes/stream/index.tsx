@@ -1,20 +1,49 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
+import Howl from "@/components/howls/Howl";
+
+type AgentStreamEvent =
+	| {
+			type: "session-started";
+			data: { sessionId: string; agentId?: string };
+			ts: number;
+	  }
+	| {
+			type: "step-started";
+			data: { sessionId: string; step: number };
+			ts: number;
+	  }
+	| {
+			type: "tool-call";
+			data: { sessionId: string; tool: string; input: unknown };
+			ts: number;
+	  }
+	| {
+			type: "tool-result";
+			data: { sessionId: string; tool: string; output: unknown };
+			ts: number;
+	  }
+	| { type: "session-completed"; data: { sessionId: string }; ts: number }
+	| {
+			type: "session-error";
+			data: { sessionId: string; error: string };
+			ts: number;
+	  }
+	| { type: "thinking"; data: { sessionId: string }; ts: number }
+	| { type: "ping"; ts: number };
 
 export const Route = createFileRoute("/stream/")({
 	component: RouteComponent,
 });
 
 function RouteComponent() {
-	const [events, setEvents] = useState<
-		{ type: string; data: unknown; ts: number }[]
-	>([]);
+	const [events, setEvents] = useState<AgentStreamEvent[]>([]);
 	const esRef = useRef<EventSource | null>(null);
 	const doneRef = useRef(false);
 	const [connected, setConnected] = useState(false);
 
 	const startStream = () => {
-		if (esRef.current) return; // already running
+		if (esRef.current) return;
 		doneRef.current = false;
 		const es = new EventSource("http://localhost:3001/agents/stream");
 		esRef.current = es;
@@ -36,6 +65,7 @@ function RouteComponent() {
 		es.addEventListener("step-started", add("step-started"));
 		es.addEventListener("tool-call", add("tool-call"));
 		es.addEventListener("tool-result", add("tool-result"));
+		es.addEventListener("thinking", add("thinking"));
 		es.addEventListener("session-completed", (e) => {
 			add("session-completed")(e as MessageEvent);
 			doneRef.current = true;
@@ -94,14 +124,18 @@ function RouteComponent() {
 					Stop
 				</button>
 			</div>
-			{events.map((event) => (
-				<p key={crypto.randomUUID()}>
-					{event.type}{" "}
-					{typeof event.data === "string"
-						? event.data
-						: JSON.stringify(event.data)}
-				</p>
-			))}
+			{events.map((event: AgentStreamEvent) => {
+				if (event.type === "tool-result") {
+					if (event.data.tool === "createHowl" && event.data.output) {
+						return <Howl howl={event.data.output} key={crypto.randomUUID()} />;
+					}
+				}
+				return (
+					<p key={crypto.randomUUID()}>
+						{event.type} {"data" in event ? JSON.stringify(event.data) : ""}
+					</p>
+				);
+			})}
 		</div>
 	);
 }
