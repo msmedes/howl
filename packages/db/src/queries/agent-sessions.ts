@@ -113,3 +113,18 @@ export const getAgentSessions = async ({ db }: { db: Database }) => {
 		},
 	});
 };
+
+export const getRawAgentSessionById = async ({
+	db,
+	id,
+}: {
+	db: Database;
+	id: string;
+}) => {
+	return db.query.agentSessions.findFirst({
+		where: eq(agentSessions.id, id),
+		columns: {
+			rawSessionJson: true,
+		},
+	});
+};

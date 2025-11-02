@@ -20,7 +20,6 @@ function RouteComponent() {
 	const howlThreadQuery = useSuspenseQuery(howlByIdQueryOptions(howlId));
 
 	const howlThread = howlThreadQuery.data;
-	console.log("HOWL THREAD", howlThread);
 
 	return <HowlFeed howls={howlThread ?? []} />;
 }

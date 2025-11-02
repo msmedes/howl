@@ -39,36 +39,28 @@ function ModelTooltip({
 	);
 }
 
-function ThoughtCount({
-	thoughts,
-}: {
-	thoughts: NonNullable<HowlResponse["session"]>["thoughts"];
-}) {
+function ThoughtCount({ count }: { count: number }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<div className="transition-transform hover:scale-105">
-					<ThoughtsBadge count={thoughts.length} showLabel={false} />
+					<ThoughtsBadge count={count} showLabel={false} />
 				</div>
 			</TooltipTrigger>
-			<TooltipContent>{thoughts.length} Thoughts</TooltipContent>
+			<TooltipContent>{count} Thoughts</TooltipContent>
 		</Tooltip>
 	);
 }
 
-function ToolCallCount({
-	toolCalls,
-}: {
-	toolCalls: NonNullable<HowlResponse["session"]>["toolCalls"];
-}) {
+function ToolCallCount({ count }: { count: number }) {
 	return (
 		<Tooltip>
 			<TooltipTrigger asChild>
 				<div className="transition-transform hover:scale-105">
-					<ToolCallsBadge count={toolCalls.length} showLabel={false} />
+					<ToolCallsBadge count={count} showLabel={false} />
 				</div>
 			</TooltipTrigger>
-			<TooltipContent>{toolCalls.length} Tool Calls</TooltipContent>
+			<TooltipContent>{count} Tool Calls</TooltipContent>
 		</Tooltip>
 	);
 }
@@ -125,15 +117,15 @@ export default function Howl({
 					<LikesCount count={howl.likesCount} />
 					{howl.session && (
 						<>
-							<SessionDialog session={howl.session} key={howl.sessionId} />
+							<SessionDialog sessionId={howl.session.id} key={howl.sessionId} />
 							{howl.session.model && (
 								<ModelTooltip model={howl.session.model} />
 							)}
-							{howl.session.toolCalls && (
-								<ToolCallCount toolCalls={howl.session.toolCalls} />
+							{howl.toolCallsCount && (
+								<ToolCallCount count={howl.toolCallsCount} />
 							)}
-							{howl.session.thoughts && (
-								<ThoughtCount thoughts={howl.session.thoughts} />
+							{howl.thoughtsCount && (
+								<ThoughtCount count={howl.thoughtsCount} />
 							)}
 						</>
 					)}

@@ -12,10 +12,10 @@ import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
 interface StatBadgeProps {
-	count: number;
 	label?: string;
 	showLabel?: boolean;
 	className?: string;
+	count?: number;
 }
 
 export function HowlsBadge({

@@ -1,6 +1,13 @@
 import type { Database } from "@howl/db";
 import type { Howl, User } from "@howl/db/schema";
-import { howlAncestors, howlLikes, howls, users } from "@howl/db/schema";
+import {
+	agentSessions,
+	howlAncestors,
+	howlLikes,
+	howls,
+	models,
+	users,
+} from "@howl/db/schema";
 import { and, desc, eq, isNull, lte, not, sql } from "drizzle-orm";
 
 export const getHowls = async ({
@@ -22,10 +29,11 @@ export const getHowls = async ({
 				},
 			},
 			session: {
+				columns: {
+					id: true,
+				},
 				with: {
 					model: true,
-					toolCalls: true,
-					thoughts: true,
 				},
 			},
 		},
@@ -33,6 +41,14 @@ export const getHowls = async ({
 			likesCount:
 				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = howls.id)`.as(
 					"likesCount",
+				),
+			toolCallsCount:
+				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = ${howls.sessionId})`.as(
+					"toolCallsCount",
+				),
+			thoughtsCount:
+				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${howls.sessionId})`.as(
+					"thoughtsCount",
 				),
 		},
 		limit,
@@ -234,7 +250,6 @@ export const getImmediateReplies = async ({
 	return replies;
 };
 
-// Get entire thread using closure table
 export const getFullThread = async ({
 	db,
 	rootHowlId,
@@ -242,6 +257,30 @@ export const getFullThread = async ({
 	db: Database;
 	rootHowlId: string;
 }) => {
+	/*
+			where: not(howls.isDeleted),
+		with: {
+			user: {
+				columns: {
+					id: true,
+					username: true,
+					agentFriendlyId: true,
+				},
+			},
+			session: {
+				with: {
+					model: true,
+					toolCalls: true,
+					thoughts: true,
+				},
+			},
+		},
+		extras: {
+			likesCount:
+				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = howls.id)`.as(
+					"likesCount",
+				),
+		},*/
 	// Get descendants (where rootHowlId is an ancestor)
 	const descendants = await db
 		.select({
@@ -255,11 +294,17 @@ export const getFullThread = async ({
 				username: users.username,
 				bio: users.bio,
 			},
+			model: {
+				id: models.id,
+				name: models.name,
+			},
 			depth: howlAncestors.depth,
 		})
 		.from(howlAncestors)
 		.innerJoin(howls, eq(howlAncestors.descendantId, howls.id))
 		.innerJoin(users, eq(howls.userId, users.id))
+		.innerJoin(agentSessions, eq(howls.sessionId, agentSessions.id))
+		.innerJoin(models, eq(agentSessions.modelId, models.id))
 		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)));
 
 	// Get ancestors (where rootHowlId is a descendant)
@@ -276,11 +321,17 @@ export const getFullThread = async ({
 				username: users.username,
 				bio: users.bio,
 			},
+			model: {
+				id: models.id,
+				name: models.name,
+			},
 			depth: howlAncestors.depth,
 		})
 		.from(howlAncestors)
 		.innerJoin(howls, eq(howlAncestors.ancestorId, howls.id))
 		.innerJoin(users, eq(howls.userId, users.id))
+		.innerJoin(agentSessions, eq(howls.sessionId, agentSessions.id))
+		.innerJoin(models, eq(agentSessions.modelId, models.id))
 		.where(
 			and(
 				eq(howlAncestors.descendantId, rootHowlId),
