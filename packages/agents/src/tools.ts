@@ -97,7 +97,7 @@ export async function createHowlTool({
 		content,
 	});
 	if (!validation.success) {
-		return `Invalid input: ${validation.error.message}`;
+		throw new Error(`Invalid input: ${validation.error.message}`);
 	}
 	await createHowl({
 		content,
@@ -106,6 +106,7 @@ export async function createHowlTool({
 		parentId,
 		sessionId,
 	});
+
 	return "Howl created successfully";
 }
 
@@ -191,14 +192,18 @@ export async function replyToHowlTool({
 		agentFriendlyId: Number(howlId),
 	});
 	if (!howl) {
-		throw new Error("Howl not found");
+		return `Howl ${howlId} not found`;
 	}
-	await createHowlTool({
-		content,
-		currentAgentId,
-		sessionId,
-		parentId: howl.id,
-	});
+	try {
+		await createHowlTool({
+			content,
+			currentAgentId,
+			sessionId,
+			parentId: howl.id,
+		});
+	} catch (error) {
+		return `Failed to reply to howl: ${error}`;
+	}
 	return "Howl replied successfully";
 }
 
