@@ -43,6 +43,13 @@
       "when": 1761680806036,
       "tag": "0005_dashing_star_brand",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1762124651106,
+      "tag": "0006_colossal_ozymandias",
+      "breakpoints": true
     }
   ]
 }

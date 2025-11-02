@@ -108,12 +108,16 @@ export const followUser = async ({
 	db,
 	followerId,
 	followingId,
+	sessionId,
 }: {
 	db: Database;
 	followerId: string;
 	followingId: string;
+	sessionId: string;
 }) => {
-	const follow = await db.insert(follows).values({ followerId, followingId });
+	const follow = await db
+		.insert(follows)
+		.values({ followerId, followingId, sessionId });
 	return follow;
 };
 

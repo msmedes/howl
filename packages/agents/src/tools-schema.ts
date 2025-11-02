@@ -125,4 +125,19 @@ export const toolsSchema = [
 			required: ["howlId", "content"],
 		},
 	},
+	{
+		name: "followUser",
+		description:
+			"Follow a user. Returns 'User followed successfully' on success.",
+		input_schema: {
+			type: "object",
+			properties: {
+				userId: {
+					type: "string",
+					description: "The ID of the user to follow.",
+				},
+			},
+			required: ["userId"],
+		},
+	},
 ];

@@ -6,6 +6,7 @@ import {
 	varchar,
 } from "drizzle-orm/pg-core";
 import { NANOID_LENGTH } from "../lib/const";
+import { agentSessions } from "./agents";
 import { users } from "./users";
 
 export const follows = pgTable(
@@ -13,6 +14,9 @@ export const follows = pgTable(
 	{
 		followerId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
 		followingId: varchar({ length: NANOID_LENGTH }).references(() => users.id),
+		sessionId: varchar({ length: NANOID_LENGTH }).references(
+			() => agentSessions.id,
+		),
 		createdAt: timestamp().notNull().defaultNow(),
 		updatedAt: timestamp()
 			.notNull()

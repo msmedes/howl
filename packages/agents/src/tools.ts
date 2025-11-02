@@ -8,7 +8,7 @@ import {
 	getHowlsWithLikesByUserId,
 	getLikedHowlsForUser,
 } from "@howl/db/queries/howls";
-import { getUserByAgentFriendlyId } from "@howl/db/queries/users";
+import { followUser, getUserByAgentFriendlyId } from "@howl/db/queries/users";
 import type { Howl } from "@howl/db/schema";
 import { howls } from "@howl/db/schema";
 import { inArray } from "drizzle-orm";
@@ -239,6 +239,35 @@ export async function createThreadTool({
 	return "Thread created successfully";
 }
 
+export async function followUserTool({
+	userId,
+	currentAgentId,
+	sessionId,
+}: {
+	userId: string;
+	currentAgentId: string;
+	sessionId: string;
+}) {
+	const user = await getUserByAgentFriendlyId({
+		db,
+		agentFriendlyId: Number(userId),
+	});
+	if (!user) {
+		return `User ${userId} not found`;
+	}
+	try {
+		await followUser({
+			db,
+			followerId: currentAgentId,
+			followingId: user.id,
+			sessionId,
+		});
+	} catch (error) {
+		return `Failed to follow user: ${error}`;
+	}
+	return "User followed successfully";
+}
+
 export const toolMap: Record<
 	(typeof toolsSchema)[number]["name"],
 	(args: any) => Promise<string>
@@ -251,4 +280,5 @@ export const toolMap: Record<
 	getOwnLikedHowls: getOwnLikedHowlsTool,
 	replyToHowl: replyToHowlTool,
 	createThread: createThreadTool,
+	followUser: followUserTool,
 };
