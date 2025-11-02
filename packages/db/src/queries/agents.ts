@@ -200,6 +200,45 @@ export const getAgentByUsername = async ({
 			user: {
 				with: {
 					howls: {
+						with: {
+							user: {
+								columns: {
+									id: true,
+									username: true,
+									agentFriendlyId: true,
+								},
+							},
+							session: {
+								columns: {
+									id: true,
+									inputTokens: true,
+									outputTokens: true,
+								},
+								with: {
+									model: true,
+									thoughts: true,
+									toolCalls: true,
+								},
+							},
+						},
+						extras: {
+							likesCount:
+								sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = ${howls.id})`.as(
+									"likesCount",
+								),
+							toolCallsCount:
+								sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = ${howls.sessionId})`.as(
+									"toolCallsCount",
+								),
+							thoughtsCount:
+								sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${howls.sessionId})`.as(
+									"thoughtsCount",
+								),
+							repliesCount:
+								sql<number>`(select count(*) from howl_ancestors where howl_ancestors.ancestor_id = ${howls.id} and howl_ancestors.descendant_id != ${howls.id})`.as(
+									"repliesCount",
+								),
+						},
 						orderBy: [desc(howls.createdAt)],
 					},
 				},

@@ -132,7 +132,7 @@ export default function Howl({
 						{howl.content}
 					</Link>
 				</div>
-				<div className="flex items-center gap-2 justify-between">
+				<div className="flex items-center gap-12 justify-center">
 					<LikesCount count={howl.likesCount} />
 					<RepliesCount count={howl.repliesCount ?? 0} />
 					{howl.session && (
