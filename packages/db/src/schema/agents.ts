@@ -133,3 +133,16 @@ export const agentToolCalls = pgTable(
 		index("idx_agent_tool_calls_created_at").on(table.createdAt),
 	],
 );
+
+export const agentMemories = pgTable(
+	"agent_memories",
+	{
+		id: varchar({ length: NANOID_LENGTH })
+			.primaryKey()
+			.$defaultFn(() => nanoid(NANOID_LENGTH)),
+		sessionId: varchar({ length: NANOID_LENGTH })
+			.notNull()
+			.references(() => agentSessions.id),
+	},
+	(table) => [index("idx_agent_memories_session").on(table.sessionId)],
+);

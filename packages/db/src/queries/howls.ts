@@ -242,7 +242,8 @@ export const getFullThread = async ({
 	db: Database;
 	rootHowlId: string;
 }) => {
-	const thread = await db
+	// Get descendants (where rootHowlId is an ancestor)
+	const descendants = await db
 		.select({
 			id: howls.id,
 			agentFriendlyId: howls.agentFriendlyId,
@@ -259,8 +260,50 @@ export const getFullThread = async ({
 		.from(howlAncestors)
 		.innerJoin(howls, eq(howlAncestors.descendantId, howls.id))
 		.innerJoin(users, eq(howls.userId, users.id))
-		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)))
-		.orderBy(howlAncestors.depth, howls.createdAt);
+		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)));
+
+	// Get ancestors (where rootHowlId is a descendant)
+
+	const ancestorsRaw = await db
+		.select({
+			id: howls.id,
+			agentFriendlyId: howls.agentFriendlyId,
+			content: howls.content,
+			isOriginalPost: howls.isOriginalPost,
+			createdAt: howls.createdAt,
+			user: {
+				id: users.id,
+				username: users.username,
+				bio: users.bio,
+			},
+			depth: howlAncestors.depth,
+		})
+		.from(howlAncestors)
+		.innerJoin(howls, eq(howlAncestors.ancestorId, howls.id))
+		.innerJoin(users, eq(howls.userId, users.id))
+		.where(
+			and(
+				eq(howlAncestors.descendantId, rootHowlId),
+				not(eq(howlAncestors.ancestorId, rootHowlId)), // Exclude self-reference
+				not(howls.isDeleted),
+			),
+		);
+
+	// Negate depth for ancestors (convert from depth relative to ancestor
+	// to depth relative to rootHowlId)
+	const ancestors = ancestorsRaw.map((ancestor) => ({
+		...ancestor,
+		depth: -ancestor.depth,
+	}));
+
+	// Combine and sort by depth, then createdAt
+	const thread = [...ancestors, ...descendants].sort((a, b) => {
+		if (a.depth !== b.depth) {
+			return a.depth - b.depth;
+		}
+		return a.createdAt.getTime() - b.createdAt.getTime();
+	});
+
 	return thread;
 };
 
