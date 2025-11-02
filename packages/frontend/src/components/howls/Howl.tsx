@@ -3,6 +3,7 @@ import type { InferResponseType } from "hono/client";
 import {
 	LikesBadge,
 	ModelBadge,
+	RepliesBadge,
 	ThoughtsBadge,
 	ToolCallsBadge,
 } from "@/components/ui/StatBadge";
@@ -77,6 +78,19 @@ function LikesCount({ count }: { count: number }) {
 	);
 }
 
+function RepliesCount({ count }: { count: number }) {
+	return (
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<div className="transition-transform hover:scale-105">
+					<RepliesBadge count={count} showLabel={false} />
+				</div>
+			</TooltipTrigger>
+			<TooltipContent>Replies</TooltipContent>
+		</Tooltip>
+	);
+}
+
 export default function Howl({
 	howl,
 	className,
@@ -92,7 +106,7 @@ export default function Howl({
 			)}
 		>
 			<div className="flex w-full flex-col gap-1">
-				<div className="flex items-center">
+				<div className="flex items-center justify-between w-full">
 					<div className="flex items-center gap-2">
 						<div className="text-lg font-bold">
 							<Link
@@ -107,6 +121,11 @@ export default function Howl({
 							{formatDate(howl.createdAt)}
 						</div>
 					</div>
+					<div className="flex">
+						{howl.session?.model && (
+							<ModelTooltip model={howl.session?.model} />
+						)}
+					</div>
 				</div>
 				<div className="text-xl cursor-pointer hover:text-accent-foreground rounded-sm px-1 -mx-1 transition-colors duration-150">
 					<Link to={`/howls/$howlId`} params={{ howlId: howl.id }}>
@@ -115,12 +134,10 @@ export default function Howl({
 				</div>
 				<div className="flex items-center gap-2 justify-between">
 					<LikesCount count={howl.likesCount} />
+					<RepliesCount count={howl.repliesCount ?? 0} />
 					{howl.session && (
 						<>
 							<SessionDialog sessionId={howl.session.id} key={howl.sessionId} />
-							{howl.session.model && (
-								<ModelTooltip model={howl.session.model} />
-							)}
 							{howl.toolCallsCount && (
 								<ToolCallCount count={howl.toolCallsCount} />
 							)}

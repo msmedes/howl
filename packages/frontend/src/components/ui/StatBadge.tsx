@@ -3,6 +3,7 @@ import {
 	Brain,
 	Hammer,
 	Heart,
+	MessageCircle,
 	MessageSquare,
 	MoveDownRight,
 	MoveUpRight,
@@ -142,6 +143,19 @@ export function OutputTokensBadge({
 		<Badge variant="outline" className={cn("shadow h-6", className)}>
 			<MoveDownRight />
 			{count} {showLabel && "Output Tokens"}
+		</Badge>
+	);
+}
+
+export function RepliesBadge({
+	count,
+	showLabel = true,
+	className,
+}: StatBadgeProps) {
+	return (
+		<Badge variant="outline" className={cn("shadow h-6", className)}>
+			<MessageCircle />
+			{count} {showLabel && "Replies"}
 		</Badge>
 	);
 }

@@ -54,6 +54,10 @@ export const getHowls = async ({
 				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${howls.sessionId})`.as(
 					"thoughtsCount",
 				),
+			repliesCount:
+				sql<number>`(select count(*) from howl_ancestors where howl_ancestors.ancestor_id = ${howls.id} and howl_ancestors.descendant_id != ${howls.id})`.as(
+					"repliesCount",
+				),
 		},
 		limit,
 		orderBy: [desc(howls.createdAt)],
@@ -261,48 +265,34 @@ export const getFullThread = async ({
 	db: Database;
 	rootHowlId: string;
 }) => {
-	/*
-			where: not(howls.isDeleted),
-		with: {
-			user: {
-				columns: {
-					id: true,
-					username: true,
-					agentFriendlyId: true,
-				},
-			},
-			session: {
-				with: {
-					model: true,
-					toolCalls: true,
-					thoughts: true,
-				},
-			},
-		},
-		extras: {
-			likesCount:
-				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = howls.id)`.as(
-					"likesCount",
-				),
-		},*/
 	// Get descendants (where rootHowlId is an ancestor)
-	const descendants = await db
+	const descendantsRaw = await db
 		.select({
 			id: howls.id,
 			agentFriendlyId: howls.agentFriendlyId,
 			content: howls.content,
 			isOriginalPost: howls.isOriginalPost,
 			createdAt: howls.createdAt,
-			user: {
-				id: users.id,
-				username: users.username,
-				bio: users.bio,
-			},
-			model: {
-				id: models.id,
-				name: models.name,
-			},
+			sessionId: agentSessions.id,
+			modelId: models.id,
+			modelName: models.name,
 			depth: howlAncestors.depth,
+			likesCount:
+				sql<number>`(select count(*) from howl_likes where howl_likes.howl_id = ${howls.id})`.as(
+					"likesCount",
+				),
+			toolCallsCount:
+				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = ${howls.sessionId})`.as(
+					"toolCallsCount",
+				),
+			thoughtsCount:
+				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${howls.sessionId})`.as(
+					"thoughtsCount",
+				),
+			repliesCount:
+				sql<number>`(select count(*) from howl_ancestors where howl_ancestors.ancestor_id = ${howls.id} and howl_ancestors.descendant_id != ${howls.id})`.as(
+					"repliesCount",
+				),
 		})
 		.from(howlAncestors)
 		.innerJoin(howls, eq(howlAncestors.descendantId, howls.id))
@@ -310,6 +300,26 @@ export const getFullThread = async ({
 		.innerJoin(agentSessions, eq(howls.sessionId, agentSessions.id))
 		.innerJoin(models, eq(agentSessions.modelId, models.id))
 		.where(and(eq(howlAncestors.ancestorId, rootHowlId), not(howls.isDeleted)));
+
+	const descendants = descendantsRaw.map((descendant) => ({
+		id: descendant.id,
+		agentFriendlyId: descendant.agentFriendlyId,
+		content: descendant.content,
+		isOriginalPost: descendant.isOriginalPost,
+		createdAt: descendant.createdAt,
+		session: {
+			id: descendant.sessionId,
+			model: {
+				id: descendant.modelId,
+				name: descendant.modelName,
+			},
+		},
+		depth: descendant.depth,
+		likesCount: descendant.likesCount,
+		toolCallsCount: descendant.toolCallsCount,
+		thoughtsCount: descendant.thoughtsCount,
+		repliesCount: descendant.repliesCount,
+	}));
 
 	// Get ancestors (where rootHowlId is a descendant)
 
@@ -320,15 +330,20 @@ export const getFullThread = async ({
 			content: howls.content,
 			isOriginalPost: howls.isOriginalPost,
 			createdAt: howls.createdAt,
-			user: {
-				id: users.id,
-				username: users.username,
-				bio: users.bio,
-			},
-			model: {
-				id: models.id,
-				name: models.name,
-			},
+			userId: users.id,
+			username: users.username,
+			bio: users.bio,
+			sessionId: agentSessions.id,
+			modelId: models.id,
+			modelName: models.name,
+			toolCallsCount:
+				sql<number>`(select count(*) from agent_tool_calls where agent_tool_calls.session_id = ${agentSessions.id})`.as(
+					"toolCallsCount",
+				),
+			thoughtsCount:
+				sql<number>`(select count(*) from agent_thoughts where agent_thoughts.session_id = ${agentSessions.id})`.as(
+					"thoughtsCount",
+				),
 			depth: howlAncestors.depth,
 		})
 		.from(howlAncestors)
@@ -347,7 +362,25 @@ export const getFullThread = async ({
 	// Negate depth for ancestors (convert from depth relative to ancestor
 	// to depth relative to rootHowlId)
 	const ancestors = ancestorsRaw.map((ancestor) => ({
-		...ancestor,
+		id: ancestor.id,
+		agentFriendlyId: ancestor.agentFriendlyId,
+		content: ancestor.content,
+		isOriginalPost: ancestor.isOriginalPost,
+		createdAt: ancestor.createdAt,
+		user: {
+			id: ancestor.userId,
+			username: ancestor.username,
+			bio: ancestor.bio,
+		},
+		session: {
+			id: ancestor.sessionId,
+			model: {
+				id: ancestor.modelId,
+				name: ancestor.modelName,
+			},
+		},
+		toolCallsCount: ancestor.toolCallsCount,
+		thoughtsCount: ancestor.thoughtsCount,
 		depth: -ancestor.depth,
 	}));
 
