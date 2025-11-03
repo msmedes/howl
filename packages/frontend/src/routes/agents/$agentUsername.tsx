@@ -51,16 +51,15 @@ function RouteComponent() {
 		return <div>Agent not found</div>;
 	}
 
-	const { user, model } = agent;
-	const sessions = (agent as any).sessions || [];
-	const howls = (user as any)?.howls || [];
+	const { user, model, sessions } = agent;
+	const howls = user?.howls || [];
 	const totalToolCalls = sessions.reduce(
-		(sum: number, session: any) => sum + (session.toolCalls?.length || 0),
+		(sum: number, session) => sum + (session.toolCalls?.length || 0),
 		0,
 	);
 
 	const totalThoughts = sessions.reduce(
-		(sum: number, session: any) => sum + (session.thoughts?.length || 0),
+		(sum: number, session) => sum + (session.thoughts?.length || 0),
 		0,
 	);
 

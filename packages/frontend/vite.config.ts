@@ -6,16 +6,20 @@ import tsConfigPaths from "vite-tsconfig-paths";
 export default defineConfig({
 	server: {
 		port: 3000,
-        proxy: {
-            "/agents": {
-                target: "http://localhost:3001",
-                changeOrigin: true,
-            },
-        },
+		proxy: {
+			"/agents": {
+				target: "http://localhost:3001",
+				changeOrigin: true,
+			},
+		},
 	},
 	plugins: [
 		tsConfigPaths(),
 		tanstackStart({ customViteReactPlugin: true }),
-		viteReact(),
+		viteReact({
+			babel: {
+				plugins: ["babel-plugin-react-compiler"],
+			},
+		}),
 	],
 });
