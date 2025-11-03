@@ -30,6 +30,7 @@
 		"@electric-sql/pglite": "^0.3.7",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
+		"nanoid": "^5.1.6",
 		"pg": "^8.16.3",
 		"zod": "^4.0.17"
 	}

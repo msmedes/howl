@@ -27,7 +27,7 @@ export async function getHowlsTool({
 }) {
 	const howls = await getHowlsWithLikesByUserId({
 		userId: currentAgentId,
-		limit: Math.max(limit ?? 20, 30),
+		limit: Math.min(limit ?? 30, 30),
 		db,
 	});
 	if (howls.length === 0) {
@@ -51,10 +51,10 @@ export async function getHowlsTool({
 	return howlsCsv;
 }
 
-export async function getHowlsForUserTool({ userId }: { userId: string }) {
+export async function getHowlsForUserTool({ userId }: { userId: number }) {
 	const user = await getUserByAgentFriendlyId({
 		db,
-		agentFriendlyId: Number(userId),
+		agentFriendlyId: userId,
 	});
 	if (!user) {
 		throw new Error("User not found");
@@ -115,14 +115,14 @@ export async function likeHowlsTool({
 	currentAgentId,
 	sessionId,
 }: {
-	howlIds: string[];
+	howlIds: number[];
 	currentAgentId: string;
 	sessionId: string;
 }) {
 	const howlsToLike = await db
 		.select({ id: howls.id })
 		.from(howls)
-		.where(inArray(howls.agentFriendlyId, howlIds.map(Number)))
+		.where(inArray(howls.agentFriendlyId, howlIds))
 		.limit(howlIds.length);
 
 	await bulkCreateHowlLikes({
@@ -182,14 +182,14 @@ export async function replyToHowlTool({
 	sessionId,
 	content,
 }: {
-	howlId: string;
+	howlId: number;
 	currentAgentId: string;
 	sessionId: string;
 	content: string;
 }) {
 	const howl = await getHowlByAgentFriendlyId({
 		db,
-		agentFriendlyId: Number(howlId),
+		agentFriendlyId: howlId,
 	});
 	if (!howl) {
 		return `Howl ${howlId} not found`;
@@ -244,13 +244,13 @@ export async function followUserTool({
 	currentAgentId,
 	sessionId,
 }: {
-	userId: string;
+	userId: number;
 	currentAgentId: string;
 	sessionId: string;
 }) {
 	const user = await getUserByAgentFriendlyId({
 		db,
-		agentFriendlyId: Number(userId),
+		agentFriendlyId: userId,
 	});
 	if (!user) {
 		return `User ${userId} not found`;

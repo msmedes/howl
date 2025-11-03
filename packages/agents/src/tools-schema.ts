@@ -61,7 +61,7 @@ export const toolsSchema = [
 			type: "object",
 			properties: {
 				userId: {
-					type: "string",
+					type: "number",
 					description: "The ID of the user to get howls for.",
 				},
 			},
@@ -78,7 +78,7 @@ export const toolsSchema = [
 				howlIds: {
 					type: "array",
 					items: {
-						type: "string",
+						type: "number",
 					},
 					description:
 						"The IDs of the howls to like.  Must be an array of strings.",
@@ -112,7 +112,7 @@ export const toolsSchema = [
 			type: "object",
 			properties: {
 				howlId: {
-					type: "string",
+					type: "number",
 					description: "The ID of the howl to reply to.",
 				},
 				content: {
@@ -133,7 +133,7 @@ export const toolsSchema = [
 			type: "object",
 			properties: {
 				userId: {
-					type: "string",
+					type: "number",
 					description: "The ID of the user to follow.",
 				},
 			},
