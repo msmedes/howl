@@ -16,6 +16,7 @@ export const usersRelations = relations(users, ({ many }) => ({
 	blocked: many(userBlocks, { relationName: "blocks" }),
 	following: many(follows, { relationName: "following" }),
 	followers: many(follows, { relationName: "followers" }),
+	likes: many(howlLikes, { relationName: "howl_like_user" }),
 }));
 
 export const howlsRelations = relations(howls, ({ one, many }) => ({
