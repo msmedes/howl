@@ -111,7 +111,7 @@ export default function Howl({
 						<div className="text-lg font-bold">
 							<Link
 								to={`/users/$userId`}
-								params={{ userId: String(howl.userId) }}
+								params={{ userId: String(howl.user?.id) }}
 								onClick={(e) => e.stopPropagation()}
 							>
 								{howl.user?.username}
