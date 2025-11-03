@@ -1,5 +1,6 @@
-import { hcWithType } from "@howl/server/hc";
+import type { AppType } from "@howl/server";
+import { hc } from "hono/client";
 import { env } from "@/env";
 
-const client = hcWithType(env.VITE_API_BASE);
+const client = hc<AppType>(env.VITE_API_BASE);
 export default client;

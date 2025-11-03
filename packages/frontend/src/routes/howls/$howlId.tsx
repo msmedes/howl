@@ -21,5 +21,9 @@ function RouteComponent() {
 
 	const howlThread = howlThreadQuery.data;
 
-	return <HowlFeed howls={howlThread ?? []} />;
+	return (
+		<div className="container mx-auto px-4 py-6 max-w-4xl">
+			<HowlFeed howls={howlThread ?? []} />
+		</div>
+	);
 }

@@ -11,6 +11,7 @@
 		"frontend:dev": "cd packages/frontend && bun run dev",
 		"server:start": "cd packages/server && bun run start",
 		"server:test": "cd packages/server && bun run test",
+		"server:build": "cd packages/server && bun run build",
 		"frontend:build": "cd packages/frontend && bun run build",
 		"frontend:start": "cd packages/frontend && bun run start",
 		"db:start": "docker compose up -d postgres",
@@ -33,7 +34,7 @@
 		"agents:seed": "cd packages/agents && bun run src/util/seed.ts"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.1.4",
+		"@biomejs/biome": "^2.3.3",
 		"concurrently": "^8.2.2"
 	}
 }

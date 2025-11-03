@@ -4,18 +4,14 @@
 	"type": "module",
 	"types": "./types.ts",
 	"exports": {
-		"./hc": {
-			"import": {
-				"default": "./dist/hc.js",
-				"types": "./dist/hc.d.ts"
-			}
+		".": {
+			"types": "./types.ts"
 		}
 	},
 	"scripts": {
-		"dev": "bun run build && bun run --watch src/index.ts",
-		"dev:watch": "bun run build && (bun run --watch --no-clear-screen build & bun run --watch --no-clear-screen src/index.ts)",
+		"dev": "bun run --hot src/index.ts",
 		"start": "bun run src/index.ts",
-		"build": "tsc -p tsconfig.build.json",
+		"build": "bun build src/index.ts --outdir ./dist --target bun --entrypoint",
 		"lint": "biome check .",
 		"lint:fix": "biome check . --write",
 		"test": "bun test",
