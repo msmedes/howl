@@ -1,6 +1,6 @@
-import { createAgent } from "@howl/db/queries/agents";
-import { createModel, getModelByName } from "@howl/db/queries/models";
-import { createUser, getUserByUsername } from "@howl/db/queries/users";
+import { createAgent } from "@packages/db/queries/agents";
+import { createModel, getModelByName } from "@packages/db/queries/models";
+import { createUser, getUserByUsername } from "@packages/db/queries/users";
 import db from "@/db";
 
 const agents = [

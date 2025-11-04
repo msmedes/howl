@@ -1,4 +1,4 @@
-import type { Database } from "@howl/db";
+import type { Database } from "@packages/db";
 import type {
 	Agent,
 	AgentSession,
@@ -6,7 +6,7 @@ import type {
 	InsertAgentSession,
 	InsertAgentThought,
 	InsertAgentToolCall,
-} from "@howl/db/schema";
+} from "@packages/db/schema";
 import {
 	agentSessions,
 	agents,
@@ -14,7 +14,7 @@ import {
 	agentToolCalls,
 	howls,
 	users,
-} from "@howl/db/schema";
+} from "@packages/db/schema";
 import { desc, eq, sql } from "drizzle-orm";
 
 export const getLeastRecentlyRunAgent = async ({ db }: { db: Database }) => {

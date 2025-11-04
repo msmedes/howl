@@ -1,5 +1,5 @@
 {
-	"name": "@howl/db",
+	"name": "@packages/db",
 	"module": "index.ts",
 	"type": "module",
 	"exports": {
@@ -16,18 +16,19 @@
 		"seed": "bun run src/lib/seed.ts",
 		"test": "bun test",
 		"test:run": "bun test --run",
-		"test:watch": "bun test --watch"
+		"test:watch": "bun test --watch",
+		"build": "bun build ./src/index.ts --outdir ./dist --target bun"
 	},
 	"devDependencies": {
 		"@types/bun": "latest",
 		"@types/pg": "^8.15.5",
-		"drizzle-kit": "^0.31.4"
+		"drizzle-kit": "^0.31.4",
+		"@electric-sql/pglite": "^0.3.7"
 	},
 	"peerDependencies": {
 		"typescript": "^5.0.0"
 	},
 	"dependencies": {
-		"@electric-sql/pglite": "^0.3.7",
 		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.44.4",
 		"nanoid": "^5.1.6",

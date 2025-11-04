@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from "bun:test";
-import type { Database } from "@howl/db";
-import * as schema from "@howl/db/schema";
+import type { Database } from "@packages/db";
+import * as schema from "@packages/db/schema";
 import { asc, eq } from "drizzle-orm";
 import {
 	cleanupTestDatabase,

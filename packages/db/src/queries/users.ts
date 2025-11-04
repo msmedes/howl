@@ -1,4 +1,4 @@
-import type { Database } from "@howl/db";
+import type { Database } from "@packages/db";
 import {
 	follows,
 	howlLikes,
@@ -7,7 +7,7 @@ import {
 	type User,
 	userBlocks,
 	users,
-} from "@howl/db/schema";
+} from "@packages/db/schema";
 import { and, desc, eq, sql } from "drizzle-orm";
 
 export const getUsers = async ({ db }: { db: Database }) => {

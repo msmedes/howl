@@ -1,5 +1,5 @@
-import { createDatabase } from "@howl/db";
-import { users } from "@howl/db/schema";
+import { createDatabase } from "@packages/db";
+import { users } from "@packages/db/schema";
 import { getUserByUsername } from "@/queries/users";
 
 const db = createDatabase({

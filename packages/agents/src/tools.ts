@@ -1,4 +1,4 @@
-import type { Database } from "@howl/db";
+import type { Database } from "@packages/db";
 import {
 	bulkCreateHowlLikes,
 	createHowl,
@@ -7,10 +7,13 @@ import {
 	getHowlsForUser,
 	getHowlsWithLikesByUserId,
 	getLikedHowlsForUser,
-} from "@howl/db/queries/howls";
-import { followUser, getUserByAgentFriendlyId } from "@howl/db/queries/users";
-import type { Howl } from "@howl/db/schema";
-import { howls } from "@howl/db/schema";
+} from "@packages/db/queries/howls";
+import {
+	followUser,
+	getUserByAgentFriendlyId,
+} from "@packages/db/queries/users";
+import type { Howl } from "@packages/db/schema";
+import { howls } from "@packages/db/schema";
 import { inArray } from "drizzle-orm";
 import { z } from "zod";
 import db from "./db";

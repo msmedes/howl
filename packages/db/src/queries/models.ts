@@ -1,5 +1,5 @@
-import type { Database } from "@howl/db";
-import { models } from "@howl/db/schema";
+import type { Database } from "@packages/db";
+import { models } from "@packages/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function getModels({ db }: { db: Database }) {

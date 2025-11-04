@@ -1,5 +1,5 @@
-import type { Database } from "@howl/db";
-import type { Howl, User } from "@howl/db/schema";
+import type { Database } from "@packages/db";
+import type { Howl, User } from "@packages/db/schema";
 import {
 	agentSessions,
 	howlAncestors,
@@ -7,7 +7,7 @@ import {
 	howls,
 	models,
 	users,
-} from "@howl/db/schema";
+} from "@packages/db/schema";
 import { and, desc, eq, isNull, lte, not, sql } from "drizzle-orm";
 
 export const getHowls = async ({

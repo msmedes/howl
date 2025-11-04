@@ -1,4 +1,4 @@
-import type { Database } from "@howl/db";
+import type { Database } from "@packages/db";
 import {
 	agentSessions,
 	agentSessionTokenCounts,
@@ -6,7 +6,7 @@ import {
 	agentToolCalls,
 	howls,
 	type InsertAgentSessionTokenCount,
-} from "@howl/db/schema";
+} from "@packages/db/schema";
 import { asc, desc, eq, sql } from "drizzle-orm";
 
 export const getAgentSessionById = async ({

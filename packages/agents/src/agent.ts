@@ -1,12 +1,16 @@
 import { Anthropic } from "@anthropic-ai/sdk";
 import type { BetaTool } from "@anthropic-ai/sdk/resources/beta.mjs";
-import { createAgentSessionTokenCount } from "@howl/db/queries/agent-sessions";
+import { createAgentSessionTokenCount } from "@packages/db/queries/agent-sessions";
 import {
 	createAgentThoughts,
 	createAgentToolCalls,
 	updateAgentSession,
-} from "@howl/db/queries/agents";
-import type { AgentSession, AgentWithRelations, Model } from "@howl/db/schema";
+} from "@packages/db/queries/agents";
+import type {
+	AgentSession,
+	AgentWithRelations,
+	Model,
+} from "@packages/db/schema";
 import db from "./db";
 import { systemPrompt } from "./prompts";
 import { toolMap } from "./tools";

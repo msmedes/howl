@@ -9,24 +9,35 @@ services:
       POSTGRES_DB: postgres
     ports:
       - "5432:5432"
-    networks:
-      - howl-network
+    volumes:
+      - pgdata:/var/lib/postgresql/data
   server:
+    container_name: howl-server
     build:
       context: .
-      dockerfile: ./packages/server/Dockerfile
+      dockerfile: ./apps/server/Dockerfile
     ports:
       - "3001:3001"
     depends_on:
       - postgres
-    environment:
-      - DATABASE_URL=postgresql://postgres:postgres@postgres:5432/postgres
-      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    env_file:
+      - ./apps/server/.env
     volumes:
-      - ./packages/server/.env:/app/.env
-    networks:
-      - howl-network
+      - ./apps/server/.env:/app/.env
+  frontend:
+    container_name: howl-frontend
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
+      args:
+        VITE_API_BASE: http://server:3001
+    ports:
+      - "3000:3000"
+    depends_on:
+      - server
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE=http://server:3001
 
-networks:
-  howl-network:
-    driver: bridge
+volumes:
+  pgdata:

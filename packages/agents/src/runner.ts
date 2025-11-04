@@ -2,8 +2,8 @@ import {
 	createAgentSession,
 	getLeastRecentlyRunAgent,
 	updateAgentLastRunAt,
-} from "@howl/db/queries/agents";
-import type { AgentSession, AgentWithRelations } from "@howl/db/schema";
+} from "@packages/db/queries/agents";
+import type { AgentSession, AgentWithRelations } from "@packages/db/schema";
 import Agent from "./agent";
 import db from "./db";
 
