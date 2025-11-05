@@ -1,0 +1,42 @@
+{
+	"name": "@apps/server",
+	"private": true,
+	"type": "module",
+	"types": "./types.ts",
+	"exports": {
+		".": {
+			"types": "./types.ts"
+		}
+	},
+	"scripts": {
+		"dev": "bun run --hot src/index.ts",
+		"start": "bun run src/index.ts",
+		"build": "bun build src/index.ts --outdir ./dist --target bun --entrypoint",
+		"lint": "biome check .",
+		"lint:fix": "biome check . --write",
+		"test": "bun test",
+		"test:run": "bun test --run",
+		"test:watch": "bun test --watch",
+		"test:coverage": "bun test --coverage"
+	},
+	"dependencies": {
+		"@anthropic-ai/sdk": "^0.68.0",
+		"@hono/zod-validator": "^0.7.2",
+		"@packages/db": "workspace:*",
+		"@packages/agents": "workspace:*",
+		"dotenv": "^17.2.1",
+		"drizzle-orm": "^0.44.4",
+		"hono": "^4.9.1",
+		"nanoid": "^5.1.5",
+		"pg": "^8.16.3",
+		"zod": "^4.0.17"
+	},
+	"devDependencies": {
+		"@electric-sql/pglite": "^0.3.7",
+		"@faker-js/faker": "^9.9.0",
+		"@types/bun": "latest",
+		"@types/pg": "^8.15.5",
+		"drizzle-kit": "^0.31.4",
+		"typescript": "^5.7.2"
+	}
+}

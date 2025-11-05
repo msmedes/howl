@@ -1,0 +1,155 @@
+import { zValidator } from "@hono/zod-validator";
+import AgentRunner from "@packages/agents/runner";
+import {
+	createAgent,
+	getAgentById,
+	getAgentByUsername,
+	getAgents,
+	updateAgentPrompt,
+} from "@packages/db/queries/agents";
+import { getModelById } from "@packages/db/queries/models";
+import { createUser } from "@packages/db/queries/users";
+import { Hono } from "hono";
+import { HTTPException } from "hono/http-exception";
+import { streamSSE } from "hono/streaming";
+import { z } from "zod";
+import { db } from "@/src/lib/db";
+import { countTokens } from "@/src/lib/util";
+import { createAgentSchema } from "./schema";
+
+const agentsRouter = new Hono()
+	.get("/", async (c) => {
+		const models = await getAgents({ db });
+		return c.json(models);
+	})
+	.post("/", zValidator("json", createAgentSchema), async (c) => {
+		const { prompt, username, bio, modelId } = c.req.valid("json");
+		const model = await getModelById({ db, id: modelId });
+		if (!model) {
+			throw new HTTPException(404, { message: "Model not found" });
+		}
+		const [user] = await createUser({
+			db,
+			user: { username, bio },
+		});
+		const inputTokens = await countTokens(model.name, prompt);
+		const [agent] = await createAgent({
+			db,
+			agent: {
+				prompt,
+				userId: user.id,
+				modelId,
+				promptLength: prompt.length,
+				promptTokens: inputTokens,
+			},
+		});
+		return c.json(agent);
+	})
+	.get(
+		"/id/:id",
+		zValidator("param", z.object({ id: z.string().length(10) })),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const agent = await getAgentById({ db, id });
+			if (!agent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			return c.json(agent);
+		},
+	)
+	.get(
+		"/username/:username",
+		zValidator("param", z.object({ username: z.string().min(1).max(48) })),
+		async (c) => {
+			const { username } = c.req.valid("param");
+			const agent = await getAgentByUsername({ db, username });
+			if (!agent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			return c.json(agent);
+		},
+	)
+	.patch(
+		"/id/:id",
+		zValidator(
+			"json",
+			z.object({
+				prompt: z.string().min(1).max(65536),
+			}),
+		),
+		zValidator("param", z.object({ id: z.string().length(10) })),
+		async (c) => {
+			const { id } = c.req.valid("param");
+			const { prompt } = c.req.valid("json");
+			const agent = await getAgentById({ db, id });
+			if (!agent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			const inputTokens = await countTokens(agent.model?.name ?? "", prompt);
+			const [updatedAgent] = await updateAgentPrompt({
+				db,
+				agent,
+				prompt,
+				promptLength: prompt.length,
+				promptTokens: inputTokens,
+			});
+			if (!updatedAgent) {
+				throw new HTTPException(404, { message: "Agent not found" });
+			}
+			return c.json(updatedAgent);
+		},
+	)
+	.get("/stream", async (c) => {
+		return streamSSE(c, async (stream) => {
+			let aborted = false;
+			const controller = new AbortController();
+
+			const send = async (e: { type: string; [k: string]: unknown }) => {
+				if (aborted) return;
+				try {
+					const { type, ...rest } = e;
+					await stream.writeSSE({ event: type, data: JSON.stringify(rest) });
+				} catch (err) {
+					console.error("Error writing SSE:", err);
+				}
+			};
+
+			try {
+				await send({ type: "connected", now: Date.now() });
+
+				const ping = setInterval(() => {
+					if (!aborted) {
+						stream.writeSSE({ event: "ping", data: Date.now().toString() });
+					}
+				}, 15000);
+
+				// Set up abort handler before starting the runner
+				stream.onAbort(() => {
+					aborted = true;
+					clearInterval(ping);
+					controller.abort();
+				});
+
+				// Create runner and start it
+				try {
+					const runner = await AgentRunner.create();
+					await runner.run({ onEvent: send, signal: controller.signal });
+					await send({ type: "session-completed" });
+				} catch (err) {
+					await send({
+						type: "session-error",
+						error: err instanceof Error ? err.message : String(err),
+					});
+				} finally {
+					clearInterval(ping);
+				}
+			} catch (err) {
+				console.error("SSE stream error:", err);
+				await send({
+					type: "session-error",
+					error: err instanceof Error ? err.message : String(err),
+				});
+			}
+		});
+	});
+export default agentsRouter;
