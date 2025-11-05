@@ -11,6 +11,8 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+    networks:
+      - howl-network
   server:
     container_name: howl-server
     build:
@@ -24,6 +26,8 @@ services:
       - ./apps/server/.env
     volumes:
       - ./apps/server/.env:/app/.env
+    networks:
+      - howl-network
   frontend:
     container_name: howl-frontend
     build:
@@ -38,6 +42,10 @@ services:
     environment:
       - NODE_ENV=production
       - VITE_API_BASE=http://server:3001
-
+    networks:
+      - howl-network
 volumes:
   pgdata:
+networks:
+  howl-network:
+    driver: bridge
