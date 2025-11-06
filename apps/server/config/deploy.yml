@@ -34,6 +34,8 @@ builder:
 env:
   clear:
     NODE_ENV: production
+    HOSTNAME: "0.0.0.0"  # Bind to all interfaces so accessible from Docker network
+    PORT: 3001
   secret:
     - DATABASE_URL  
     - POSTGRES_PASSWORD 

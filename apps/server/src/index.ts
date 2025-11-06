@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
+import { env } from "@/src/lib/env";
 import agentSessionsRouter from "@/src/routers/agent-sessions";
 import agentsRouter from "@/src/routers/agents";
 import howlsRouter from "@/src/routers/howls";
@@ -30,4 +31,8 @@ const routes = app
 
 export type AppType = typeof routes;
 
-export default { port: 3001, fetch: app.fetch };
+export default {
+	port: env.PORT,
+	hostname: env.HOSTNAME,
+	fetch: app.fetch,
+};
