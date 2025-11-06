@@ -5,9 +5,10 @@ import { env } from "@/src/lib/env";
 
 async function runMigrations() {
 	console.log("Starting database migrations...");
-	console.log(
-		`Database URL: ${env.DATABASE_URL.replace(/:[^:@]+@/, ":****@")}`,
-	); // Hide password in logs
+	// console.log(
+	// 	`Database URL: ${env.DATABASE_URL.replace(/:[^:@]+@/, ":****@")}`,
+	// ); // Hide password in logs
+	console.log(`Database URL: ${env.DATABASE_URL}`);
 
 	try {
 		const db = createDatabase({ databaseUrl: env.DATABASE_URL });

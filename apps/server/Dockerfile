@@ -21,4 +21,5 @@ RUN cd apps/server && bun run build
 USER bun
 EXPOSE 3001/tcp
 WORKDIR /app
-CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]
+# CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]
+CMD ["bun", "run", "start"]
