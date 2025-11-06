@@ -35,7 +35,7 @@ env:
   clear:
     NODE_ENV: production
   secret:
-    - DATABASE_URL  # Constructed in .kamal/secrets: postgresql://postgres:PASSWORD@db:5432/postgres
+    - DATABASE_URL  # Constructed in .kamal/secrets: postgresql://postgres:PASSWORD@db:5432/howl
     - POSTGRES_PASSWORD  # Used by PostgreSQL accessory
     - ANTHROPIC_API_KEY  # Required for agent functionality
 
