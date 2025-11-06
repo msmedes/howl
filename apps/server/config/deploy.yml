@@ -12,7 +12,7 @@ servers:
 
 proxy:
   ssl: true
-  host: api.howl.mikesmedes.com
+  host: api.mikesmedes.com
   app_port: 3001
 
 
