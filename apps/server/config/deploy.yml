@@ -74,9 +74,8 @@ env:
 accessories:
   db:
     image: postgres:17-alpine
+    host: mikesmedes.com
     port: "5432:5432"
-    roles:
-     - web
     env:
       clear:
         POSTGRES_USER: postgres
