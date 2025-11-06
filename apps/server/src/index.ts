@@ -10,12 +10,7 @@ import usersRouter from "@/src/routers/users";
 
 const app = new Hono().use(logger()).use(
 	cors({
-		origin: [
-			"http://localhost:3000",
-			"http://localhost:3001",
-			"http://127.0.0.1:3000",
-			"http://127.0.0.1:3001",
-		],
+		origin: env.CORS_ORIGINS,
 		allowMethods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
 		allowHeaders: ["Content-Type", "Authorization"],
 	}),
