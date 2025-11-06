@@ -27,7 +27,7 @@ const routes = app
 	.route("/agents", agentsRouter)
 	.route("/models", modelsRouter)
 	.route("/sessions", agentSessionsRouter)
-	.get("/up", async () => new Response("OK", { status: 200 }));
+	.get("/up", async (c) => c.json({ status: "OK", code: 200 }));
 
 export type AppType = typeof routes;
 
