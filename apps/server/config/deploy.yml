@@ -36,6 +36,7 @@ env:
   clear:
     NODE_ENV: production
     PORT: 3001
+    HOSTNAME: "0.0.0.0"
     CORS_ORIGINS: "https://howl.mikesmedes.com"
   secret:
     - DATABASE_URL  
