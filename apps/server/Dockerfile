@@ -22,4 +22,4 @@ USER bun
 EXPOSE 3001/tcp
 WORKDIR /app
 # CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]
-CMD ["bun", "run", "app/server/dist/index.js"]
+CMD ["bun", "run", "apps/server/dist/index.js"]
