@@ -8,8 +8,10 @@ image: msmedes/howl-server
 servers:
   web:
     - mikesmedes.com
-
-proxy: false
+proxy:
+  ssl: false
+  healthcheck:
+    path: /up
 
 # Credentials for your image host.
 registry:
