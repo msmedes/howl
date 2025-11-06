@@ -1,6 +1,12 @@
 FROM oven/bun:1 AS base
 WORKDIR /app
 
+# Accept VITE_API_BASE as build argument
+ARG VITE_API_BASE=http://localhost:3001
+
+# Set as environment variable for Vite build
+ENV VITE_API_BASE=${VITE_API_BASE}
+
 COPY package.json bun.lock ./
 COPY apps/frontend/package.json ./apps/frontend/
 COPY apps/server/package.json ./apps/server/
