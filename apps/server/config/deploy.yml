@@ -9,7 +9,11 @@ servers:
   web:
     hosts:
       - mikesmedes.com
-    proxy: false
+
+proxy:
+  ssl: true
+  host: api.howl.mikesmedes.com
+  app_port: 3001
 
 
 # Credentials for your image host.
