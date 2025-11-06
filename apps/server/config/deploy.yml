@@ -11,9 +11,15 @@ servers:
 
 # Note: Server is NOT exposed externally - only accessible via Docker network
 # Frontend connects to server internally, server connects to PostgreSQL internally
-# proxy:
-#   ssl: true
-#   host: app.example.com
+# No proxy configuration - server is internal only
+# Kamal will check health via Docker healthcheck instead of proxy
+healthcheck:
+  path: /up
+  port: 3001
+  interval: 5
+  timeout: 3
+  retries: 3
+  max_attempts: 5
 
 # Credentials for your image host.
 registry:
