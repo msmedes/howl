@@ -22,4 +22,4 @@ USER bun
 EXPOSE 3001/tcp
 WORKDIR /app
 # CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]
-ENTRYPOINT ["bun", "run", "apps/server/dist/index.js"]
+ENTRYPOINT ["bun", "run", "migrate", "&&", "bun", "run", "apps/server/dist/index.js"]
