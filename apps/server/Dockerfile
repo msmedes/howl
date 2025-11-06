@@ -20,4 +20,7 @@ RUN cd apps/server && bun run build
 
 USER bun
 EXPOSE 3001/tcp
-ENTRYPOINT [ "bun", "run", "apps/server/dist/index.js" ]
+WORKDIR /app
+# Run migrations then start the server
+# Migrations run from server package where DATABASE_URL is available
+CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]

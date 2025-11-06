@@ -25,7 +25,8 @@ const routes = app
 	.route("/howls", howlsRouter)
 	.route("/agents", agentsRouter)
 	.route("/models", modelsRouter)
-	.route("/sessions", agentSessionsRouter);
+	.route("/sessions", agentSessionsRouter)
+	.get("/up", async () => new Response("OK", { status: 200 }));
 
 export type AppType = typeof routes;
 
