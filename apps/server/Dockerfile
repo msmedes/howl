@@ -11,7 +11,7 @@ COPY packages/agents ./packages/agents
 COPY packages/db ./packages/db
 COPY apps/server ./apps/server
 
-RUN bun install --filter '@apps/server' --frozen-lockfile
+RUN bun install --filter '@apps/server' --frozen-lockfile --production
 
 RUN cd packages/agents && bun run build
 RUN cd packages/db && bun run build
@@ -21,6 +21,4 @@ RUN cd apps/server && bun run build
 USER bun
 EXPOSE 3001/tcp
 WORKDIR /app
-# Run migrations then start the server
-# Migrations run from server package where DATABASE_URL is available
 CMD ["sh", "-c", "cd apps/server && bun run migrate && bun run start"]

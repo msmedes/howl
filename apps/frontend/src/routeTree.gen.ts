@@ -9,8 +9,10 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as UpRouteImport } from './routes/up'
 import { Route as RedirectRouteImport } from './routes/redirect'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as UpIndexRouteImport } from './routes/up/index'
 import { Route as StreamIndexRouteImport } from './routes/stream/index'
 import { Route as SessionsIndexRouteImport } from './routes/sessions/index'
 import { Route as HowlsIndexRouteImport } from './routes/howls/index'
@@ -21,6 +23,11 @@ import { Route as HowlsHowlIdRouteImport } from './routes/howls/$howlId'
 import { Route as AgentsCreateRouteImport } from './routes/agents/create'
 import { Route as AgentsAgentUsernameRouteImport } from './routes/agents/$agentUsername'
 
+const UpRoute = UpRouteImport.update({
+  id: '/up',
+  path: '/up',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RedirectRoute = RedirectRouteImport.update({
   id: '/redirect',
   path: '/redirect',
@@ -30,6 +37,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const UpIndexRoute = UpIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => UpRoute,
 } as any)
 const StreamIndexRoute = StreamIndexRouteImport.update({
   id: '/stream/',
@@ -80,6 +92,7 @@ const AgentsAgentUsernameRoute = AgentsAgentUsernameRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/redirect': typeof RedirectRoute
+  '/up': typeof UpRouteWithChildren
   '/agents/$agentUsername': typeof AgentsAgentUsernameRoute
   '/agents/create': typeof AgentsCreateRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
@@ -89,6 +102,7 @@ export interface FileRoutesByFullPath {
   '/howls': typeof HowlsIndexRoute
   '/sessions': typeof SessionsIndexRoute
   '/stream': typeof StreamIndexRoute
+  '/up/': typeof UpIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -102,11 +116,13 @@ export interface FileRoutesByTo {
   '/howls': typeof HowlsIndexRoute
   '/sessions': typeof SessionsIndexRoute
   '/stream': typeof StreamIndexRoute
+  '/up': typeof UpIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/redirect': typeof RedirectRoute
+  '/up': typeof UpRouteWithChildren
   '/agents/$agentUsername': typeof AgentsAgentUsernameRoute
   '/agents/create': typeof AgentsCreateRoute
   '/howls/$howlId': typeof HowlsHowlIdRoute
@@ -116,12 +132,14 @@ export interface FileRoutesById {
   '/howls/': typeof HowlsIndexRoute
   '/sessions/': typeof SessionsIndexRoute
   '/stream/': typeof StreamIndexRoute
+  '/up/': typeof UpIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/redirect'
+    | '/up'
     | '/agents/$agentUsername'
     | '/agents/create'
     | '/howls/$howlId'
@@ -131,6 +149,7 @@ export interface FileRouteTypes {
     | '/howls'
     | '/sessions'
     | '/stream'
+    | '/up/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -144,10 +163,12 @@ export interface FileRouteTypes {
     | '/howls'
     | '/sessions'
     | '/stream'
+    | '/up'
   id:
     | '__root__'
     | '/'
     | '/redirect'
+    | '/up'
     | '/agents/$agentUsername'
     | '/agents/create'
     | '/howls/$howlId'
@@ -157,11 +178,13 @@ export interface FileRouteTypes {
     | '/howls/'
     | '/sessions/'
     | '/stream/'
+    | '/up/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   RedirectRoute: typeof RedirectRoute
+  UpRoute: typeof UpRouteWithChildren
   AgentsAgentUsernameRoute: typeof AgentsAgentUsernameRoute
   AgentsCreateRoute: typeof AgentsCreateRoute
   HowlsHowlIdRoute: typeof HowlsHowlIdRoute
@@ -175,6 +198,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/up': {
+      id: '/up'
+      path: '/up'
+      fullPath: '/up'
+      preLoaderRoute: typeof UpRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/redirect': {
       id: '/redirect'
       path: '/redirect'
@@ -188,6 +218,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/up/': {
+      id: '/up/'
+      path: '/'
+      fullPath: '/up/'
+      preLoaderRoute: typeof UpIndexRouteImport
+      parentRoute: typeof UpRoute
     }
     '/stream/': {
       id: '/stream/'
@@ -255,9 +292,20 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface UpRouteChildren {
+  UpIndexRoute: typeof UpIndexRoute
+}
+
+const UpRouteChildren: UpRouteChildren = {
+  UpIndexRoute: UpIndexRoute,
+}
+
+const UpRouteWithChildren = UpRoute._addFileChildren(UpRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   RedirectRoute: RedirectRoute,
+  UpRoute: UpRouteWithChildren,
   AgentsAgentUsernameRoute: AgentsAgentUsernameRoute,
   AgentsCreateRoute: AgentsCreateRoute,
   HowlsHowlIdRoute: HowlsHowlIdRoute,
