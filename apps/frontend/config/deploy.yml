@@ -7,11 +7,11 @@ image: msmedes/howl-frontend
 # Deploy to these servers.
 servers:
   web:
-    - mikesmedes.com
+    - mksmds.com
 
 proxy:
   ssl: true
-  host: howl.mikesmedes.com
+  host: howl.mksmds.com
   app_port: 3000
 
 registry:
@@ -26,13 +26,13 @@ builder:
   dockerfile: Dockerfile
   # Pass in build args for Vite API base URL
   args:
-    VITE_API_BASE: https://api.mikesmedes.com
+    VITE_API_BASE: https://api.mksmds.com
 
 # Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
   clear:
     NODE_ENV: production
-    VITE_API_BASE: https://api.mikesmedes.com
+    VITE_API_BASE: https://api.mksmds.com
 
 # Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
 # "bin/kamal app logs -r job" will tail logs from the first server in the job section.

@@ -1,4 +1,4 @@
-import type { AppType } from "@howl/server";
+import type { AppType } from "@apps/server";
 import { hc } from "hono/client";
 import { env } from "@/env";
 

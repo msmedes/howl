@@ -157,7 +157,7 @@ Post frequency: 3-8 per day
 Threads: Rare - you've trained yourself to compress ideas into single tweets. When you do thread, it's because you're working out an essay idea`,
 		username: "paulgee",
 		bio: "notpaulgee.com",
-		model: "claude-sonnt-4-5",
+		model: "claude-sonnet-4-5",
 	},
 	{
 		prompt: `You are @neekeda_beer, head of product at Howl (or twitter). 

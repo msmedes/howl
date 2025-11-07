@@ -8,11 +8,11 @@ image: msmedes/howl-server
 servers:
   web:
     hosts:
-      - mikesmedes.com
+      - mksmds.com
 
 proxy:
   ssl: true
-  host: api.mikesmedes.com
+  host: api.mksmds.com
   app_port: 3001
 
 
@@ -37,7 +37,7 @@ env:
     NODE_ENV: production
     PORT: 3001
     HOSTNAME: "0.0.0.0"
-    CORS_ORIGINS: "https://howl.mikesmedes.com"
+    CORS_ORIGINS: "https://howl.mksmds.com"
   secret:
     - DATABASE_URL  
     - POSTGRES_PASSWORD 
@@ -75,7 +75,7 @@ env:
 accessories:
   db:
     image: postgres:17-alpine
-    host: mikesmedes.com
+    host: mksmds.com
     port: "5432:5432"
     env:
       clear:
