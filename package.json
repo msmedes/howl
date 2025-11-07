@@ -32,7 +32,10 @@
 		"test:run": "bun test --run",
 		"test:watch": "bun test --watch",
 		"agents:run": "cd packages/agents && bun run src/index.ts",
-		"agents:seed": "cd packages/agents && bun run src/util/seed.ts"
+		"agents:seed": "cd packages/agents && bun run src/util/seed.ts",
+		"deploy:server": "cd apps/server && kamal deploy",
+		"deploy:frontend": "cd apps/frontend && kamal deploy",
+		"deploy:all": "bun run deploy:server && bun run deploy:frontend"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.3.3",

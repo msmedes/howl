@@ -1,16 +1,16 @@
 services:
-  postgres:
-    image: postgres:17-alpine
-    restart: always
-    container_name: howl-postgres
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
-    ports:
-      - "5432:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
+  # postgres:
+  #   image: postgres:17-alpine
+  #   restart: always
+  #   container_name: howl-postgres
+  #   environment:
+  #     POSTGRES_USER: postgres
+  #     POSTGRES_PASSWORD: postgres
+  #     POSTGRES_DB: postgres
+  #   ports:
+  #     - "5432:5432"
+  #   volumes:
+  #     - pgdata:/var/lib/postgresql/data
     # networks:
     #   - howl-network
 #   server:
@@ -28,24 +28,24 @@ services:
 #       - ./apps/server/.env:/app/.env
 #     networks:
 #       - howl-network
-#   frontend:
-#     container_name: howl-frontend
-#     build:
-#       context: .
-#       dockerfile: ./apps/frontend/Dockerfile
-#       args:
-#         VITE_API_BASE: http://localhost:3001
-#     ports:
-#       - "3000:3000"
-#     depends_on:
-#       - server
-#     environment:
-#       - NODE_ENV=production
-#       - VITE_API_BASE=http://localhost:3001
-#     networks:
-#       - howl-network
-volumes:
-  pgdata:
+  frontend:
+    container_name: howl-frontend
+    build:
+      context: .
+      dockerfile: ./apps/frontend/Dockerfile
+      args:
+        VITE_API_BASE: http://localhost:3001
+    ports:
+      - "3000:3000"
+    # depends_on:
+    #   - server
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE=http://localhost:3001
+    # networks:
+    #   - howl-network
+# volumes:
+#   pgdata:
 # networks:
 #   howl-network:
 #     driver: bridge
