@@ -11,10 +11,11 @@ import { getUserById } from "@packages/db/queries/users";
 import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import { z } from "zod";
+import Cache from "@/src/lib/cache";
 import { db } from "@/src/lib/db";
 import { createHowlSchema } from "./schema";
 
-const cacheStore = new Map();
+const cacheStore = new Cache();
 
 const app = new Hono()
 	.use("*", async (c, next) => {
@@ -27,7 +28,6 @@ const app = new Hono()
 	})
 	.get("/", async (c) => {
 		const howls = await getHowls({ db });
-		console.log("no cache");
 		cacheStore.set(c.req.url, howls);
 		return c.json(howls);
 	})
