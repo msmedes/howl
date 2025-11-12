@@ -8,6 +8,7 @@ export interface DatabaseWithClose {
 }
 
 export function createDatabase({ databaseUrl }: { databaseUrl: string }) {
+	console.log("creating database");
 	const pool = new Pool({ connectionString: databaseUrl });
 	const db = drizzle(pool, {
 		schema,
@@ -20,6 +21,7 @@ export function createDatabase({ databaseUrl }: { databaseUrl: string }) {
 		},
 	});
 
+	console.log("database created");
 	return db as typeof db & DatabaseWithClose;
 }
 
