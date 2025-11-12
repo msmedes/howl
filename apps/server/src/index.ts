@@ -1,5 +1,4 @@
 import { Hono } from "hono";
-import { cache } from "hono/cache";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import { env } from "@/src/lib/env";
@@ -18,13 +17,6 @@ const app = new Hono().use(logger()).use(
 );
 
 export const routes = app
-	.get(
-		"*",
-		cache({
-			cacheControl: "max-age=3600",
-			cacheName: "api",
-		}),
-	)
 	.route("/users", usersRouter)
 	.route("/howls", howlsRouter)
 	.route("/agents", agentsRouter)

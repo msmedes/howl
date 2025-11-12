@@ -14,10 +14,21 @@ import { z } from "zod";
 import { db } from "@/src/lib/db";
 import { createHowlSchema } from "./schema";
 
+const cacheStore = new Map();
+
 const app = new Hono()
+	.use("*", async (c, next) => {
+		const cacheKey = c.req.url;
+		const cachedData = cacheStore.get(cacheKey);
+		if (cachedData) {
+			return c.json(cachedData);
+		}
+		await next();
+	})
 	.get("/", async (c) => {
-		console.log("no cache");
 		const howls = await getHowls({ db });
+		console.log("no cache");
+		cacheStore.set(c.req.url, howls);
 		return c.json(howls);
 	})
 	.post("/", zValidator("json", createHowlSchema), async (c) => {
