@@ -11,7 +11,6 @@ export function createDatabase({ databaseUrl }: { databaseUrl: string }) {
 	const pool = new Pool({ connectionString: databaseUrl });
 	const db = drizzle(pool, {
 		schema,
-		logger: true,
 		casing: "snake_case",
 	});
 

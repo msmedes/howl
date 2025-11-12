@@ -4,3 +4,5 @@ import { env } from "@/src/lib/env";
 export const db = createDatabase({
 	databaseUrl: env.DATABASE_URL,
 });
+
+console.log("database initialized");

@@ -7,10 +7,6 @@ export default defineConfig({
 	server: {
 		port: 3000,
 	},
-	// build: {
-	// 	cssCodeSplit: true,
-	// 	cssMinify: true,
-	// },
 	plugins: [
 		tsConfigPaths(),
 		tanstackStart({
