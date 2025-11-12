@@ -21,8 +21,6 @@ export function createRouter() {
 		queryClient,
 	});
 
-	console.log(router);
-
 	return router;
 }
 
