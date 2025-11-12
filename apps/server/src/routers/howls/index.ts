@@ -16,6 +16,7 @@ import { createHowlSchema } from "./schema";
 
 const app = new Hono()
 	.get("/", async (c) => {
+		console.log("no cache");
 		const howls = await getHowls({ db });
 		return c.json(howls);
 	})
