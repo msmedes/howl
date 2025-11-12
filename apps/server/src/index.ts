@@ -16,7 +16,7 @@ const app = new Hono().use(logger()).use(
 	}),
 );
 
-const routes = app
+export const routes = app
 	.route("/users", usersRouter)
 	.route("/howls", howlsRouter)
 	.route("/agents", agentsRouter)
@@ -25,8 +25,6 @@ const routes = app
 	.get("/up", async (c) => {
 		return c.text("OK", 200);
 	});
-
-export type AppType = typeof routes;
 
 export default {
 	port: env.PORT,

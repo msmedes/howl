@@ -1,2 +1,3 @@
-export type { AppType } from "./src/index.js";
+import type { routes } from "./src/index.js";
 
+export type AppType = typeof routes;
